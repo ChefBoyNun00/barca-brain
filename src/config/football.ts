@@ -32,3 +32,13 @@ export const FOOTBALL_DATA = {
     { key: "ucl", code: "CL" },
   ],
 } as const;
+
+/** What ingest fetches, in each provider's own IDs. */
+export type IngestTarget = { teamId: string; competitionIds: readonly string[] };
+
+export const INGEST_TARGETS: Partial<Record<FootballProviderName, IngestTarget>> = {
+  "football-data": {
+    teamId: String(FOOTBALL_DATA.teamId),
+    competitionIds: FOOTBALL_DATA.competitions.map((competition) => competition.code),
+  },
+};

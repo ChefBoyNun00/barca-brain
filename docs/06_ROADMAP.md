@@ -13,12 +13,12 @@ Each phase ends with something that runs. Tick boxes as they ship.
 
 ## Phase 1 — Data engine (weekend 1)
 - [x] Supabase migrations 0001 + 0002 applied.
-- [ ] `FootballProvider` interface + football-data.org adapter (client, zod schemas, mapper).
-- [ ] Jobs: fixtures → squad → scorers → standings.
-- [ ] Runner logs every run to `ingest_runs`, enforces request budget.
-- [ ] `npm run ingest` works locally; re-running produces no duplicates.
+- [x] `FootballProvider` interface + football-data.org adapter (client, zod schemas, mapper).
+- [x] Jobs: fixtures → squad → scorers → standings.
+- [x] Runner logs every run to `ingest_runs`, enforces request budget.
+- [x] `npm run ingest` works locally; re-running produces no duplicates.
 - [ ] GitHub Actions workflow runs ingest daily (e.g. 04:00 Israel time).
-- [ ] Mapper unit tests using recorded JSON in `tests/fixtures/`.
+- [x] Mapper unit tests using recorded JSON in `tests/fixtures/`.
 
 **Done =** Supabase shows every Barça match of the season with scores, plus scorers and standings, updated daily automatically.
 
