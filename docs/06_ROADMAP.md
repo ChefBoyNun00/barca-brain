@@ -12,7 +12,7 @@ Each phase ends with something that runs. Tick boxes as they ship.
 **Done =** empty app live at a URL, keys stored as secrets, provider decision logged.
 
 ## Phase 1 — Data engine (weekend 1)
-- [ ] Supabase migrations 0001 + 0002 applied.
+- [x] Supabase migrations 0001 + 0002 applied.
 - [ ] `FootballProvider` interface + football-data.org adapter (client, zod schemas, mapper).
 - [ ] Jobs: fixtures → squad → scorers → standings.
 - [ ] Runner logs every run to `ingest_runs`, enforces request budget.
