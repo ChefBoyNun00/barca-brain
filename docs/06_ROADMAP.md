@@ -34,8 +34,9 @@ Each phase ends with something that runs. Tick boxes as they ship.
 
 ## Phase 3 — App shell (1 weekend)
 - [ ] Home: next match countdown, last result, table position, form strip.
-- [ ] Match detail page: score, events timeline, lineups on a pitch, team stats.
-- [ ] Player page: season stats, per-match chart.
+- [ ] Match detail page: full-time and half-time score, competition, round, referee.
+- [ ] Player page: season stats (goals, assists, penalties, matches played).
+- Needs a paid provider, so not in this phase: events timeline, lineups, team stats, per-match player chart.
 - [ ] Barça visual identity (blaugrana palette, typography), mobile-first.
 
 ## Phase 4 — Opponent Scout Report (1 weekend)

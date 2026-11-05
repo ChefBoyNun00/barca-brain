@@ -42,6 +42,6 @@ The other docs are the source of truth for data, schema, AI design, roadmap and 
 - When a roadmap item ships, tell Daniel to tick it in `06_ROADMAP.md`.
 
 ## Current state
-- Phase: **Phase 0 — setup** (see `06_ROADMAP.md`). Repo scaffolded, provider chosen
-  (football-data.org); Vercel deploy still open.
+- Phase: **Phase 1 — data engine** (see `06_ROADMAP.md`). Phase 0 is done: app deployed to
+  Vercel, provider chosen (football-data.org).
 - Season in focus: 2026–27 (`season=2026` in most APIs).

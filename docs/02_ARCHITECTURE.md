@@ -50,14 +50,13 @@ barca-brain/
 │   └── server/                   # never imported by client components
 │       ├── providers/            # one folder per external API
 │       │   ├── types.ts          # FootballProvider interface (the contract)
-│       │   ├── registry.ts       # { "api-football": ApiFootballProvider, ... }
-│       │   ├── api-football/     # client.ts, schemas.ts (zod), mapper.ts
-│       │   └── football-data/    # alternative provider, same contract
+│       │   ├── registry.ts       # { "football-data": FootballDataProvider }
+│       │   └── football-data/    # client.ts, schemas.ts (zod), mapper.ts
 │       ├── db/
 │       │   ├── client.ts
 │       │   └── queries/          # matches.ts, players.ts, stats.ts — typed functions
 │       ├── ingest/
-│       │   ├── jobs/             # fixtures.ts, match-details.ts, squad.ts, standings.ts
+│       │   ├── jobs/             # fixtures.ts, squad.ts, scorers.ts, standings.ts
 │       │   └── runner.ts         # runs jobs, logs to ingest_runs
 │       └── ai/
 │           ├── client.ts
@@ -83,9 +82,9 @@ barca-brain/
   interface FootballProvider {
     name: string;
     getTeamFixtures(p: { teamId: string; season: number }): Promise<DomainFixture[]>;
-    getFixtureDetails(ids: string[]): Promise<DomainFixtureDetail[]>;
-    getSquad(teamId: string, season: number): Promise<DomainPlayer[]>;
+    getSquad(teamId: string): Promise<DomainPlayer[]>;
     getStandings(competitionId: string, season: number): Promise<DomainStanding[]>;
+    getSeasonScorers(competitionId: string, season: number): Promise<DomainScorer[]>;
   }
   ```
   Raw API shapes **never** leave the provider folder. Everything outside sees domain types.

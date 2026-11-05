@@ -72,63 +72,24 @@ create table fixtures (
   away_goals     int,
   home_goals_ht  int,
   away_goals_ht  int,
-  venue          text,
-  referee        text,
-  details_ingested_at timestamptz     -- null = events/lineups/stats not fetched yet
+  venue          text,                -- not on football-data match responses; stays null
+  referee        text
 );
 create index on fixtures (season, kickoff_at);
 
-create table fixture_events (
-  id          uuid primary key default gen_random_uuid(),
-  fixture_id  uuid references fixtures(id) on delete cascade,
-  minute      int not null,
-  extra_minute int,
-  team_id     uuid references teams(id),
-  player_id   uuid references players(id),
-  assist_player_id uuid references players(id),
-  type        text not null,          -- 'goal'|'card'|'subst'|'var'
-  detail      text                    -- 'Normal Goal'|'Penalty'|'Own Goal'|'Yellow Card'|...
-);
-create index on fixture_events (fixture_id);
-
-create table fixture_lineups (
-  fixture_id  uuid references fixtures(id) on delete cascade,
-  team_id     uuid references teams(id),
-  player_id   uuid references players(id),
-  is_starter  boolean not null,
-  position    text,
-  grid        text,                   -- e.g. '2:3' formation grid position
-  formation   text,                   -- team formation e.g. '4-3-3'
-  primary key (fixture_id, player_id)
-);
-
-create table team_match_stats (
-  fixture_id uuid references fixtures(id) on delete cascade,
-  team_id    uuid references teams(id),
-  stats      jsonb not null,          -- { shots_total, shots_on, possession, xg, passes, ... }
-  primary key (fixture_id, team_id)
-);
-
--- Typed columns for what Ask Barça queries most; jsonb for the long tail.
-create table player_match_stats (
-  fixture_id  uuid references fixtures(id) on delete cascade,
-  player_id   uuid references players(id),
-  team_id     uuid references teams(id),
-  minutes     int,
-  rating      numeric(3,1),
-  goals       int default 0,
-  assists     int default 0,
-  shots       int,
-  shots_on    int,
-  key_passes  int,
-  passes      int,
-  pass_accuracy int,
-  dribbles_success int,
-  tackles     int,
-  yellow      int default 0,
-  red         int default 0,
-  extra       jsonb,
-  primary key (fixture_id, player_id)
+-- Season totals straight from the provider's scorers endpoint.
+-- Null assists/penalties are kept as null: the provider does not say they mean zero.
+create table player_season_stats (
+  player_id      uuid references players(id),
+  team_id        uuid references teams(id),
+  competition_id uuid references competitions(id),
+  season         int not null,
+  matches_played int,
+  goals          int not null,
+  assists        int,
+  penalties      int,
+  updated_at     timestamptz not null default now(),
+  primary key (player_id, team_id, competition_id, season)
 );
 
 create table standings (
@@ -171,8 +132,14 @@ Ingest uses the service role. If an AI bug ever slips through, it cannot write o
 
 ## Useful views (migration 0003, built when Ask Barça needs them)
 - `v_barca_matches` — fixtures where Barça played, with `barca_goals`, `opp_goals`, `result`
-  ('W'/'D'/'L'), `venue_side` ('home'/'away'), opponent name.
-- `v_player_season_totals` — sums per player per competition per season.
+  ('W'/'D'/'L'), `venue_side` ('home'/'away'), opponent name, `half_time_state`
+  ('leading'/'level'/'trailing').
+
+## Deferred tables
+`fixture_events`, `fixture_lineups`, `team_match_stats` and `player_match_stats` are not in
+migration 0001: the free tier cannot fill them, and empty tables would make Ask Barça report
+zero instead of "no data". Add them in a new migration if a paid provider is adopted. Their
+original SQL is in git history (commit `c01c8f8`).
 
 ## Upsert rule
 All ingest writes are **idempotent upserts** keyed on `external_ids`. Running ingest twice

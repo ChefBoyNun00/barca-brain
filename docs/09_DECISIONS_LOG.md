@@ -39,3 +39,11 @@ Rejected: API-Football on season 2024 for free (data two seasons old); API-Footb
 $19/month (cost while still learning).
 Revisit: if per-match player questions become the priority → add API-Football Pro or football-data's
 paid add-on as a new provider adapter.
+
+**2026-11-05 · Data model: season totals table, per-match tables deferred**
+Why: football-data.org's free tier gives season scorer totals but no per-match player data.
+`player_season_stats` stores those totals; `fixture_events`, `fixture_lineups`,
+`team_match_stats` and `player_match_stats` leave migration 0001 so that "no data" cannot look
+like zero. `FootballProvider` drops `getFixtureDetails` and gains `getSeasonScorers`.
+Rejected: keeping the empty tables for later (misleading to Ask Barça, and a new migration is cheap).
+Revisit: if a paid provider is added.

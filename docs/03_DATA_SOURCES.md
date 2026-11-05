@@ -10,7 +10,12 @@ Verified with a live token on 2026-11-05 (see `09_DECISIONS_LOG.md`).
 - Available on free: team matches (full-time and half-time scores, matchday, referee), standings,
   season scorers (goals, assists, penalties, matches played).
 - **Not on free:** scorers per match, lineups, cards, subs, match stats (paid add-on).
-- Season scorers only list players with a goal or assist, and carry no minutes.
+- Season scorers only list players with at least 1 goal, and carry no minutes. Players with
+  assists but no goals are absent. Assists and penalties can be null.
+- Scorers are cut off at `limit`: always pass a high one. `limit=100` dropped 6 of 13 Barça
+  La Liga scorers; `limit=1000` returned all 160 rows.
+- Squad comes from `GET /v4/teams/81`: id, name, position (blank for some), birth date,
+  nationality. No shirt numbers; those appear on scorer rows.
 - Copa del Rey **not** included.
 - Errors use real HTTP codes: 400 invalid token (seen live); 403 restricted and 429 rate limited
   expected, not yet seen.

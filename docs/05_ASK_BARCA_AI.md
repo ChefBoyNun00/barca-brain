@@ -22,6 +22,7 @@ User question
 
 ## v1 tools (one file each in `src/server/ai/tools/`)
 Scoped to what football-data.org's free tier provides (see `03_DATA_SOURCES.md`).
+Assist numbers cover goalscorers only, so any assists answer must say so.
 Every tool has: a name, a description written for Claude, a zod input schema (converted to
 JSON Schema for the API), and a handler that calls query functions only.
 
