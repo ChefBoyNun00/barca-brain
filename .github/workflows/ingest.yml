@@ -1,0 +1,35 @@
+name: Daily ingest
+
+on:
+  schedule:
+    # GitHub schedules run in UTC: 02:07 is 04:07 in Israel in winter, 05:07 in summer.
+    # Off the hour because GitHub delays jobs most at the top of each hour.
+    - cron: "7 2 * * *"
+  workflow_dispatch: # adds a "Run workflow" button for manual runs
+
+# Never let two runs overlap: they could both try to create the same rows.
+concurrency:
+  group: ingest
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      # Scripts are skipped so the Supabase CLI binary is not downloaded: ingest does not need it.
+      - run: npm ci --ignore-scripts
+      - run: npm run ingest
+        env:
+          FOOTBALL_PROVIDER: ${{ secrets.FOOTBALL_PROVIDER }}
+          FOOTBALL_DATA_KEY: ${{ secrets.FOOTBALL_DATA_KEY }}
+          DATABASE_URL_INGEST: ${{ secrets.DATABASE_URL_INGEST }}
+          DAILY_REQUEST_BUDGET: ${{ secrets.DAILY_REQUEST_BUDGET }}
