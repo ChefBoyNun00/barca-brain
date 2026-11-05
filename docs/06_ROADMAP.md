@@ -3,11 +3,11 @@
 Each phase ends with something that runs. Tick boxes as they ship.
 
 ## Phase 0 — Setup (1 evening)
-- [ ] Accounts: GitHub, Vercel, Supabase, API-Football (free key), Anthropic Console (API key + small credit).
+- [x] Accounts: GitHub, Vercel, Supabase, football-data.org (free token), Anthropic Console (API key + small credit).
 - [x] **Verify free-plan season access:** `GET /fixtures?team=529&season=2026` (see `03_DATA_SOURCES.md` Risk #1). Decide provider; log decision.
 - [x] Create repo `barca-brain`, Next.js + TS strict + Tailwind + ESLint.
 - [x] `src/config/env.ts` with zod validation; `.env.local` with keys; `.env.example` committed (no values).
-- [ ] Deploy the empty app to Vercel (prove the pipeline end to end on day 1).
+- [x] Deploy the empty app to Vercel (prove the pipeline end to end on day 1).
 
 **Done =** empty app live at a URL, keys stored as secrets, provider decision logged.
 
