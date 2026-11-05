@@ -47,3 +47,11 @@ Why: football-data.org's free tier gives season scorer totals but no per-match p
 like zero. `FootballProvider` drops `getFixtureDetails` and gains `getSeasonScorers`.
 Rejected: keeping the empty tables for later (misleading to Ask Barça, and a new migration is cheap).
 Revisit: if a paid provider is added.
+
+**2026-11-05 · Database access: Supabase web API closed, row level security on**
+Why: Supabase exposes the `public` schema through a web API and gives `anon` and `authenticated`
+full access to new tables by default. The app connects to Postgres directly and never uses that
+API. Migration 0001 revokes that access and enables row level security; migration 0002 adds
+`barca_readonly` with select-only grants and policies, excluding `raw_payloads`.
+Rejected: leaving tables open because the API key is unused (one leaked key would allow writes).
+Revisit: if the browser ever needs Supabase directly, e.g. Realtime for Live Second Screen.

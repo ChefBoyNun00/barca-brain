@@ -3,8 +3,8 @@
 Principles:
 - Our own IDs (`uuid`) + a mapping table to provider IDs. Switching providers doesn't change keys.
 - Raw JSON kept separately; normalised tables are rebuildable.
-- Migrations are numbered SQL files in `supabase/migrations/`. Never edit an applied migration —
-  add a new one.
+- Migrations are timestamped SQL files in `supabase/migrations/`; "0001" and "0002" below name
+  them by order. Never edit an applied migration — add a new one.
 - `schema_meta.version` tracks the data shape version.
 
 ## Migration 0001 — core
@@ -127,8 +127,18 @@ create table ingest_runs (
 ```
 
 ## Read-only role for the app/AI (migration 0002)
-The web app and AI tools connect with a role that can only `select`.
-Ingest uses the service role. If an AI bug ever slips through, it cannot write or delete.
+The web app and AI tools connect as `barca_readonly`, a role that can only `select`.
+Ingest connects as the table owner. If an AI bug ever slips through, it cannot write or delete.
+`raw_payloads` is not readable by this role. Its password is set once outside the migrations,
+because migrations are committed to git.
+
+## Supabase web API is closed
+Supabase exposes the `public` schema through a web API, and `anon` and `authenticated` get full
+access to new tables by default. This app never uses that API, so migration 0001 revokes that
+access and turns on row level security for every table.
+
+A new table therefore needs row level security enabled, plus a `grant select` and a policy for
+`barca_readonly` if the app should read it.
 
 ## Useful views (migration 0003, built when Ask Barça needs them)
 - `v_barca_matches` — fixtures where Barça played, with `barca_goals`, `opp_goals`, `result`
