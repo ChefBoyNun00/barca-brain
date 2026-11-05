@@ -1,0 +1,267 @@
+{
+  "area": {
+    "id": 2224,
+    "name": "Spain",
+    "code": "ESP",
+    "flag": "https://crests.football-data.org/760.svg"
+  },
+  "id": 81,
+  "name": "FC Barcelona",
+  "shortName": "Barça",
+  "tla": "FCB",
+  "crest": "https://crests.football-data.org/81.png",
+  "address": "Avenida Arístides Maillol s/n Barcelona 08028",
+  "website": "http://www.fcbarcelona.com",
+  "founded": 1899,
+  "clubColors": "Red / Navy Blue / Orange",
+  "venue": "Camp Nou",
+  "runningCompetitions": [
+    {
+      "id": 2014,
+      "name": "Primera Division",
+      "code": "PD",
+      "type": "LEAGUE",
+      "emblem": "https://crests.football-data.org/laliga.png"
+    },
+    {
+      "id": 2001,
+      "name": "UEFA Champions League",
+      "code": "CL",
+      "type": "CUP",
+      "emblem": "https://crests.football-data.org/CL.png"
+    }
+  ],
+  "coach": {
+    "id": 133997,
+    "firstName": "Hansi",
+    "lastName": "Flick",
+    "name": "Hansi Flick",
+    "dateOfBirth": "1965-02-24",
+    "nationality": "Germany",
+    "contract": {
+      "start": null,
+      "until": null
+    }
+  },
+  "squad": [
+    {
+      "id": 2022,
+      "name": "Wojciech Szczęsny",
+      "position": "Goalkeeper",
+      "dateOfBirth": "1990-04-18",
+      "nationality": "Poland"
+    },
+    {
+      "id": 3548,
+      "name": "Dominik Livaković",
+      "position": "Goalkeeper",
+      "dateOfBirth": "1995-01-09",
+      "nationality": "Croatia"
+    },
+    {
+      "id": 152506,
+      "name": "Joan García",
+      "position": "Goalkeeper",
+      "dateOfBirth": "2001-05-04",
+      "nationality": "Spain"
+    },
+    {
+      "id": 2000,
+      "name": "João Cancelo",
+      "position": "Defence",
+      "dateOfBirth": "1994-05-27",
+      "nationality": "Portugal"
+    },
+    {
+      "id": 3455,
+      "name": "Andreas Christensen",
+      "position": "Defence",
+      "dateOfBirth": "1996-04-10",
+      "nationality": "Denmark"
+    },
+    {
+      "id": 8499,
+      "name": "Jules Koundé",
+      "position": "Defence",
+      "dateOfBirth": "1998-11-12",
+      "nationality": "France"
+    },
+    {
+      "id": 101345,
+      "name": "Eric García",
+      "position": "Defence",
+      "dateOfBirth": "2001-01-09",
+      "nationality": "Spain"
+    },
+    {
+      "id": 172761,
+      "name": "Álex Balde",
+      "position": "Defence",
+      "dateOfBirth": "2003-10-18",
+      "nationality": "Spain"
+    },
+    {
+      "id": 217540,
+      "name": "Pau Cubarsí",
+      "position": "Defence",
+      "dateOfBirth": "2007-01-22",
+      "nationality": "Spain"
+    },
+    {
+      "id": 264320,
+      "name": "Gerard Martín",
+      "position": "Defence",
+      "dateOfBirth": "2002-02-26",
+      "nationality": "Spain"
+    },
+    {
+      "id": 287848,
+      "name": "Xavi Espart",
+      "position": "Defence",
+      "dateOfBirth": "2007-05-21",
+      "nationality": "Spain"
+    },
+    {
+      "id": 3199,
+      "name": "Rodri",
+      "position": "Midfield",
+      "dateOfBirth": "1996-06-22",
+      "nationality": "Spain"
+    },
+    {
+      "id": 7559,
+      "name": "Frenkie de Jong",
+      "position": "Midfield",
+      "dateOfBirth": "1997-05-12",
+      "nationality": "Netherlands"
+    },
+    {
+      "id": 23132,
+      "name": "Dani Olmo",
+      "position": "Midfield",
+      "dateOfBirth": "1998-05-07",
+      "nationality": "Spain"
+    },
+    {
+      "id": 133860,
+      "name": "Pedri",
+      "position": "Midfield",
+      "dateOfBirth": "2002-11-25",
+      "nationality": "Spain"
+    },
+    {
+      "id": 171992,
+      "name": "Pablo Gavira",
+      "position": "Midfield",
+      "dateOfBirth": "2004-08-05",
+      "nationality": "Spain"
+    },
+    {
+      "id": 214533,
+      "name": "Fermín López",
+      "position": "Midfield",
+      "dateOfBirth": "2003-05-11",
+      "nationality": "Spain"
+    },
+    {
+      "id": 264321,
+      "name": "Marc Bernal",
+      "position": "Midfield",
+      "dateOfBirth": "2007-05-26",
+      "nationality": "Spain"
+    },
+    {
+      "id": 298638,
+      "name": "Brian Fariñas",
+      "position": "Midfield",
+      "dateOfBirth": "2006-02-09",
+      "nationality": "Spain"
+    },
+    {
+      "id": 3236,
+      "name": "Gabriel Jesus",
+      "position": "Offence",
+      "dateOfBirth": "1997-04-03",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 7848,
+      "name": "Anthony Gordon",
+      "position": "Offence",
+      "dateOfBirth": "2001-02-24",
+      "nationality": "England"
+    },
+    {
+      "id": 37428,
+      "name": "Raphinha",
+      "position": "Offence",
+      "dateOfBirth": "1996-12-14",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 82515,
+      "name": "Karim Adeyemi",
+      "position": "Offence",
+      "dateOfBirth": "2002-01-18",
+      "nationality": "Germany"
+    },
+    {
+      "id": 184723,
+      "name": "Roony Bardghji",
+      "position": "Offence",
+      "dateOfBirth": "2005-11-15",
+      "nationality": "Sweden"
+    },
+    {
+      "id": 202283,
+      "name": "Lamine Yamal",
+      "position": "Offence",
+      "dateOfBirth": "2007-07-13",
+      "nationality": "Spain"
+    },
+    {
+      "id": 274542,
+      "name": "Hamza Abdelkarim",
+      "position": "Offence",
+      "dateOfBirth": "2008-01-01",
+      "nationality": "Egypt"
+    },
+    {
+      "id": 298634,
+      "name": "Jesse Bisiwu",
+      "position": "Offence",
+      "dateOfBirth": "2008-01-22",
+      "nationality": "Belgium"
+    },
+    {
+      "id": 302801,
+      "name": "Ebrima Tunkara",
+      "position": null,
+      "dateOfBirth": "2010-03-10",
+      "nationality": "Spain"
+    },
+    {
+      "id": 302641,
+      "name": "Orian Goren",
+      "position": null,
+      "dateOfBirth": "2009-03-15",
+      "nationality": "Israel"
+    },
+    {
+      "id": 302538,
+      "name": "Álex Campos",
+      "position": null,
+      "dateOfBirth": "2008-02-02",
+      "nationality": "Spain"
+    },
+    {
+      "id": 301129,
+      "name": "Iker Rodríguez",
+      "position": null,
+      "dateOfBirth": "2008-02-22",
+      "nationality": "Spain"
+    }
+  ],
+  "staff": [],
+  "lastUpdated": "2024-07-29T17:09:22Z"
+}

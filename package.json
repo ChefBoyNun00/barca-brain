@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "verify:football-data": "node --env-file-if-exists=.env.local --import tsx scripts/verify-football-data.ts"
+    "verify:football-data": "node --env-file-if-exists=.env.local --import tsx scripts/verify-football-data.ts",
+    "verify:provider": "node --env-file-if-exists=.env.local --import tsx scripts/verify-provider.ts"
   },
   "dependencies": {
     "next": "16.4.5",

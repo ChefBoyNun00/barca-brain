@@ -16,6 +16,10 @@ Verified with a live token on 2026-11-05 (see `09_DECISIONS_LOG.md`).
   La Liga scorers; `limit=1000` returned all 160 rows.
 - Squad comes from `GET /v4/teams/81`: id, name, position (blank for some), birth date,
   nationality. No shirt numbers; those appear on scorer rows.
+- Positions are broad on the squad (`Goalkeeper`, `Defence`, `Midfield`, `Offence`, or null).
+  On scorer rows `position` was always null and the value is in `section`, which can also be
+  specific (`Right Winger`).
+- Standings return three tables per competition (`TOTAL`, `HOME`, `AWAY`); only `TOTAL` is used.
 - Copa del Rey **not** included.
 - Errors use real HTTP codes: 400 invalid token (seen live); 403 restricted and 429 rate limited
   expected, not yet seen.

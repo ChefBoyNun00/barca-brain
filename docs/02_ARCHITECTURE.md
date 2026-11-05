@@ -51,7 +51,7 @@ barca-brain/
 │       ├── providers/            # one folder per external API
 │       │   ├── types.ts          # FootballProvider interface (the contract)
 │       │   ├── registry.ts       # { "football-data": FootballDataProvider }
-│       │   └── football-data/    # client.ts, schemas.ts (zod), mapper.ts
+│       │   └── football-data/    # client.ts, request.ts, schemas.ts (zod), mapper.ts, provider.ts
 │       ├── db/
 │       │   ├── client.ts
 │       │   └── queries/          # matches.ts, players.ts, stats.ts — typed functions
