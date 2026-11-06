@@ -55,3 +55,13 @@ API. Migration 0001 revokes that access and enables row level security; migratio
 `barca_readonly` with select-only grants and policies, excluding `raw_payloads`.
 Rejected: leaving tables open because the API key is unused (one leaked key would allow writes).
 Revisit: if the browser ever needs Supabase directly, e.g. Realtime for Live Second Screen.
+
+**2026-11-05 · Home page: the season as a woven shirt, not a dashboard**
+Why: nearly all football apps stack scores and tables. Barça's identity is vertical stripes, so
+each match is one stripe, and one stripe is the unit everywhere: a match, a point, a goal. Results
+use shape (a defeat tears the stripe), so they read without colour vision. Half-time scores give
+the page its own story, written from data by `season-story.ts`.
+Colours: blaugrana for the shirt and data, with the vivid design system's purple for controls and
+its light surfaces, motion and spacing. This departs from purple-first on purpose.
+Rejected: the first version's card dashboard (looked like every other sports app).
+Revisit: if the fixture list grows far past 46 stripes, or phone stripes get too thin to read.
