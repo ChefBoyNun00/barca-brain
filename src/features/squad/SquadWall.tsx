@@ -41,7 +41,10 @@ function PlayerTile({ player, onOpen }: { player: SquadPlayer; onOpen: () => voi
   );
 }
 
-type SquadWallProps = { squad: SquadPlayer[]; onOpen: (playerId: string) => void };
+type SquadWallProps = {
+  squad: SquadPlayer[];
+  onOpen: (playerId: string) => void;
+};
 
 export function SquadWall({ squad, onOpen }: SquadWallProps) {
   const [position, setPosition] = useState<PositionFilter>("all");
@@ -53,9 +56,9 @@ export function SquadWall({ squad, onOpen }: SquadWallProps) {
 
   return (
     <section id="squad" aria-labelledby="squad-title" className="page-gutter section reveal">
-      <h2 id="squad-title" className="section-title">
+      <h1 id="squad-title" className="section-title">
         The squad
-      </h2>
+      </h1>
       <p className="section-note">Tap a player to open their card.</p>
       <div className="squad-controls">
         <ChoiceChips

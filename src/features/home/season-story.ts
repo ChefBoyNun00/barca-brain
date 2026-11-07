@@ -9,6 +9,9 @@ type ScoredMatch = SeasonMatch & {
   goalsAgainst: number;
 };
 
+/** The id of the shirt section, so other pages can link straight to it. */
+export const SEASON_SECTION_ID = "season";
+
 export type SeasonSummary = {
   played: number;
   wins: number;
@@ -22,8 +25,6 @@ export type SeasonSummary = {
   behindAtHalfTime: number;
   winsFromBehind: number;
 };
-
-export type SeasonFact = { figure: string; text: string };
 
 const isScored = (match: SeasonMatch): match is ScoredMatch =>
   match.status === "finished" && match.goalsFor !== null && match.goalsAgainst !== null;
@@ -124,37 +125,4 @@ export function buildHeadline(summary: SeasonSummary, standing: HomeStanding | n
   if (summary.played === 0) return [...lines, "The season starts here."];
   const wins = summary.wins === 1 ? "1 win" : `${summary.wins} wins`;
   return [...lines, `${wins} from ${summary.played}.`];
-}
-
-export function buildFacts(summary: SeasonSummary): SeasonFact[] {
-  const facts: SeasonFact[] = [];
-
-  if (summary.notBehindAtHalfTime > 0) {
-    const allWon = summary.winsWhenNotBehind === summary.notBehindAtHalfTime;
-    facts.push({
-      figure: `${summary.winsWhenNotBehind}/${summary.notBehindAtHalfTime}`,
-      text: allWon
-        ? "Level or ahead at half-time, and they won every single one."
-        : "Wins when level or ahead at half-time.",
-    });
-  }
-
-  if (summary.behindAtHalfTime > 0) {
-    facts.push({
-      figure: `${summary.winsFromBehind}/${summary.behindAtHalfTime}`,
-      text:
-        summary.winsFromBehind === 0
-          ? "Behind at half-time, and they haven't turned one around yet."
-          : "Wins after trailing at half-time.",
-    });
-  }
-
-  if (summary.goalsFor > 0 && summary.withHalfTimeScore === summary.played) {
-    facts.push({
-      figure: `${summary.secondHalfGoals}/${summary.goalsFor}`,
-      text: "Goals scored after the break.",
-    });
-  }
-
-  return facts;
 }

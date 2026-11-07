@@ -12,7 +12,6 @@ import {
 } from "@/features/home/simulator";
 import { buildTape, findLastMeeting } from "@/features/home/tale-of-the-tape";
 import {
-  buildScorerBoard,
   formatGoalsPerMatch,
   formatShareOfGoals,
   getAge,
@@ -65,7 +64,11 @@ const pointsOf = (ending: ReturnType<typeof projectEnding>, id: string) =>
 
 describe("the ending simulator", () => {
   it("leaves out played, cancelled and European matches", () => {
-    const played = fixture("played", "x", { status: "finished", goalsFor: 1, goalsAgainst: 0 });
+    const played = fixture("played", "x", {
+      status: "finished",
+      goalsFor: 1,
+      goalsAgainst: 0,
+    });
     const cancelled = fixture("cancelled", "x", { status: "cancelled" });
     const europe = fixture("europe", "x", { isLeague: false });
     const open = fixture("open", "x");
@@ -182,8 +185,16 @@ describe("tale of the tape", () => {
   });
 
   it("finds the latest finished meeting only", () => {
-    const first = fixture("first", "rival", { status: "finished", goalsFor: 1, goalsAgainst: 0 });
-    const second = fixture("second", "rival", { status: "finished", goalsFor: 2, goalsAgainst: 2 });
+    const first = fixture("first", "rival", {
+      status: "finished",
+      goalsFor: 1,
+      goalsAgainst: 0,
+    });
+    const second = fixture("second", "rival", {
+      status: "finished",
+      goalsFor: 2,
+      goalsAgainst: 2,
+    });
     const later = fixture("later", "rival");
     expect(findLastMeeting([first, second, later], "rival")?.id).toBe("second");
     expect(findLastMeeting([later], "rival")).toBeNull();
@@ -221,7 +232,11 @@ const europe = (goals: number, assists: number | null) => ({
 describe("squad stats", () => {
   it("adds up competitions, keeping an all-blank figure blank", () => {
     const both = player("A", { stats: [league(5, null), europe(2, 3)] });
-    expect(getPlayerTotals(both)).toEqual({ goals: 7, assists: 3, matches: 14 });
+    expect(getPlayerTotals(both)).toEqual({
+      goals: 7,
+      assists: 3,
+      matches: 14,
+    });
     expect(getPlayerTotals(player("B", { stats: [league(1, null)] })).assists).toBeNull();
   });
 
@@ -244,20 +259,6 @@ describe("squad stats", () => {
   it("makes initials from one or several names", () => {
     expect(getInitials("Pedri")).toBe("P");
     expect(getInitials("Frenkie de Jong")).toBe("FJ");
-  });
-
-  it("ranks scorers per competition", () => {
-    const squad = [
-      player("Low", { stats: [league(1, null)] }),
-      player("Euro", { stats: [europe(5, 1)] }),
-      player("Top", { stats: [league(9, 2), europe(1, null)] }),
-      player("None"),
-    ];
-    const names = (scope: "league" | "europe" | "all", limit = 5) =>
-      buildScorerBoard(squad, scope, limit).map((row) => row.player.name);
-    expect(names("league")).toEqual(["Top", "Low"]);
-    expect(names("europe")).toEqual(["Euro", "Top"]);
-    expect(names("all", 1)).toEqual(["Top"]);
   });
 
   it("sorts the squad, keeping unknown birth dates last", () => {

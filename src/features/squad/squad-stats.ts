@@ -1,10 +1,10 @@
 import type { SquadPlayer } from "@/domain/home";
 
-export type PlayerTotals = { goals: number; assists: number | null; matches: number | null };
-
-export type ScorerScope = "league" | "europe" | "all";
-
-export type BoardRow = { player: SquadPlayer; goals: number; assists: number | null };
+export type PlayerTotals = {
+  goals: number;
+  assists: number | null;
+  matches: number | null;
+};
 
 export type SquadSort = "goals" | "name" | "youngest";
 
@@ -47,33 +47,6 @@ export function getInitials(name: string): string {
   const first = words[0]?.[0] ?? "";
   const last = words.length > 1 ? (words.at(-1)?.[0] ?? "") : "";
   return `${first}${last}`.toUpperCase();
-}
-
-const inScope = (scope: ScorerScope, isLeague: boolean) =>
-  scope === "all" || (scope === "league") === isLeague;
-
-export function buildScorerBoard(
-  squad: SquadPlayer[],
-  scope: ScorerScope,
-  limit: number,
-): BoardRow[] {
-  return squad
-    .map((player) => {
-      const rows = player.stats.filter((row) => inScope(scope, row.isLeague));
-      return {
-        player,
-        goals: rows.reduce((total, row) => total + row.goals, 0),
-        assists: sumKnown(rows.map((row) => row.assists)),
-      };
-    })
-    .filter((row) => row.goals > 0)
-    .sort(
-      (a, b) =>
-        b.goals - a.goals ||
-        (b.assists ?? -1) - (a.assists ?? -1) ||
-        a.player.name.localeCompare(b.player.name),
-    )
-    .slice(0, limit);
 }
 
 const byName = (a: SquadPlayer, b: SquadPlayer) => a.name.localeCompare(b.name);

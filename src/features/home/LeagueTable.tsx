@@ -1,11 +1,9 @@
-"use client";
-
+import Link from "next/link";
 import Image from "next/image";
 import type { LeagueRow, SeasonMatch } from "@/domain/home";
 import { FormPips } from "./FormPips";
 import { formatMatchDate } from "./format";
-import { useSeasonSelection } from "./season-selection";
-import { describeMatch, getMatchOutcome } from "./season-story";
+import { describeMatch, getMatchOutcome, SEASON_SECTION_ID } from "./season-story";
 
 type Meeting = { match: SeasonMatch; index: number };
 
@@ -16,19 +14,17 @@ function goalDifference({ goalsFor, goalsAgainst }: LeagueRow): string {
 }
 
 function MeetingButton({ match, index }: Meeting) {
-  const { showOnShirt } = useSeasonSelection();
   const outcome = getMatchOutcome(match);
   return (
-    <button
-      type="button"
+    <Link
+      href={{ pathname: "/", query: { match: index }, hash: SEASON_SECTION_ID }}
       className="meeting"
       data-outcome={outcome ?? "none"}
       aria-label={`Show on the shirt: ${describeMatch(match)}`}
       title={describeMatch(match)}
-      onClick={() => showOnShirt(index)}
     >
       {outcome ? `${match.goalsFor}–${match.goalsAgainst}` : formatMatchDate(match.kickoffAt)}
-    </button>
+    </Link>
   );
 }
 
@@ -45,11 +41,11 @@ export function LeagueTable({ table, matches }: LeagueTableProps) {
 
   return (
     <section id="table" aria-labelledby="table-title" className="page-gutter section reveal">
-      <h2 id="table-title" className="section-title">
+      <h1 id="table-title" className="section-title">
         The table
-      </h2>
+      </h1>
       <p className="section-note">
-        Tap a score or date to find that match on the shirt. Scores are Barça&apos;s first.
+        Tap a score or date to see that match on the shirt. Scores are Barça&apos;s first.
       </p>
       {table.length === 0 ? (
         <p className="section-note">The table will appear after the next daily update.</p>
@@ -109,11 +105,9 @@ export function LeagueTable({ table, matches }: LeagueTableProps) {
                   </td>
                   <td>
                     <span className="meetings">
-                      {meetingsByTeam
-                        .get(row.teamId)
-                        ?.map(({ match, index }) => (
-                          <MeetingButton key={match.id} match={match} index={index} />
-                        ))}
+                      {meetingsByTeam.get(row.teamId)?.map(({ match, index }) => (
+                        <MeetingButton key={match.id} match={match} index={index} />
+                      ))}
                     </span>
                   </td>
                 </tr>

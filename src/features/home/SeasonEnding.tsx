@@ -92,9 +92,9 @@ export function SeasonEnding({ matches, table }: SeasonEndingProps) {
 
   return (
     <section id="ending" aria-labelledby="ending-title" className="page-gutter section reveal">
-      <h2 id="ending-title" className="section-title">
+      <h1 id="ending-title" className="section-title">
         Weave the ending
-      </h2>
+      </h1>
       <p className="section-note">
         {remaining.length === 0
           ? "The league season is over, so there is nothing left to decide."

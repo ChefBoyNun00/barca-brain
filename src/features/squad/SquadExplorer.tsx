@@ -4,7 +4,6 @@ import { useState } from "react";
 import type { SquadPlayer } from "@/domain/home";
 import type { Story } from "../news/stories";
 import { PlayerCard } from "./PlayerCard";
-import { ScorersBoard } from "./ScorersBoard";
 import { sortSquad } from "./squad-stats";
 import { SquadWall } from "./SquadWall";
 
@@ -15,7 +14,7 @@ type SquadExplorerProps = {
   stories: Story[];
 };
 
-/** The wall and the board share one player card, so either can open it. */
+/** The squad wall, with one player card that opens over it. */
 export function SquadExplorer({ squad, now, teamGoals, stories }: SquadExplorerProps) {
   const [openId, setOpenId] = useState<string | null>(null);
   // The card's arrows follow the wall's default order, so the next player is the expected one.
@@ -31,7 +30,7 @@ export function SquadExplorer({ squad, now, teamGoals, stories }: SquadExplorerP
   if (squad.length === 0) {
     return (
       <section id="squad" className="page-gutter section">
-        <h2 className="section-title">The squad</h2>
+        <h1 className="section-title">The squad</h1>
         <p className="section-note">The squad will appear after the next daily update.</p>
       </section>
     );
@@ -40,7 +39,6 @@ export function SquadExplorer({ squad, now, teamGoals, stories }: SquadExplorerP
   return (
     <>
       <SquadWall squad={squad} onOpen={setOpenId} />
-      <ScorersBoard squad={squad} onOpen={setOpenId} />
       {openPlayer && (
         <PlayerCard
           player={openPlayer}

@@ -166,11 +166,7 @@ body {
   }
 
   .stripe[data-outcome="D"] .stripe-cloth {
-    background: repeating-linear-gradient(
-      135deg,
-      var(--cloth) 0 4px,
-      transparent 4px 7px
-    );
+    background: repeating-linear-gradient(135deg, var(--cloth) 0 4px, transparent 4px 7px);
   }
 
   /* A defeat is a shape, not a colour, so it reads without colour vision. */
@@ -475,35 +471,6 @@ body {
     font-size: 0.875rem;
   }
 
-  .facts {
-    display: grid;
-    gap: 1.5rem;
-    margin-top: 1.5rem;
-  }
-
-  .fact {
-    padding-top: 1rem;
-    border-top: 2px solid var(--text-heading);
-  }
-
-  .fact-figure {
-    font-family: var(--font-display);
-    font-size: clamp(4.5rem, 16vw, 7rem);
-    font-weight: 900;
-    line-height: 1.2;
-    color: var(--barca-garnet);
-  }
-
-  .fact:nth-child(even) .fact-figure {
-    color: var(--barca-blue);
-  }
-
-  .fact dd {
-    margin-top: 0.25rem;
-    font-size: 1.05rem;
-    color: var(--text-heading);
-  }
-
   .tally-rows {
     display: grid;
     gap: 1rem;
@@ -613,7 +580,12 @@ body {
 
   .skeleton {
     border-radius: 12px;
-    background: linear-gradient(90deg, var(--primary-wash), var(--primary-soft), var(--primary-wash));
+    background: linear-gradient(
+      90deg,
+      var(--primary-wash),
+      var(--primary-soft),
+      var(--primary-wash)
+    );
     background-size: 200% 100%;
     animation: shimmer 1.8s linear infinite;
   }
@@ -656,11 +628,6 @@ body {
       grid-row: 1 / 4;
       align-self: center;
       margin-top: 0;
-    }
-
-    .facts {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 2rem;
     }
 
     .tally-rows li {
@@ -1275,6 +1242,9 @@ body {
   }
 
   .meeting {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     min-width: 3rem;
     min-height: 1.75rem;
     padding: 0.125rem 0.25rem;
@@ -1669,7 +1639,6 @@ body {
 }
 
 @layer components {
-
   .poster-ask {
     grid-column: 1 / -1;
     justify-self: center;
@@ -2049,5 +2018,51 @@ body {
     .stories {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
+  }
+}
+
+@layer components {
+  /* The home page's doors to the other pages */
+  .explore {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  }
+
+  .explore-tile {
+    display: block;
+    padding: 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    background: #ffffff;
+    transition:
+      transform 150ms var(--ease-smooth),
+      box-shadow 150ms var(--ease-smooth);
+  }
+
+  .explore-tile:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .explore-tile:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+  }
+
+  .explore-title {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: var(--text-heading);
+  }
+
+  .explore-note {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
   }
 }

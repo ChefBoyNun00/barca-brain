@@ -1,8 +1,7 @@
 "use client";
 
+import { SEASON_SECTION_ID } from "./season-story";
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
-
-export const SEASON_SECTION_ID = "season";
 
 type SeasonSelection = {
   selected: number;
@@ -24,9 +23,9 @@ export function SeasonSelectionProvider({ initialIndex, children }: ProviderProp
 
   const showOnShirt = useCallback((index: number) => {
     select(index);
-    document
-      .getElementById(SEASON_SECTION_ID)
-      ?.scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth" });
+    document.getElementById(SEASON_SECTION_ID)?.scrollIntoView({
+      behavior: prefersReducedMotion() ? "auto" : "smooth",
+    });
   }, []);
 
   const value = useMemo(() => ({ selected, select, showOnShirt }), [selected, showOnShirt]);

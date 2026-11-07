@@ -1,8 +1,6 @@
 // What the home page shows, independent of the database and any provider.
 // Matches are told from Barça's side: goalsFor is always Barça's goals.
 
-import type { NewsArticle, NewsBriefing } from "./news";
-
 export type HomeTeam = { id: string; name: string; logoUrl: string | null };
 
 export type MatchStatus = "scheduled" | "live" | "finished" | "postponed" | "cancelled";
@@ -80,8 +78,5 @@ export type HomeData = {
   matches: SeasonMatch[];
   standing: HomeStanding | null;
   table: LeagueRow[];
-  squad: SquadPlayer[];
-  articles: NewsArticle[];
-  briefing: NewsBriefing | null;
   lastUpdatedAt: Date | null;
 };

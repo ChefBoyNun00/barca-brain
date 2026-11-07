@@ -1,11 +1,11 @@
 import Link from "next/link";
 
 const SECTIONS = [
+  { href: "/squad", label: "Squad" },
+  { href: "/table", label: "Table" },
+  { href: "/season", label: "Ending" },
   { href: "/news", label: "News" },
   { href: "/ask", label: "Ask" },
-  { href: "/#ending", label: "Ending" },
-  { href: "/#table", label: "Table" },
-  { href: "/#squad", label: "Squad" },
 ];
 
 export function SiteNav() {

@@ -8,7 +8,6 @@ import {
   getCountdownParts,
 } from "@/features/home/format";
 import {
-  buildFacts,
   buildHeadline,
   getLastPlayedIndex,
   getMatchOutcome,
@@ -113,7 +112,13 @@ describe("home queries on ingested data", () => {
     expect(table.slice(0, 4).map((team) => team.points)).toEqual([30, 28, 27, 23]);
     expect(table.filter((team) => team.isBarca).map((team) => team.name)).toEqual(["Barça"]);
     expect(table.every((team) => team.logoUrl)).toBe(true);
-    expect(table[0]).toMatchObject({ played: 11, won: 10, drawn: 0, lost: 1, goalsFor: 46 });
+    expect(table[0]).toMatchObject({
+      played: 11,
+      won: 10,
+      drawn: 0,
+      lost: 1,
+      goalsFor: 46,
+    });
   });
 
   it("links a league opponent to its table row", async () => {
@@ -130,7 +135,9 @@ describe("home queries on ingested data", () => {
     const squad = await getSquad(created.database, scope);
     expect(squad).toHaveLength(31);
     const raphinha = squad.find((player) => player.name === "Raphinha");
-    expect(raphinha?.stats.find((row) => row.isLeague)).toMatchObject({ goals: 15 });
+    expect(raphinha?.stats.find((row) => row.isLeague)).toMatchObject({
+      goals: 15,
+    });
     expect(raphinha?.birthDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     expect(squad.filter((player) => player.stats.length === 0).length).toBeGreaterThan(0);
   });
@@ -186,29 +193,15 @@ describe("season story", () => {
   it("counts a comeback", () => {
     const summary = summariseSeason([played(2, 1, 0, 1)]);
     expect(summary).toMatchObject({ behindAtHalfTime: 1, winsFromBehind: 1 });
-    expect(buildFacts(summary).map((fact) => fact.text)).toContain(
-      "Wins after trailing at half-time.",
-    );
-  });
-
-  it("only claims 'every single one' when it is true", () => {
-    const allWon = buildFacts(summariseSeason([played(2, 0, 1, 0)]));
-    const notAll = buildFacts(summariseSeason([played(2, 0, 1, 0), played(1, 1, 1, 0)]));
-    expect(allWon[0]?.text).toMatch(/every single one/);
-    expect(notAll[0]?.text).not.toMatch(/every single one/);
-  });
-
-  it("drops the second-half fact when a half-time score is missing", () => {
-    const facts = buildFacts(summariseSeason([played(2, 0, 1, 0), played(1, 0, null, null)]));
-    expect(facts.some((fact) => fact.text.includes("after the break"))).toBe(false);
-  });
-
-  it("has nothing to say before a match is played", () => {
-    expect(buildFacts(summariseSeason([upcoming]))).toEqual([]);
   });
 
   it("writes the headline from the data", () => {
-    const standing = { competition: "Primera Division", rank: 1, points: 30, played: 11 };
+    const standing = {
+      competition: "Primera Division",
+      rank: 1,
+      points: 30,
+      played: 11,
+    };
     const summary = summariseSeason([played(2, 0), played(1, 0), played(0, 1)]);
     expect(buildHeadline(summary, standing)).toEqual(["Top of La Liga.", "2 wins from 3."]);
     expect(buildHeadline(summary, { ...standing, rank: 2 })[0]).toBe("2nd in La Liga.");

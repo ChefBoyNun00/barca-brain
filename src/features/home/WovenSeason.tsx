@@ -7,12 +7,9 @@ import { REPLAY_STEP_MS } from "@/config/display";
 import type { SeasonMatch } from "@/domain/home";
 import { displayCompetition, formatKickoff, formatMatchDate } from "./format";
 import { SEASON_FILTERS } from "./season-filters";
+import { prefersReducedMotion, useSeasonSelection } from "./season-selection";
 import {
-  prefersReducedMotion,
   SEASON_SECTION_ID,
-  useSeasonSelection,
-} from "./season-selection";
-import {
   describeMatch,
   describeOutcome,
   getMatchOutcome,
