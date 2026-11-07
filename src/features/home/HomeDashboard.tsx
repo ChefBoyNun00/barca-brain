@@ -20,6 +20,8 @@ const EXPLORE = [
   { href: "/table", title: "explore.table", note: "explore.tableNote" },
   { href: "/season", title: "explore.ending", note: "explore.endingNote" },
   { href: "/news", title: "explore.press", note: "explore.pressNote" },
+  { href: "/stats", title: "explore.stats", note: "explore.statsNote" },
+  { href: "/history", title: "explore.history", note: "explore.historyNote" },
   { href: "/shirt", title: "explore.shirt", note: "explore.shirtNote" },
   { href: "/ask", title: "explore.ask", note: "explore.askNote" },
 ] as const satisfies readonly { href: string; title: TextKey; note: TextKey }[];

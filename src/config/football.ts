@@ -42,3 +42,6 @@ export const INGEST_TARGETS: Partial<Record<FootballProviderName, IngestTarget>>
     competitionIds: FOOTBALL_DATA.competitions.map((competition) => competition.code),
   },
 };
+
+/** La Liga has 20 clubs, so each plays 38 league matches. Used to project a points total. */
+export const LEAGUE_MATCHES = 38;

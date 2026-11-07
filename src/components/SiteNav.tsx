@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Suspense, type ReactNode } from "react";
+import { Suspense, useState, type ReactNode } from "react";
 import { BARCA_CREST_URL } from "@/config/display";
 import type { TextKey } from "@/i18n/dictionary";
 import { useT } from "@/i18n/language";
@@ -18,7 +18,7 @@ const icon = (paths: string) => (
 );
 
 /** The main features, in the order fans reach for them. Add a page here to add a tab. */
-const SECTIONS: Section[] = [
+const PRIMARY: Section[] = [
   { href: "/", label: "nav.home", icon: icon("M3 11l9-8 9 8v10H15v-7H9v7H3z") },
   {
     href: "/news",
@@ -43,6 +43,31 @@ const SECTIONS: Section[] = [
   },
 ];
 
+/** More pages. On a wide screen they sit in the top bar, on a phone behind the More tab. */
+const SECONDARY: Section[] = [
+  {
+    href: "/stats",
+    label: "nav.stats",
+    icon: icon("M5 20V10M12 20V4M19 20v-7"),
+  },
+  {
+    href: "/history",
+    label: "nav.history",
+    icon: icon("M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7v5l3 3"),
+  },
+];
+
+/** Only in the More menu on phones: the desktop top bar has no room for it. */
+const EXTRA: Section[] = [
+  {
+    href: "/shirt",
+    label: "nav.shirt",
+    icon: icon("M8 3L3 6l2 5 3-1v11h8V10l3 1 2-5-5-3a4 4 0 0 1-8 0z"),
+  },
+];
+
+const MORE_ICON = icon("M5 12h.01M12 12h.01M19 12h.01");
+
 function isActive(pathname: string, { href, also = [] }: Section): boolean {
   if (href === "/") return pathname === "/";
   return [href, ...also].some((path) => pathname === path || pathname.startsWith(`${path}/`));
@@ -50,6 +75,10 @@ function isActive(pathname: string, { href, also = [] }: Section): boolean {
 
 function NavShell({ pathname }: { pathname: string }) {
   const t = useT();
+  // The menu is open for one page only, so moving to another page closes it by itself.
+  const [moreOpenFor, setMoreOpenFor] = useState<string | null>(null);
+  const moreOpen = moreOpenFor === pathname;
+  const moreIsActive = [...SECONDARY, ...EXTRA].some((section) => isActive(pathname, section));
   return (
     <>
       <nav aria-label="Main" className="nav">
@@ -59,7 +88,7 @@ function NavShell({ pathname }: { pathname: string }) {
             <span className="brand-name">Barça Brain</span>
           </Link>
           <ul className="nav-links">
-            {SECTIONS.map((section) => (
+            {[...PRIMARY, ...SECONDARY].map((section) => (
               <li key={section.href}>
                 <Link
                   href={section.href}
@@ -75,8 +104,23 @@ function NavShell({ pathname }: { pathname: string }) {
       </nav>
       {/* On phones the same links sit at the bottom, where a thumb can reach them. */}
       <nav aria-label="Tabs" className="tabbar">
+        {moreOpen && (
+          <ul className="tabbar-more">
+            {[...SECONDARY, ...EXTRA].map((section) => (
+              <li key={section.href}>
+                <Link
+                  href={section.href}
+                  aria-current={isActive(pathname, section) ? "page" : undefined}
+                >
+                  {section.icon}
+                  <span>{t(section.label)}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
         <ul>
-          {SECTIONS.map((section) => (
+          {PRIMARY.map((section) => (
             <li key={section.href}>
               <Link
                 href={section.href}
@@ -87,6 +131,17 @@ function NavShell({ pathname }: { pathname: string }) {
               </Link>
             </li>
           ))}
+          <li>
+            <button
+              type="button"
+              aria-expanded={moreOpen}
+              aria-current={moreIsActive ? "page" : undefined}
+              onClick={() => setMoreOpenFor(moreOpen ? null : pathname)}
+            >
+              {MORE_ICON}
+              <span>{t("nav.more")}</span>
+            </button>
+          </li>
         </ul>
       </nav>
     </>

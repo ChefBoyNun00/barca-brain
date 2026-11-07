@@ -2154,7 +2154,7 @@ body {
     .tabbar {
       position: fixed;
       inset: auto 0 0;
-      z-index: 60;
+      z-index: 70;
       display: block;
       padding-bottom: env(safe-area-inset-bottom);
       background: rgba(10, 18, 48, 0.97);
@@ -3418,8 +3418,19 @@ body {
 
   .page-loader {
     display: grid;
-    place-items: center;
+    place-content: center;
+    justify-items: center;
+    gap: 1rem;
     min-height: 16rem;
+  }
+
+  .page-loader .intro-bar {
+    background: var(--border);
+  }
+
+  .page-loader .intro-bar span {
+    animation-duration: 1.6s;
+    animation-iteration-count: infinite;
   }
 
   .page-loader img {
@@ -3650,6 +3661,618 @@ body {
   }
   to {
     transform: none;
+  }
+}
+
+@layer components {
+  /* Season in numbers */
+  .num-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .num-grid-three {
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  }
+
+  .num-tile {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    color: #ffffff;
+    background: var(--barca-navy);
+    border-bottom: 5px solid var(--barca-gold);
+    border-radius: 6px;
+  }
+
+  .num-tile:nth-child(3n + 2) {
+    border-bottom-color: var(--barca-garnet);
+  }
+
+  .num-tile:nth-child(3n) {
+    border-bottom-color: var(--barca-blue);
+  }
+
+  .num-tile-value {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--barca-gold);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .num-tile-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .pace {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.75rem;
+    padding: 1rem 1.25rem;
+    margin-top: 1rem;
+    background: #ffffff;
+    border: 2px dashed var(--barca-blue);
+    border-radius: 8px;
+  }
+
+  .pace-label {
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-heading);
+  }
+
+  .pace-value {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--barca-garnet);
+  }
+
+  .pace-note {
+    flex-basis: 100%;
+    font-size: 0.85rem;
+  }
+
+  .stats-heading {
+    margin-top: 2.25rem;
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: var(--text-heading);
+    border-left: 6px solid var(--barca-gold);
+    padding-left: 0.75rem;
+  }
+
+  .stats-columns {
+    display: grid;
+    gap: 0 2.5rem;
+  }
+
+  .split {
+    margin-top: 1rem;
+  }
+
+  .split-label {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 800;
+    color: var(--text-heading);
+  }
+
+  .split-bar {
+    display: flex;
+    height: 1.25rem;
+    margin-top: 0.25rem;
+    overflow: hidden;
+    border-radius: 9999px;
+    background: var(--border);
+  }
+
+  .split-bar span[data-part="W"] {
+    background: var(--barca-blue);
+  }
+
+  .split-bar span[data-part="D"] {
+    background: var(--barca-gold);
+  }
+
+  .split-bar span[data-part="L"] {
+    background: var(--barca-garnet);
+  }
+
+  .halves {
+    display: flex;
+    height: 4.5rem;
+    margin-top: 1rem;
+    overflow: hidden;
+    border-radius: 8px;
+  }
+
+  .halves div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 5rem;
+    padding: 0 1rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #ffffff;
+  }
+
+  .halves div[data-half="first"] {
+    background: var(--barca-blue);
+  }
+
+  .halves div[data-half="second"] {
+    background: var(--barca-garnet);
+  }
+
+  .halves strong {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    line-height: 1;
+  }
+
+  .standout {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .standout-label {
+    margin-bottom: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--barca-garnet);
+  }
+
+  .leaders-title {
+    margin-top: 2.25rem;
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: var(--text-heading);
+    border-left: 6px solid var(--barca-garnet);
+    padding-left: 0.75rem;
+  }
+
+  .leaders ol {
+    display: grid;
+    gap: 0.375rem;
+    margin-top: 0.75rem;
+  }
+
+  .leaders a {
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr) 4.5rem 2rem;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.375rem 0.5rem;
+    border-radius: 8px;
+    transition: background 150ms var(--ease-smooth);
+  }
+
+  .leaders a:hover {
+    background: var(--primary-wash);
+  }
+
+  .leaders-number {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--barca-garnet);
+    text-align: center;
+  }
+
+  .leaders-name {
+    overflow: hidden;
+    font-weight: 700;
+    color: var(--text-heading);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .leaders-bar {
+    height: 0.5rem;
+    overflow: hidden;
+    background: var(--border);
+    border-radius: 9999px;
+  }
+
+  .leaders-bar span {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, var(--barca-blue), var(--barca-garnet));
+    border-radius: 9999px;
+  }
+
+  .leaders-value {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--text-heading);
+    text-align: right;
+  }
+
+  @media (min-width: 768px) {
+    .stats-columns {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+}
+
+@layer components {
+  /* History: a line of years with the moments hung along it */
+  .timeline {
+    position: relative;
+    display: grid;
+    gap: 2.5rem;
+    margin-top: 2.5rem;
+    padding-left: 1.5rem;
+  }
+
+  .timeline::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0.4rem;
+    width: 4px;
+    background: repeating-linear-gradient(
+      180deg,
+      var(--barca-garnet) 0 24px,
+      var(--barca-blue) 24px 48px
+    );
+    border-radius: 2px;
+  }
+
+  .moment {
+    position: relative;
+  }
+
+  .moment::before {
+    content: "";
+    position: absolute;
+    inset: 0.9rem auto auto -1.5rem;
+    width: 1.1rem;
+    height: 1.1rem;
+    background: var(--barca-gold);
+    border: 3px solid var(--barca-navy);
+    border-radius: 50%;
+  }
+
+  .moment-year {
+    display: block;
+    font-family: var(--font-display);
+    font-size: clamp(3.5rem, 14vw, 7rem);
+    font-weight: 900;
+    line-height: 0.9;
+    color: transparent;
+    -webkit-text-stroke: 2px var(--barca-garnet);
+  }
+
+  .moment:nth-child(even) .moment-year {
+    -webkit-text-stroke-color: var(--barca-blue);
+  }
+
+  .moment-card {
+    padding: 1.25rem;
+    margin-top: 0.25rem;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-left: 6px solid var(--barca-gold);
+    border-radius: 6px 16px 16px 6px;
+    box-shadow: var(--shadow-md);
+  }
+
+  .moment-when {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--barca-garnet);
+  }
+
+  .moment-title {
+    margin-top: 0.125rem;
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 900;
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--text-heading);
+  }
+
+  .moment-story {
+    margin-top: 0.5rem;
+  }
+
+  .moment-fact summary {
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--primary);
+    cursor: pointer;
+  }
+
+  .moment-fact p {
+    padding: 0.5rem 0.75rem;
+    margin-top: 0.375rem;
+    font-size: 0.9rem;
+    color: var(--text-heading);
+    background: var(--primary-wash);
+    border-radius: 8px;
+  }
+
+  .moment-tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.375rem;
+    margin-top: 0.875rem;
+  }
+
+  .moment-tags span {
+    padding: 0.0625rem 0.625rem;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--barca-navy);
+    background: var(--barca-gold);
+    border-radius: 9999px;
+  }
+
+  .moment-ask {
+    margin-left: auto;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--primary);
+  }
+
+  .moment-ask:hover {
+    text-decoration: underline;
+  }
+
+  @media (min-width: 900px) {
+    .timeline {
+      padding-left: 0;
+    }
+
+    .timeline::before {
+      inset: 0 auto 0 50%;
+      margin-left: -2px;
+    }
+
+    .moment {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .moment::before {
+      inset: 50% auto auto 50%;
+      margin: -0.55rem 0 0 -0.55rem;
+    }
+
+    .moment-year {
+      text-align: right;
+    }
+
+    .moment[data-side="right"] .moment-year {
+      order: 2;
+      text-align: left;
+    }
+
+    .moment[data-side="right"] .moment-card {
+      order: 1;
+    }
+
+    .moment-card {
+      margin-top: 0;
+    }
+  }
+
+  @supports (animation-timeline: view()) {
+    .moment-card,
+    .moment-year {
+      animation: cardPop linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+  }
+}
+
+@layer components {
+  @media (max-width: 639px) {
+    .tabbar ul {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    .tabbar button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.125rem;
+      width: 100%;
+      padding: 0.5rem 0 0.4rem;
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.65);
+      cursor: pointer;
+    }
+
+    .tabbar button[aria-current="page"],
+    .tabbar button[aria-expanded="true"] {
+      color: var(--barca-gold);
+    }
+
+    .tabbar button:focus-visible {
+      outline: 2px solid var(--barca-gold);
+      outline-offset: -2px;
+    }
+
+    .tabbar-more {
+      position: absolute;
+      inset: auto 0.5rem 100% auto;
+      display: grid;
+      gap: 0.125rem;
+      min-width: 11rem;
+      padding: 0.375rem;
+      margin-bottom: 0.5rem;
+      background: var(--barca-navy);
+      border: 2px solid var(--barca-gold);
+      border-radius: 12px;
+      box-shadow: 0 16px 32px -10px rgba(0, 0, 0, 0.6);
+      animation: cardPop 0.25s var(--ease-out) both;
+    }
+
+    .tabbar .tabbar-more {
+      grid-template-columns: none;
+    }
+
+    .tabbar-more a {
+      flex-direction: row;
+      justify-content: flex-start;
+      gap: 0.75rem;
+      padding: 0.625rem 0.75rem;
+      font-size: 0.9rem;
+      border-radius: 8px;
+    }
+  }
+}
+
+@layer components {
+  /* The intro: the crest turns in over broken tiles while a stripe fills */
+  .intro {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 1.25rem;
+    cursor: pointer;
+    background:
+      linear-gradient(rgba(10, 18, 48, 0.9), rgba(10, 18, 48, 0.94)),
+      url("/trencadis.svg") center / cover;
+    transition:
+      opacity 550ms var(--ease-smooth),
+      transform 550ms var(--ease-smooth);
+  }
+
+  .intro[data-phase="out"] {
+    pointer-events: none;
+    opacity: 0;
+    transform: scale(1.04);
+  }
+
+  html[data-intro="seen"] .intro {
+    display: none;
+  }
+
+  .intro-crest {
+    perspective: 800px;
+  }
+
+  .intro-crest img {
+    width: clamp(7rem, 24vw, 9rem);
+    height: auto;
+    filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.6));
+    animation: crestEntrance 1.5s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  }
+
+  .intro-word {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 6vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--barca-gold);
+    animation: wordIn 1s var(--ease-out) 0.7s both;
+  }
+
+  .intro-bar {
+    display: block;
+    width: min(18rem, 70vw);
+    height: 6px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.16);
+    border-radius: 9999px;
+  }
+
+  .intro-bar span {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      90deg,
+      var(--barca-garnet) 0 14px,
+      var(--barca-blue) 14px 28px
+    );
+    transform-origin: left;
+    animation: barFill 2.2s cubic-bezier(0.4, 0, 0.2, 1) 0.1s both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .intro {
+      display: none;
+    }
+
+    .page-loader .intro-bar span {
+      animation: none;
+    }
+  }
+}
+
+@keyframes crestEntrance {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) rotateY(-540deg);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.08) rotateY(0deg);
+  }
+  100% {
+    transform: scale(1) rotateY(0deg);
+  }
+}
+
+@keyframes wordIn {
+  from {
+    opacity: 0;
+    letter-spacing: 0.7em;
+  }
+  to {
+    opacity: 1;
+    letter-spacing: 0.3em;
+  }
+}
+
+@keyframes barFill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
   }
 }
 

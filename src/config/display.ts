@@ -32,3 +32,6 @@ export const MATCH_LENGTH_MINUTES = 115;
 
 /** The opponent's name, as the data provider spells it, that turns a match into El Clásico. */
 export const CLASICO_RIVAL = "Real Madrid";
+
+/** Remembers, for this visit only, that the intro has already played. */
+export const INTRO_STORAGE_KEY = "barca-brain:intro";

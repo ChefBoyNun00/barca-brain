@@ -6,6 +6,9 @@ export function PageLoader({ label = "Loading" }: { label?: string }) {
   return (
     <div role="status" aria-label={label} className="page-loader">
       <Image src={BARCA_CREST_URL} alt="" width={72} height={72} unoptimized />
+      <span aria-hidden="true" className="intro-bar">
+        <span />
+      </span>
     </div>
   );
 }
