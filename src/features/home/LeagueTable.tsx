@@ -3,9 +3,9 @@ import Image from "next/image";
 import type { LeagueRow, SeasonMatch } from "@/domain/home";
 import { FormPips } from "./FormPips";
 import { formatMatchDate } from "./format";
-import { describeMatch, getMatchOutcome, SEASON_SECTION_ID } from "./season-story";
+import { describeMatch, getMatchOutcome } from "./season-story";
 
-type Meeting = { match: SeasonMatch; index: number };
+type Meeting = { match: SeasonMatch };
 
 function goalDifference({ goalsFor, goalsAgainst }: LeagueRow): string {
   if (goalsFor === null || goalsAgainst === null) return "–";
@@ -13,14 +13,14 @@ function goalDifference({ goalsFor, goalsAgainst }: LeagueRow): string {
   return difference > 0 ? `+${difference}` : String(difference);
 }
 
-function MeetingButton({ match, index }: Meeting) {
+function MeetingButton({ match }: Meeting) {
   const outcome = getMatchOutcome(match);
   return (
     <Link
-      href={{ pathname: "/", query: { match: index }, hash: SEASON_SECTION_ID }}
+      href={`/matches#match-${match.id}`}
       className="meeting"
       data-outcome={outcome ?? "none"}
-      aria-label={`Show on the shirt: ${describeMatch(match)}`}
+      aria-label={`Open the match: ${describeMatch(match)}`}
       title={describeMatch(match)}
     >
       {outcome ? `${match.goalsFor}–${match.goalsAgainst}` : formatMatchDate(match.kickoffAt)}
@@ -33,10 +33,10 @@ type LeagueTableProps = { table: LeagueRow[]; matches: SeasonMatch[] };
 /** The league table, with Barça's meetings against each side linking back to the shirt. */
 export function LeagueTable({ table, matches }: LeagueTableProps) {
   const meetingsByTeam = new Map<string, Meeting[]>();
-  matches.forEach((match, index) => {
+  matches.forEach((match) => {
     if (!match.isLeague || !match.opponent) return;
     const meetings = meetingsByTeam.get(match.opponent.id) ?? [];
-    meetingsByTeam.set(match.opponent.id, [...meetings, { match, index }]);
+    meetingsByTeam.set(match.opponent.id, [...meetings, { match }]);
   });
 
   return (
@@ -45,7 +45,7 @@ export function LeagueTable({ table, matches }: LeagueTableProps) {
         The table
       </h1>
       <p className="section-note">
-        Tap a score or date to see that match on the shirt. Scores are Barça&apos;s first.
+        Tap a score or date to open that match. Scores are Barça&apos;s first.
       </p>
       {table.length === 0 ? (
         <p className="section-note">The table will appear after the next daily update.</p>
@@ -105,8 +105,8 @@ export function LeagueTable({ table, matches }: LeagueTableProps) {
                   </td>
                   <td>
                     <span className="meetings">
-                      {meetingsByTeam.get(row.teamId)?.map(({ match, index }) => (
-                        <MeetingButton key={match.id} match={match} index={index} />
+                      {meetingsByTeam.get(row.teamId)?.map(({ match }) => (
+                        <MeetingButton key={match.id} match={match} />
                       ))}
                     </span>
                   </td>

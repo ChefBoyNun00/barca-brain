@@ -133,21 +133,6 @@ body {
     cursor: ew-resize;
   }
 
-  .wall:has(.wall-input:focus-visible) {
-    outline: 2px solid var(--primary);
-    outline-offset: 4px;
-  }
-
-  .wall-input {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    opacity: 0;
-    pointer-events: none;
-  }
-
   .stripe {
     position: relative;
     flex: 1 1 0;
@@ -273,17 +258,6 @@ body {
     border-radius: 50%;
   }
 
-  .wall-readout {
-    display: grid;
-    grid-template-columns: 44px minmax(0, 1fr) 44px;
-    align-items: center;
-    gap: 0.5rem;
-    width: 100%;
-    max-width: 1200px;
-    margin: 1.75rem auto 0;
-    padding-inline: 1rem;
-  }
-
   .wall-step {
     width: 44px;
     height: 44px;
@@ -316,103 +290,9 @@ body {
   .pick:focus-visible,
   .hanger:focus-visible,
   .meeting:focus-visible,
-  .nav a:focus-visible,
-  .wall-table summary:focus-visible {
+  .nav a:focus-visible {
     outline: 2px solid var(--primary);
     outline-offset: 2px;
-  }
-
-  .match-detail {
-    min-height: 8.5rem;
-    text-align: center;
-    animation: fadeInScale 0.25s var(--ease-out) both;
-  }
-
-  .match-meta {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--primary);
-  }
-
-  .match-line {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: 0.25rem 0.75rem;
-    margin-top: 0.25rem;
-  }
-
-  .match-side {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  /* The right-hand team reads name first, then crest, so each crest hugs its own name. */
-  .match-side:last-child {
-    flex-direction: row-reverse;
-  }
-
-  .match-side img {
-    width: 44px;
-    height: 44px;
-    object-fit: contain;
-  }
-
-  .match-team {
-    font-family: var(--font-display);
-    font-size: clamp(1.25rem, 4.5vw, 2rem);
-    font-weight: 900;
-    line-height: 1.05;
-    text-transform: uppercase;
-    color: var(--text-heading);
-  }
-
-  .match-score {
-    font-family: var(--font-display);
-    font-size: clamp(2rem, 7vw, 3.75rem);
-    font-weight: 900;
-    line-height: 1.05;
-    text-transform: uppercase;
-    color: var(--text-heading);
-  }
-
-  .match-note {
-    margin-top: 0.25rem;
-    font-size: 0.9rem;
-  }
-
-  .wall-legend {
-    max-width: 44rem;
-    margin: 1rem auto 0;
-    padding-inline: 1rem;
-    font-size: 0.875rem;
-    text-align: center;
-  }
-
-  .wall-table {
-    max-width: 44rem;
-    margin: 0.75rem auto 0;
-    padding-inline: 1rem;
-    font-size: 0.875rem;
-    text-align: center;
-  }
-
-  .wall-table summary {
-    font-weight: 600;
-    color: var(--primary);
-    cursor: pointer;
-  }
-
-  .wall-table ol {
-    margin-top: 0.75rem;
-    text-align: left;
-  }
-
-  .wall-table li {
-    padding-block: 0.25rem;
-    border-top: 1px solid var(--border);
   }
 
   .poster {
@@ -649,10 +529,6 @@ body {
       gap: 2px;
     }
 
-    .wall-crests {
-      display: flex;
-    }
-
     .poster-inner {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
@@ -811,59 +687,6 @@ body {
     color: var(--primary);
     background: var(--primary-wash);
     border-color: var(--primary-soft);
-  }
-
-  /* The shirt's controls and crests */
-  .wall-controls {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem 1rem;
-    margin-bottom: 1rem;
-  }
-
-  .wall-record {
-    margin-left: auto;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-heading);
-    font-variant-numeric: tabular-nums;
-  }
-
-  .wall-crests {
-    display: none;
-    gap: 2px;
-    margin-top: 1.25rem;
-    padding-inline: 1rem;
-    cursor: ew-resize;
-  }
-
-  .wall-crests span {
-    display: grid;
-    flex: 1 1 0;
-    min-width: 0;
-    height: 28px;
-    place-items: center;
-    transition:
-      transform 150ms var(--ease-smooth),
-      opacity 150ms var(--ease-smooth);
-  }
-
-  .wall-crests img {
-    width: 100%;
-    max-width: 24px;
-    height: auto;
-    max-height: 24px;
-    object-fit: contain;
-    pointer-events: none;
-  }
-
-  .wall-crests span[data-selected="true"] {
-    transform: scale(1.5);
-  }
-
-  .wall-crests span[data-dimmed="true"] {
-    opacity: 0.2;
   }
 
   /* Tale of the tape */
@@ -1501,7 +1324,6 @@ body {
     .credits {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-
   }
 
   @media (min-width: 1024px) {
@@ -2309,7 +2131,8 @@ body {
     display: flex;
     flex: 1;
     flex-direction: column;
-    animation: fadeInUp 0.45s var(--ease-out) both;
+    /* Opacity only: a transform here would trap the fixed tab bar inside the page. */
+    animation: pageFade 0.4s var(--ease-out) both;
   }
 
   /* Explore tiles: a strip of the shirt on top, and they light up in club colours on hover. */
@@ -2356,5 +2179,380 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .page-enter {
     animation: none;
+  }
+}
+
+@layer components {
+  /* Nav: the page you are on is lit up */
+  .nav-links a[aria-current="page"] {
+    color: var(--barca-gold);
+    box-shadow: 0 2px 0 var(--barca-gold);
+  }
+
+  .tabbar {
+    display: none;
+  }
+
+  /* Phones: the main features move to the bottom, within a thumb's reach. */
+  @media (max-width: 639px) {
+    .nav-links {
+      display: none;
+    }
+
+    body {
+      padding-bottom: 4.5rem;
+    }
+
+    .tabbar {
+      position: fixed;
+      inset: auto 0 0;
+      z-index: 60;
+      display: block;
+      padding-bottom: env(safe-area-inset-bottom);
+      background: rgba(10, 18, 48, 0.97);
+      backdrop-filter: blur(16px);
+      border-top: 3px solid transparent;
+      border-image: repeating-linear-gradient(
+          90deg,
+          var(--barca-garnet) 0 32px,
+          var(--barca-blue) 32px 64px
+        )
+        1;
+    }
+
+    .tabbar ul {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    .tabbar a {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.125rem;
+      padding: 0.5rem 0 0.4rem;
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.65);
+      transition: color 150ms var(--ease-smooth);
+    }
+
+    .tabbar a[aria-current="page"] {
+      color: var(--barca-gold);
+    }
+
+    .tabbar a:focus-visible {
+      outline: 2px solid var(--barca-gold);
+      outline-offset: -2px;
+    }
+
+    .tab-icon {
+      width: 1.4rem;
+      height: 1.4rem;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .tabbar a[aria-current="page"] .tab-icon {
+      animation: tabPop 0.35s var(--ease-out);
+    }
+  }
+
+  .section-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+  }
+
+  /* The filter: one highlight that glides to whichever option you pick */
+  .segmented {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(var(--count), 1fr);
+    width: min(100%, 26rem);
+    padding: 4px;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 9999px;
+  }
+
+  .segmented-thumb {
+    position: absolute;
+    inset: 4px auto 4px 4px;
+    width: calc((100% - 8px) / var(--count));
+    background: linear-gradient(135deg, var(--barca-blue), var(--barca-garnet));
+    border-radius: 9999px;
+    transform: translateX(calc(var(--index) * 100%));
+    transition: transform 350ms cubic-bezier(0.34, 1.4, 0.64, 1);
+  }
+
+  .segmented button {
+    position: relative;
+    padding: 0.5rem 0.25rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-heading);
+    cursor: pointer;
+    border-radius: 9999px;
+    transition: color 250ms var(--ease-smooth);
+  }
+
+  .segmented button[aria-pressed="true"] {
+    color: #ffffff;
+  }
+
+  .segmented button:focus-visible {
+    outline: 2px solid var(--barca-gold);
+    outline-offset: 1px;
+  }
+
+  .board-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+    margin-top: 1.25rem;
+  }
+
+  .board-record {
+    font-weight: 700;
+    color: var(--text-heading);
+  }
+
+  .board-month {
+    margin-top: 2rem;
+  }
+
+  .board-month-title {
+    position: sticky;
+    top: 3.6rem;
+    z-index: 5;
+    padding-block: 0.5rem;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--barca-garnet);
+    background: linear-gradient(180deg, var(--off-white) 70%, transparent);
+  }
+
+  .board-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+    gap: 0.875rem;
+    margin-top: 0.5rem;
+  }
+
+  /* A match card: result colour on the edge, pops in one after another */
+  .match-card {
+    --tone: var(--border);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem 1rem 0.875rem;
+    overflow: hidden;
+    scroll-margin-top: 6rem;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    box-shadow: var(--shadow-md);
+    animation: cardPop 0.5s var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * 45ms);
+    transition:
+      transform 200ms var(--ease-smooth),
+      box-shadow 200ms var(--ease-smooth);
+  }
+
+  .match-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 6px;
+    background: var(--tone);
+  }
+
+  .match-card[data-outcome="W"] {
+    --tone: var(--barca-blue);
+  }
+
+  .match-card[data-outcome="D"] {
+    --tone: var(--barca-gold);
+  }
+
+  .match-card[data-outcome="L"] {
+    --tone: var(--barca-garnet);
+  }
+
+  .match-card:hover {
+    transform: translateY(-4px) rotate(-0.4deg);
+    box-shadow: 0 18px 36px -14px rgba(0, 77, 152, 0.4);
+  }
+
+  /* Arriving from the table: the card you asked for glows */
+  .match-card:target {
+    animation: cardGlow 1.6s var(--ease-out) 2;
+  }
+
+  .match-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--primary);
+  }
+
+  .match-card-badge {
+    display: inline-grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0.75rem;
+    color: #ffffff;
+    background: var(--tone);
+    border-radius: 50%;
+  }
+
+  .match-card[data-outcome="D"] .match-card-badge {
+    color: var(--barca-navy);
+  }
+
+  .match-card-teams {
+    margin-block: auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.25rem;
+    text-align: center;
+  }
+
+  .match-card-team {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--text-heading);
+  }
+
+  .match-card-team img {
+    width: 3rem;
+    height: 3rem;
+    object-fit: contain;
+    transition: transform 250ms var(--ease-smooth);
+  }
+
+  .match-card:hover .match-card-team img {
+    transform: scale(1.12);
+  }
+
+  .match-card-score {
+    padding-inline: 0.5rem;
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--text-heading);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .match-card-foot {
+    font-size: 0.75rem;
+    text-align: center;
+  }
+
+  /* On the home page: a row you swipe through */
+  .match-rail {
+    display: flex;
+    gap: 0.875rem;
+    padding-block: 1rem 1.25rem;
+    margin-inline: -1rem;
+    padding-inline: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+    mask-image: linear-gradient(
+      90deg,
+      transparent,
+      #000 1.5rem,
+      #000 calc(100% - 1.5rem),
+      transparent
+    );
+  }
+
+  .match-rail .match-card {
+    flex: 0 0 min(16.5rem, 78vw);
+    scroll-snap-align: center;
+  }
+
+  .match-rail:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .match-card,
+    .match-card:target,
+    .segmented-thumb,
+    .tabbar a[aria-current="page"] .tab-icon {
+      animation: none;
+      transition: none;
+    }
+  }
+}
+
+@keyframes cardPop {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes cardGlow {
+  0%,
+  100% {
+    box-shadow: var(--shadow-md);
+  }
+  40% {
+    box-shadow:
+      0 0 0 3px var(--barca-gold),
+      0 0 32px 6px rgba(237, 187, 0, 0.55);
+  }
+}
+
+@keyframes tabPop {
+  0% {
+    transform: scale(0.7);
+  }
+  60% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes pageFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }

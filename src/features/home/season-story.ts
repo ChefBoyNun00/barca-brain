@@ -9,9 +9,6 @@ type ScoredMatch = SeasonMatch & {
   goalsAgainst: number;
 };
 
-/** The id of the shirt section, so other pages can link straight to it. */
-export const SEASON_SECTION_ID = "season";
-
 export type SeasonSummary = {
   played: number;
   wins: number;
