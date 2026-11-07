@@ -1,6 +1,6 @@
 import type { SquadPlayer } from "@/domain/home";
 import type { NewsCertainty } from "@/domain/news";
-import { PlayerFace } from "../squad/PlayerFace";
+import { StoryArt } from "./StoryArt";
 import { formatStoryAge, isCoveredByBothCities, type Story } from "./stories";
 
 const CERTAINTY_LABELS: Record<NewsCertainty, string> = {
@@ -18,64 +18,62 @@ const SIDE_LABELS = {
   official: "Club",
 } as const;
 
-type StoryCardProps = { story: Story; squad: SquadPlayer[]; now: Date };
+type StoryCardProps = {
+  story: Story;
+  squad: SquadPlayer[];
+  now: Date;
+  variant: "hero" | "tile";
+};
 
-export function StoryCard({ story, squad, now }: StoryCardProps) {
+/** A story with its picture. The hero is the big one at the top, tiles sit in the rows. */
+export function StoryCard({ story, squad, now, variant }: StoryCardProps) {
   const { lead, coverage, outlets } = story;
-  const faces = story.players.flatMap((name) => squad.find((p) => p.name === name) ?? []);
   const isTranslated = lead.titleEn !== null;
+  const Title = variant === "hero" ? "h2" : "h3";
 
   return (
-    <article className="story">
-      <div className="story-tags">
-        {lead.certainty && (
-          <span className="story-certainty" data-certainty={lead.certainty}>
-            {CERTAINTY_LABELS[lead.certainty]}
-          </span>
-        )}
-        {isCoveredByBothCities(story) && <span className="story-both">Both cities</span>}
-        <span className="story-age">{formatStoryAge(story.latestAt, now)}</span>
+    <article className="nw-card" data-variant={variant}>
+      <StoryArt story={story} squad={squad} size={variant} />
+      <div className="nw-card-body">
+        <div className="story-tags">
+          {lead.certainty && (
+            <span className="story-certainty" data-certainty={lead.certainty}>
+              {CERTAINTY_LABELS[lead.certainty]}
+            </span>
+          )}
+          {isCoveredByBothCities(story) && <span className="story-both">Both cities</span>}
+          <span className="story-age">{formatStoryAge(story.latestAt, now)}</span>
+        </div>
+
+        <Title className="nw-title" lang={isTranslated ? "en" : "es"}>
+          {lead.titleEn ?? lead.titleOriginal}
+        </Title>
+        {lead.summaryEn && <p className="nw-summary">{lead.summaryEn}</p>}
+        {!isTranslated && <p className="story-pending">Still in Spanish: translation pending.</p>}
+
+        <p className="story-outlets">
+          {outlets.length > 1 ? `${outlets.length} outlets: ` : ""}
+          {outlets.slice(0, 3).join(", ")}
+          {outlets.length > 3 ? ` +${outlets.length - 3}` : ""}
+          {outlets.length === 1 && ` · ${SIDE_LABELS[lead.pressSide]}`}
+        </p>
+
+        <details className="story-sources">
+          <summary>{isTranslated ? "Original Spanish and sources" : "Sources"}</summary>
+          <ul>
+            {coverage.map((article) => (
+              <li key={article.id}>
+                <a href={article.url} target="_blank" rel="noreferrer">
+                  <span lang="es">{article.titleOriginal}</span>
+                </a>
+                <span className="story-source-outlet">
+                  {article.outlet} · {SIDE_LABELS[article.pressSide]}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </details>
       </div>
-
-      <h3 className="story-title" lang={isTranslated ? "en" : "es"}>
-        {lead.titleEn ?? lead.titleOriginal}
-      </h3>
-      {lead.summaryEn && <p className="story-summary">{lead.summaryEn}</p>}
-      {!isTranslated && <p className="story-pending">Still in Spanish: translation pending.</p>}
-
-      {faces.length > 0 && (
-        <ul className="story-faces" aria-label="Players in this story">
-          {faces.map((player) => (
-            <li key={player.id}>
-              <PlayerFace player={player} size={32} />
-              <span>{player.name}</span>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <p className="story-outlets">
-        {outlets.length > 1 ? `${outlets.length} outlets: ` : ""}
-        {outlets.slice(0, 4).join(", ")}
-        {outlets.length > 4 ? ` and ${outlets.length - 4} more` : ""}
-        {outlets.length === 1 && ` · ${SIDE_LABELS[lead.pressSide]}`}
-      </p>
-
-      <details className="story-sources">
-        <summary>{isTranslated ? "Original Spanish and sources" : "Sources"}</summary>
-        <ul>
-          {coverage.map((article) => (
-            <li key={article.id}>
-              <a href={article.url} target="_blank" rel="noreferrer">
-                <span lang="es">{article.titleOriginal}</span>
-              </a>
-              <span className="story-source-outlet">
-                {article.outlet} · {SIDE_LABELS[article.pressSide]}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </details>
     </article>
   );
 }

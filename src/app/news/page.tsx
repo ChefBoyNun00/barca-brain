@@ -16,11 +16,13 @@ export default function News() {
         <p className="kicker">Spanish in, English out</p>
         <h1 className="display-title mt-3">The press</h1>
         <p className="mt-4 max-w-2xl">
-          Every story here was published in Spanish or Catalan. AI translates the headline and
-          labels how solid it is, so treat labels as a guide and open the source to check.
+          Spanish and Catalan press, translated. Labels show how solid each story is, and every card
+          links back to the source.
         </p>
         <Suspense
-          fallback={<div role="status" aria-label="Loading the press" className="skeleton mt-8 h-96" />}
+          fallback={
+            <div role="status" aria-label="Loading the press" className="skeleton mt-8 h-96" />
+          }
         >
           <NewsPage />
         </Suspense>

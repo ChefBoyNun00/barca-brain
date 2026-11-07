@@ -1,7 +1,14 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { NewsFeed } from "@/config/news";
 import type { NewsArticle } from "@/domain/news";
-import { filterStories, findPlayerStories, formatStoryAge, groupStories } from "@/features/news/stories";
+import {
+  filterStories,
+  findPlayerStories,
+  formatStoryAge,
+  groupStories,
+  pickHero,
+  topicOf,
+} from "@/features/news/stories";
 import { getLatestBriefing, getRecentArticles, searchArticles } from "@/server/db/queries/news";
 import { makeDedupeKey, prepareArticles } from "@/server/news/prepare";
 import { runNews } from "@/server/news/run-news";
@@ -14,9 +21,19 @@ import { createEmptyDatabase } from "./helpers/ingested-database";
 const now = new Date();
 const hoursAgo = (hours: number) => new Date(now.getTime() - hours * 3_600_000);
 
-const directFeed: NewsFeed = { id: "md", url: "https://x.test", outlet: "Mundo Deportivo", barcaOnly: true };
+const directFeed: NewsFeed = {
+  id: "md",
+  url: "https://x.test",
+  outlet: "Mundo Deportivo",
+  barcaOnly: true,
+};
 const googleFeed: NewsFeed = { id: "g", url: "https://y.test", outlet: null, barcaOnly: true };
-const generalFeed: NewsFeed = { id: "as", url: "https://z.test", outlet: "Diario AS", barcaOnly: false };
+const generalFeed: NewsFeed = {
+  id: "as",
+  url: "https://z.test",
+  outlet: "Diario AS",
+  barcaOnly: false,
+};
 
 const RSS = `<?xml version="1.0"?><rss xmlns:content="x"><channel>
 <item><title><![CDATA[Pedri vuelve &amp; marca]]></title><link>https://a.test/1</link>
@@ -71,7 +88,9 @@ describe("reading a feed", () => {
 
   it("strips tags and spacing, and decodes entities", () => {
     expect(toPlainText("<p>Hola   <b>Barça</b></p>")).toBe("Hola Barça");
-    expect(toPlainText("Gavi&nbsp;&amp; Pedri &#8217;26 &unknown;")).toBe("Gavi & Pedri ’26 &unknown;");
+    expect(toPlainText("Gavi&nbsp;&amp; Pedri &#8217;26 &unknown;")).toBe(
+      "Gavi & Pedri ’26 &unknown;",
+    );
     expect(toPlainText("&lt;b&gt;Lamine&lt;/b&gt;")).toBe("Lamine");
   });
 });
@@ -93,7 +112,9 @@ describe("choosing articles", () => {
 
   it("filters general feeds down to Barça", () => {
     const articles = [feedArticle({ title: "El Betis empata" }), feedArticle()];
-    expect(prepareArticles(articles, generalFeed, now).map((a) => a.title)).toEqual(["El Barça gana"]);
+    expect(prepareArticles(articles, generalFeed, now).map((a) => a.title)).toEqual([
+      "El Barça gana",
+    ]);
   });
 
   it("drops blocked outlets and labels press by city", () => {
@@ -122,12 +143,17 @@ const translation = (id: string, changes: Partial<Translation> = {}): Translatio
 
 const fakeAi = (changes: Partial<NewsAi> = {}): NewsAi => ({
   translate: async (articles) => articles.map((article) => translation(article.id)),
-  writeBriefing: async () => ({ headline: "A big day", bullets: [{ text: "Barça won.", topic: null }] }),
+  writeBriefing: async () => ({
+    headline: "A big day",
+    bullets: [{ text: "Barça won.", topic: null }],
+  }),
   ...changes,
 });
 
 const providerOf = (articles: FeedArticle[]): NewsProvider => ({ fetchFeed: async () => articles });
-const three = [1, 2, 3].map((n) => feedArticle({ url: `https://a.test/${n}`, title: `Barça noticia ${n}` }));
+const three = [1, 2, 3].map((n) =>
+  feedArticle({ url: `https://a.test/${n}`, title: `Barça noticia ${n}` }),
+);
 
 describe("the news job", () => {
   let created: Awaited<ReturnType<typeof createEmptyDatabase>>;
@@ -251,7 +277,12 @@ function article(id: string, changes: Partial<NewsArticle> = {}): NewsArticle {
 describe("grouping stories", () => {
   const mixed = [
     article("a"),
-    article("b", { outlet: "MARCA", pressSide: "madrid", certainty: "reported", playerNames: ["Pedri"] }),
+    article("b", {
+      outlet: "MARCA",
+      pressSide: "madrid",
+      certainty: "reported",
+      playerNames: ["Pedri"],
+    }),
     article("c", { topic: "other", category: "match", publishedAt: hoursAgo(5) }),
   ];
 
@@ -282,6 +313,19 @@ describe("grouping stories", () => {
   it("finds a player's stories", () => {
     expect(findPlayerStories(groupStories(mixed), "Pedri", 3)).toHaveLength(1);
     expect(findPlayerStories(groupStories(mixed), "Rodri", 3)).toEqual([]);
+  });
+
+  it("puts a story in the row for its category, or under other while untranslated", () => {
+    const [transfers, match] = groupStories(mixed);
+    expect(transfers && topicOf(transfers)).toBe("transfers");
+    expect(match && topicOf(match)).toBe("match");
+    const pending = groupStories([article("p", { category: null, topic: null })]);
+    expect(pending[0] && topicOf(pending[0])).toBe("other");
+  });
+
+  it("picks the story most outlets are running as the top story", () => {
+    expect(pickHero(groupStories(mixed))?.id).toBe("rashford");
+    expect(pickHero([])).toBeNull();
   });
 
   it("says how old a story is", () => {

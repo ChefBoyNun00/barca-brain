@@ -88,3 +88,17 @@ export function formatStoryAge(date: Date, now: Date): string {
   if (hours < 24) return `${hours}h ago`;
   return `${Math.round(hours / 24)}d ago`;
 }
+
+export type StoryTopic = NewsCategory;
+
+/** The row a story sits in. Untranslated stories have no category yet, so they go under "other". */
+export const topicOf = (story: Story): StoryTopic => story.lead.category ?? "other";
+
+/** The top story: the one most outlets are running, among the freshest, then the newest. */
+export function pickHero(stories: Story[], freshest = 10): Story | null {
+  return (
+    [...stories.slice(0, freshest)].sort(
+      (a, b) => b.outlets.length - a.outlets.length || b.latestAt.getTime() - a.latestAt.getTime(),
+    )[0] ?? null
+  );
+}
