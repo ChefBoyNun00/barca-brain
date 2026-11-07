@@ -8,7 +8,13 @@ export function FormPips({ form }: { form: string | null }) {
   return (
     <span className="form-pips" role="img" aria-label={`Recent form, oldest first: ${summary}`}>
       {outcomes.map((outcome, index) => (
-        <span key={index} className="form-pip" data-outcome={outcome}>
+        <span
+          key={index}
+          className="form-pip"
+          data-outcome={outcome}
+          data-prev={index > 0 ? outcomes[index - 1] : undefined}
+          style={{ "--i": index } as React.CSSProperties}
+        >
           {outcome}
         </span>
       ))}

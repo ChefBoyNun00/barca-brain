@@ -193,6 +193,10 @@ body {
     width: 2px;
     margin-left: -1px;
     background: repeating-linear-gradient(180deg, #9db8dd 0 6px, transparent 6px 12px);
+    background-size: 100% 12px;
+    /* the needle runs down the seam: stitches march, staggered so the wall ripples */
+    animation: stitchRun 1.6s linear infinite;
+    animation-delay: calc(var(--i, 0) * -37ms);
   }
 
   .stripe[data-next="true"]::before {
@@ -201,7 +205,10 @@ body {
     margin-left: 0;
     background: linear-gradient(180deg, var(--barca-garnet), var(--primary), var(--barca-blue));
     border-radius: 4px 4px 0 0;
-    animation: threadPulse 1.8s ease-in-out infinite;
+    background-size: 100% 200%;
+    animation:
+      threadPulse 1.8s ease-in-out infinite,
+      threadFlow 2.4s linear infinite;
   }
 
   .stripe[data-selected="true"] {
@@ -367,6 +374,35 @@ body {
   .countdown-label {
     font-size: 0.8rem;
     font-weight: 600;
+  }
+
+  .countdown-value[data-tick="true"] {
+    animation: secondTick 0.35s var(--ease-out);
+  }
+
+  /* The thread fills as kick-off nears, then glows in the final hour */
+  .countdown-thread {
+    position: relative;
+    width: min(100%, 22rem);
+    height: 3px;
+    margin-top: 1rem;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 2px;
+  }
+
+  .countdown-thread::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, var(--barca-blue), var(--barca-garnet), var(--barca-gold));
+    transform: scaleX(var(--p, 0));
+    transform-origin: left;
+    transition: transform 1s linear;
+  }
+
+  .countdown-thread[data-imminent="true"] {
+    animation: threadGlow 1.4s ease-in-out infinite;
   }
 
   .section {
@@ -585,9 +621,25 @@ body {
     opacity: 0;
     transform: scaleY(0);
   }
+  65% {
+    opacity: 1;
+    transform: scaleY(1.04);
+  }
   to {
     opacity: 1;
     transform: scaleY(1);
+  }
+}
+
+@keyframes stitchRun {
+  to {
+    background-position: 0 12px;
+  }
+}
+
+@keyframes threadFlow {
+  to {
+    background-position: 0 200%;
   }
 }
 
@@ -785,11 +837,14 @@ body {
   /* Form */
   .form-pips {
     display: inline-flex;
-    gap: 2px;
+    gap: 6px;
   }
 
   .form-pip {
+    position: relative;
     display: grid;
+    animation: pipStitch 0.4s var(--ease-out) backwards;
+    animation-delay: calc(var(--i, 0) * 90ms);
     width: 1.25rem;
     height: 1.25rem;
     place-items: center;
@@ -808,6 +863,27 @@ body {
   .form-pip[data-outcome="L"] {
     color: #ffffff;
     background: var(--barca-garnet);
+  }
+
+  /* A thread links each result to the one before. It runs unbroken through wins and draws,
+     and is cut where a defeat falls. */
+  .form-pip[data-prev]::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    width: 6px;
+    height: 2px;
+    margin-top: -1px;
+    background: var(--barca-blue);
+    transform-origin: right;
+    animation: threadDraw 0.3s var(--ease-out) backwards;
+    animation-delay: calc(var(--i, 0) * 90ms + 120ms);
+  }
+
+  .form-pip[data-outcome="L"]::before,
+  .form-pip[data-prev="L"]::before {
+    background: repeating-linear-gradient(90deg, var(--barca-garnet) 0 2px, transparent 2px 4px);
   }
 
   .tape .form-pip {
@@ -1881,14 +1957,36 @@ body {
   .hero-stripes {
     position: absolute;
     inset: 0;
-    background: repeating-linear-gradient(
-      90deg,
-      rgba(0, 77, 152, 0.75) 0 56px,
-      rgba(165, 0, 68, 0.75) 56px 112px
-    );
-    background-size: 224px 100%;
-    animation: stripeDrift 30s linear infinite;
+    /* Two layers: the warp (shirt stripes) drifts sideways, the weft (fine cross threads) drifts down */
+    background:
+      repeating-linear-gradient(
+        0deg,
+        rgba(255, 255, 255, 0.07) 0 1px,
+        transparent 1px 6px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        rgba(0, 77, 152, 0.75) 0 56px,
+        rgba(165, 0, 68, 0.75) 56px 112px
+      );
+    background-size:
+      100% 24px,
+      224px 100%;
+    animation:
+      stripeWeaveIn 1.4s var(--ease-out) both,
+      stripeDrift 30s linear 1.4s infinite;
     mask-image: linear-gradient(100deg, transparent 5%, rgba(0, 0, 0, 0.9) 100%);
+  }
+
+  /* A soft band of light slides across the cloth now and then, like a shirt catching the floodlights */
+  .hero-stripes::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.16) 50%, transparent 65%);
+    background-size: 250% 100%;
+    background-position: 160% 0;
+    animation: clothSheen 9s ease-in-out 2s infinite;
   }
 
   .hero::after {
@@ -2052,7 +2150,29 @@ body {
 
 @keyframes stripeDrift {
   to {
-    background-position: 224px 0;
+    background-position:
+      0 24px,
+      224px 0;
+  }
+}
+
+/* Each coloured stripe is pulled in from the left, like a thread being drawn through */
+@keyframes stripeWeaveIn {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes clothSheen {
+  0%,
+  35% {
+    background-position: 160% 0;
+  }
+  100% {
+    background-position: -60% 0;
   }
 }
 
@@ -2064,6 +2184,7 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .hero-stripes,
+  .hero-stripes::after,
   .hero-hot,
   .ticker-track {
     animation: none;
@@ -3440,6 +3561,59 @@ body {
     filter: drop-shadow(0 8px 14px rgba(10, 18, 48, 0.3));
   }
 
+  /* Now and then a few tiles catch the light */
+  .mosaic-band {
+    position: relative;
+  }
+
+  .mosaic-band::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    mix-blend-mode: soft-light;
+    background: linear-gradient(
+      110deg,
+      transparent 40%,
+      rgba(255, 255, 255, 0.9) 50%,
+      transparent 60%
+    );
+    background-size: 300% 100%;
+    background-position: 160% 0;
+    animation: tileGlint 8s ease-in-out 3s infinite;
+    pointer-events: none;
+  }
+
+  /* Full time: a garnet-and-blue thread whips across the banner as the score lands;
+     while a match is live a slow thread runs along the foot. */
+  .matchday[data-kind="fulltime"]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      100deg,
+      transparent 42%,
+      var(--barca-garnet) 46%,
+      var(--barca-blue) 54%,
+      transparent 58%
+    );
+    background-size: 300% 100%;
+    animation: threadWhip 1.1s var(--ease-out) 0.2s both;
+    mix-blend-mode: multiply;
+    opacity: 0.55;
+  }
+
+  .matchday[data-kind="live"]::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--barca-garnet), var(--barca-blue), transparent);
+    background-size: 40% 100%;
+    background-repeat: no-repeat;
+    animation: liveThread 2.4s linear infinite;
+  }
+
   /* The 404: the linesman's flag is up */
   .lost {
     display: grid;
@@ -4098,6 +4272,21 @@ body {
       animation-range: entry 0% entry 60%;
     }
   }
+
+  /* The seam sews itself down the page as you scroll; each knot pops when its moment arrives */
+  @supports (animation-timeline: view()) {
+    .timeline::before {
+      animation: seamSew linear both;
+      animation-timeline: view();
+      animation-range: cover 12% cover 78%;
+    }
+
+    .moment::before {
+      animation: knotPop linear both;
+      animation-timeline: view();
+      animation-range: entry 10% entry 50%;
+    }
+  }
 }
 
 @layer components {
@@ -4276,3 +4465,85 @@ body {
   }
 }
 
+
+@keyframes pipStitch {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+@keyframes threadDraw {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes secondTick {
+  from {
+    opacity: 0.5;
+    transform: translateY(-0.15em);
+  }
+}
+
+@keyframes threadGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgba(255, 193, 7, 0);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(255, 193, 7, 0.9);
+  }
+}
+
+@keyframes seamSew {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes knotPop {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+  70% {
+    transform: scale(1.3);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes tileGlint {
+  0%,
+  40% {
+    background-position: 160% 0;
+  }
+  100% {
+    background-position: -60% 0;
+  }
+}
+
+@keyframes threadWhip {
+  from {
+    background-position: 140% 0;
+  }
+  to {
+    background-position: -40% 0;
+    opacity: 0;
+  }
+}
+
+@keyframes liveThread {
+  from {
+    background-position: -40% 0;
+  }
+  to {
+    background-position: 140% 0;
+  }
+}
