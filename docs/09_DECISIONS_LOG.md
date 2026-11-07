@@ -65,3 +65,41 @@ Colours: blaugrana for the shirt and data, with the vivid design system's purple
 its light surfaces, motion and spacing. This departs from purple-first on purpose.
 Rejected: the first version's card dashboard (looked like every other sports app).
 Revisit: if the fixture list grows far past 46 stripes, or phone stripes get too thin to read.
+
+**2026-11-06 · Player photos: Wikimedia Commons, matched by birth date**
+Why: football-data.org's free tier has no photos. Wikidata and Commons give freely licensed ones.
+A photo is only used when exactly one Wikidata person matches the player's birth date, so a
+namesake cannot appear, and only under an allowed licence. Credit, licence and source page are
+stored, and a photo with no licence details is not shown. Players with no photo show initials.
+Rejected: scraping club or agency photos (not licensed for reuse).
+Revisit: if a paid provider supplies licensed headshots.
+
+**2026-11-06 · Weave the ending: a what-if in the browser, not a forecast**
+Why: it lets a fan play with the season without a model or an account. Picked matches count
+exactly, and also count for the opponent. Everything else runs at each team's points per match.
+Picks stay in the viewer's browser, because the app's database login is read-only by design.
+Rejected: presenting the result as a prediction (points per match is not a forecasting model).
+Revisit: when accounts exist, if people want to save or share an ending.
+
+**2026-11-06 · News is in scope: the Spanish press, in English**
+Why: this replaces "no news" from the v1 brief. Daniel's real pain is that most Barça reporting is
+in Spanish, so he relies on English accounts on X. The app reads the press itself. Only headlines
+and feed snippets are stored, for 30 days, and every story links to its outlet: the product is a
+translated summary that sends readers to the source, not a copy of the article. Outlets are
+labelled by city because Barcelona and Madrid papers lean towards their own club.
+Rejected: scraping X (against its terms, and its API is paid); fetching full articles (copyright);
+Marca's feed (frozen since June 2025) and Sport's (refuses readers), both covered by Google News.
+Revisit: if the app goes public or commercial, since Google News feeds are for personal use.
+
+**2026-11-06 · Models: Sonnet for Ask Blaugrana, Haiku for translation**
+Why: follows `05_ASK_BARCA_AI.md`. Questions need good tool use. Translating headlines is high
+volume and simple, which is the doc's "cheap mode" case. Refusal fallback is on for Ask.
+Revisit: if translation quality disappoints. It is one line in `src/config/ai.ts`.
+
+**2026-11-06 · Ask Blaugrana: an access code instead of a database rate limit**
+Why: `05_ASK_BARCA_AI.md` planned a per-IP limit and an `ai_requests` log in Postgres, but the app's
+login is read-only by design, and this is mainly a personal app. A shared code is the real cost
+gate: with no code set, the live site stays closed. An in-memory hourly limit backs it up.
+Rejected: giving the web app a write login just for logging.
+Revisit: before opening Ask to other people. Add Upstash or a write-only role, then logging and
+the 20-question eval.
