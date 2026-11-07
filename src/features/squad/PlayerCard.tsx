@@ -70,7 +70,7 @@ export function PlayerCard({
     >
       <div className="player-card" key={player.id}>
         <div className="player-card-cloth">
-          <Jersey jersey={getJersey(player)} mode="back" />
+          <Jersey jersey={getJersey(player)} keeper={player.position === "GK"} mode="back" />
         </div>
         <div className="player-card-body">
           <h3 id="player-card-name" className="player-card-name">

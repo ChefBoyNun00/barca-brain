@@ -36,7 +36,7 @@ function Hanger({ player, onOpen }: { player: SquadPlayer; onOpen: () => void })
       aria-label={`${player.name}${jersey.number === null ? "" : `, number ${jersey.number}`}. ${position}. Open stats.`}
     >
       <span aria-hidden="true" className="hanger-hook" />
-      <Jersey jersey={jersey} mode="flip" />
+      <Jersey jersey={jersey} keeper={player.position === "GK"} mode="flip" />
       {/* Touch screens cannot hover, so the name is also written underneath. */}
       <span aria-hidden="true" className="hanger-caption">
         {jersey.number === null ? jersey.printed : `${jersey.number} · ${jersey.printed}`}
