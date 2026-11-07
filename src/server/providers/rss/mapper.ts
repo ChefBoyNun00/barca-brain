@@ -1,6 +1,6 @@
 import { NEWS_SNIPPET_MAX_CHARS, type NewsFeed } from "@/config/news";
 import type { FeedArticle } from "../types";
-import { RssItemSchema, type RssItem } from "./schemas";
+import { AtomEntrySchema, RssItemSchema, type AtomEntry, type RssItem } from "./schemas";
 
 const NAMED_ENTITIES: Record<string, string> = {
   amp: "&",
@@ -67,4 +67,44 @@ function mapItem(raw: unknown, feed: NewsFeed): FeedArticle | null {
 
 export function mapFeedItems(items: unknown[], feed: NewsFeed): FeedArticle[] {
   return items.flatMap((item) => mapItem(item, feed) ?? []);
+}
+
+const alternateLink = (link: AtomEntry["link"]) => {
+  const links = Array.isArray(link) ? link : [link];
+  return (links.find((item) => !item["@_rel"] || item["@_rel"] === "alternate") ?? links[0])?.[
+    "@_href"
+  ];
+};
+
+/** A video id goes into an embed address, so only YouTube's own id shape is accepted. */
+const toVideoId = (id: string | undefined) => (id && /^[\w-]{6,20}$/.test(id) ? id : null);
+
+function mapEntry(raw: unknown, feed: NewsFeed): FeedArticle | null {
+  const parsed = AtomEntrySchema.safeParse(raw);
+  if (!parsed.success || !feed.outlet) return null;
+  const entry = parsed.data;
+
+  const link = alternateLink(entry.link);
+  const url = link ? toWebUrl(link) : null;
+  const publishedAt = new Date(entry.published ?? entry.updated ?? "");
+  const title = toPlainText(entry.title);
+  if (!url || !title || Number.isNaN(publishedAt.getTime())) return null;
+
+  const description = entry.summary ?? entry["media:group"]?.["media:description"];
+  const videoId = toVideoId(entry["yt:videoId"]);
+  if (feed.kind === "video" && !videoId) return null;
+
+  return {
+    url,
+    outlet: feed.outlet,
+    title,
+    snippet: description ? trimSnippet(toPlainText(description)) : null,
+    publishedAt,
+    videoId,
+    author: entry.author?.name.replace(/^\/u\//, "") ?? null,
+  };
+}
+
+export function mapAtomEntries(entries: unknown[], feed: NewsFeed): FeedArticle[] {
+  return entries.flatMap((entry) => mapEntry(entry, feed) ?? []);
 }

@@ -9,7 +9,12 @@ import {
   pickHero,
   topicOf,
 } from "@/features/news/stories";
-import { getLatestBriefing, getRecentArticles, searchArticles } from "@/server/db/queries/news";
+import {
+  getLatestBriefing,
+  getRecentArticles,
+  getRecentMedia,
+  searchArticles,
+} from "@/server/db/queries/news";
 import { makeDedupeKey, prepareArticles } from "@/server/news/prepare";
 import { runNews } from "@/server/news/run-news";
 import type { NewsAi, Translation } from "@/server/news/types";
@@ -21,19 +26,72 @@ import { createEmptyDatabase } from "./helpers/ingested-database";
 const now = new Date();
 const hoursAgo = (hours: number) => new Date(now.getTime() - hours * 3_600_000);
 
+const SPANISH = { format: "rss", kind: "article", language: "es" } as const;
 const directFeed: NewsFeed = {
+  ...SPANISH,
   id: "md",
   url: "https://x.test",
   outlet: "Mundo Deportivo",
   barcaOnly: true,
 };
-const googleFeed: NewsFeed = { id: "g", url: "https://y.test", outlet: null, barcaOnly: true };
+const googleFeed: NewsFeed = {
+  ...SPANISH,
+  id: "g",
+  url: "https://y.test",
+  outlet: null,
+  barcaOnly: true,
+};
 const generalFeed: NewsFeed = {
+  ...SPANISH,
   id: "as",
   url: "https://z.test",
   outlet: "Diario AS",
   barcaOnly: false,
 };
+const englishFeed: NewsFeed = {
+  id: "gn-en",
+  format: "rss",
+  kind: "article",
+  language: "en",
+  url: "https://e.test",
+  outlet: null,
+  barcaOnly: true,
+};
+const videoFeed: NewsFeed = {
+  id: "yt",
+  format: "atom",
+  kind: "video",
+  language: "en",
+  url: "https://v.test",
+  outlet: "FC Barcelona",
+  barcaOnly: true,
+};
+const fanFeed: NewsFeed = {
+  id: "reddit",
+  format: "atom",
+  kind: "fan",
+  language: "en",
+  url: "https://r.test",
+  outlet: "r/Barca",
+  barcaOnly: true,
+};
+
+const YOUTUBE = `<?xml version="1.0"?><feed xmlns="http://www.w3.org/2005/Atom" xmlns:yt="y" xmlns:media="m">
+<title>FC Barcelona</title>
+<entry><yt:videoId>IlfT2EkHXNg</yt:videoId><title>MATCH PREVIEW &amp; more</title>
+<link rel="alternate" href="https://www.youtube.com/watch?v=IlfT2EkHXNg"/>
+<published>${hoursAgo(2).toISOString()}</published>
+<media:group><media:description>Training at the Ciutat Esportiva</media:description></media:group></entry>
+<entry><yt:videoId>bad id"onload=x</yt:videoId><title>Broken</title>
+<link rel="alternate" href="https://www.youtube.com/watch?v=x"/><published>${hoursAgo(2).toISOString()}</published></entry>
+</feed>`;
+
+const REDDIT = `<?xml version="1.0"?><feed xmlns="http://www.w3.org/2005/Atom">
+<entry><author><name>/u/culer</name></author><title>Open Thread #45 (Nov 2026)</title>
+<link href="https://www.reddit.com/r/Barca/comments/1/"/><published>${hoursAgo(3).toISOString()}</published></entry>
+<entry><author><name>/u/culer</name></author><title>Flick: &quot;We focus on our players&quot;</title>
+<link href="https://www.reddit.com/r/Barca/comments/2/"/><published>${hoursAgo(3).toISOString()}</published></entry>
+</feed>`;
 
 const RSS = `<?xml version="1.0"?><rss xmlns:content="x"><channel>
 <item><title><![CDATA[Pedri vuelve &amp; marca]]></title><link>https://a.test/1</link>
@@ -104,6 +162,26 @@ const feedArticle = (changes: Partial<FeedArticle> = {}): FeedArticle => ({
   ...changes,
 });
 
+describe("reading Atom feeds", () => {
+  it("reads club videos, and refuses a video id that is not YouTube's shape", async () => {
+    const provider = createRssProvider({ fetchText: async () => YOUTUBE });
+    const videos = await provider.fetchFeed(videoFeed);
+    expect(videos).toHaveLength(1);
+    expect(videos[0]).toMatchObject({
+      videoId: "IlfT2EkHXNg",
+      title: "MATCH PREVIEW & more",
+      url: "https://www.youtube.com/watch?v=IlfT2EkHXNg",
+      snippet: "Training at the Ciutat Esportiva",
+      outlet: "FC Barcelona",
+    });
+  });
+
+  it("fails loudly on an Atom feed that is not a feed", async () => {
+    const provider = createRssProvider({ fetchText: async () => "<html></html>" });
+    await expect(provider.fetchFeed(videoFeed)).rejects.toThrow("Unrecognised");
+  });
+});
+
 describe("choosing articles", () => {
   it("drops anything too old, so a frozen feed cannot show old news", () => {
     const stale = feedArticle({ publishedAt: hoursAgo(24 * 30) });
@@ -122,6 +200,31 @@ describe("choosing articles", () => {
     const kept = prepareArticles(articles, googleFeed, now);
     expect(kept).toHaveLength(1);
     expect(kept[0]?.pressSide).toBe("madrid");
+  });
+
+  it("labels English outlets, and badges scoops from named journalists", () => {
+    const kept = prepareArticles(
+      [
+        feedArticle({ outlet: "The Athletic", title: "Barcelona agree deal, says Ornstein" }),
+        feedArticle({ outlet: "Some Blog", title: "Here we go! Barça sign a striker" }),
+        feedArticle({ outlet: "Some Blog", title: "Barça train ahead of Sunday" }),
+      ],
+      englishFeed,
+      now,
+    );
+    expect(kept.map((article) => article.pressSide)).toEqual(["english", "english", "english"]);
+    expect(kept.map((article) => article.scoopBy)).toEqual(["ornstein", "romano", null]);
+    expect(kept[0]).toMatchObject({ kind: "article", language: "en" });
+    const romanoSearch = { ...englishFeed, scoopBy: "romano" } as const;
+    const credited = prepareArticles([feedArticle({ title: "Barça close in" })], romanoSearch, now);
+    expect(credited[0]?.scoopBy).toBe("romano");
+  });
+
+  it("drops the pinned fan threads that never change", async () => {
+    const provider = createRssProvider({ fetchText: async () => REDDIT });
+    const threads = prepareArticles(await provider.fetchFeed(fanFeed), fanFeed, now);
+    expect(threads.map((thread) => thread.title)).toEqual(['Flick: "We focus on our players"']);
+    expect(threads[0]).toMatchObject({ kind: "fan", author: "culer", scoopBy: null });
   });
 
   it("treats accents, case and punctuation as the same headline", () => {
@@ -245,6 +348,34 @@ describe("the news job", () => {
     expect((await run(shaky, null, [directFeed])).status).toBe("failed");
   });
 
+  it("stores videos and fan threads apart, and never sends them to be translated", async () => {
+    const sent: string[] = [];
+    const ai = fakeAi({
+      translate: async (articles) => {
+        sent.push(...articles.map((article) => article.title));
+        return articles.map((article) => translation(article.id));
+      },
+    });
+    const provider: NewsProvider = {
+      fetchFeed: async (feed) =>
+        feed.kind === "video"
+          ? [feedArticle({ url: "https://v.test/1", title: "Barça training", videoId: "abcdef123" })]
+          : feed.kind === "fan"
+            ? [feedArticle({ url: "https://r.test/1", title: "Match thread", author: "culer" })]
+            : three,
+    };
+    const result = await run(provider, ai, [directFeed, videoFeed, fanFeed]);
+    expect(result.status).toBe("success");
+    expect(sent).toHaveLength(3);
+    expect(await getRecentArticles(created.database, 10)).toHaveLength(3);
+    expect(await getRecentMedia(created.database, "video", 10)).toMatchObject([
+      { title: "Barça training", videoId: "abcdef123", outlet: "Mundo Deportivo" },
+    ]);
+    expect(await getRecentMedia(created.database, "fan", 10)).toMatchObject([
+      { title: "Match thread", author: "culer" },
+    ]);
+  });
+
   it("searches English and Spanish, and treats % as a normal character", async () => {
     await run(providerOf(three), fakeAi());
     const search = (query: string) =>
@@ -270,6 +401,8 @@ function article(id: string, changes: Partial<NewsArticle> = {}): NewsArticle {
     certainty: "rumour",
     topic: "rashford",
     playerNames: [],
+    language: "es",
+    scoopBy: null,
     ...changes,
   };
 }

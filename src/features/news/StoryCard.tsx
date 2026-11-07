@@ -15,6 +15,7 @@ const SIDE_LABELS = {
   barcelona: "Barcelona press",
   madrid: "Madrid press",
   national: "National press",
+  english: "English press",
   official: "Club",
 } as const;
 

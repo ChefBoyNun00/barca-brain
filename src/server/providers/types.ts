@@ -60,6 +60,10 @@ export type FeedArticle = {
   title: string;
   snippet: string | null;
   publishedAt: Date;
+  /** YouTube only: the id the embed plays. */
+  videoId?: string | null;
+  /** Fan threads only: who posted it. */
+  author?: string | null;
 };
 
 export interface NewsProvider {

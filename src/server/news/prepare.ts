@@ -1,9 +1,13 @@
 import {
   BARCA_KEYWORDS,
   BLOCKED_OUTLETS,
+  FAN_THREAD_SKIP,
   NEWS_MAX_AGE_DAYS,
   OUTLET_SIDES,
+  SCOOP_JOURNALISTS,
   type NewsFeed,
+  type PressSide,
+  type ScoopJournalist,
 } from "@/config/news";
 import type { ArticleToStore } from "@/server/db/queries/news-writes";
 import type { FeedArticle } from "@/server/providers/types";
@@ -24,8 +28,19 @@ function isWanted(article: FeedArticle, feed: NewsFeed, now: Date): boolean {
   const age = now.getTime() - article.publishedAt.getTime();
   if (age > NEWS_MAX_AGE_DAYS * DAY_MS) return false;
   if (BLOCKED_OUTLETS.has(article.outlet)) return false;
+  if (feed.kind === "fan" && FAN_THREAD_SKIP.test(article.title)) return false;
   if (feed.barcaOnly) return true;
   return BARCA_KEYWORDS.test(`${article.title} ${article.snippet ?? ""}`);
+}
+
+/** The journalist a story comes from, when the headline or summary names one. */
+export function findScoop(text: string): ScoopJournalist | null {
+  return SCOOP_JOURNALISTS.find((journalist) => journalist.pattern.test(text))?.id ?? null;
+}
+
+function sideOf(outlet: string, feed: NewsFeed): PressSide {
+  if (feed.kind === "video") return "official";
+  return OUTLET_SIDES[outlet] ?? (feed.language === "en" ? "english" : "national");
 }
 
 export function prepareArticles(
@@ -38,6 +53,12 @@ export function prepareArticles(
     .map((article) => ({
       ...article,
       dedupeKey: makeDedupeKey(article.title),
-      pressSide: OUTLET_SIDES[article.outlet] ?? "national",
+      pressSide: sideOf(article.outlet, feed),
+      kind: feed.kind,
+      language: feed.language,
+      scoopBy:
+        feed.kind === "article"
+          ? (feed.scoopBy ?? findScoop(`${article.title} ${article.snippet ?? ""}`))
+          : null,
     }));
 }

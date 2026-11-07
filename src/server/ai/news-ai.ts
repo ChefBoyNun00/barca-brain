@@ -4,7 +4,7 @@ import { z } from "zod";
 import { NEWS_MAX_OUTPUT_TOKENS, NEWS_MODEL } from "@/config/ai";
 import { NEWS_CATEGORIES, NEWS_CERTAINTIES } from "@/domain/news";
 import type { NewsAi } from "@/server/news/types";
-import { TRANSLATE_NEWS_PROMPT, WRITE_BRIEFING_PROMPT } from "./prompts/news.v1";
+import { TRANSLATE_NEWS_PROMPT, WRITE_BRIEFING_PROMPT } from "./prompts/news.v2";
 
 const TranslationsSchema = z.object({
   articles: z.array(

@@ -1,18 +1,25 @@
 import { z } from "zod";
-import type { PressSide } from "@/config/news";
+import type { FeedKind, PressSide, ScoopJournalist } from "@/config/news";
 import type { BriefingBullet } from "@/domain/news";
 import type { Translation } from "@/server/news/types";
 import type { FeedArticle } from "@/server/providers/types";
 import type { Db } from "../client";
 
-export type ArticleToStore = FeedArticle & { dedupeKey: string; pressSide: PressSide };
+export type ArticleToStore = FeedArticle & {
+  dedupeKey: string;
+  pressSide: PressSide;
+  kind: FeedKind;
+  language: "es" | "en";
+  scoopBy: ScoopJournalist | null;
+};
 
 /** Returns true when the article was new. Either unique column can reject a repeat. */
 export async function insertArticle(db: Db, article: ArticleToStore): Promise<boolean> {
   const { rows } = await db.query(
     `insert into news_articles
-       (url, dedupe_key, outlet, press_side, title_original, snippet_original, published_at)
-     values ($1, $2, $3, $4, $5, $6, $7)
+       (url, dedupe_key, outlet, press_side, title_original, snippet_original, published_at,
+        kind, language, scoop_by, video_id, author)
+     values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
      on conflict do nothing
      returning id`,
     [
@@ -23,6 +30,11 @@ export async function insertArticle(db: Db, article: ArticleToStore): Promise<bo
       article.title,
       article.snippet,
       article.publishedAt,
+      article.kind,
+      article.language,
+      article.scoopBy,
+      article.videoId ?? null,
+      article.author ?? null,
     ],
   );
   return rows.length > 0;
@@ -40,7 +52,8 @@ const UntranslatedSchema = z.array(
 export async function getUntranslatedArticles(db: Db, maxAgeDays: number, limit: number) {
   const { rows } = await db.query(
     `select id, outlet, title_original, snippet_original from news_articles
-     where translated_at is null and published_at > now() - make_interval(days => $1)
+     where kind = 'article' and translated_at is null
+       and published_at > now() - make_interval(days => $1)
      order by published_at desc
      limit $2`,
     [maxAgeDays, limit],

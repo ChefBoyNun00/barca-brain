@@ -1,8 +1,8 @@
 import { XMLParser } from "fast-xml-parser";
 import { NEWS_REQUEST_TIMEOUT_MS, NEWS_USER_AGENT, type NewsFeed } from "@/config/news";
 import { ProviderError, type NewsProvider } from "../types";
-import { mapFeedItems } from "./mapper";
-import { RssFeedSchema } from "./schemas";
+import { mapAtomEntries, mapFeedItems } from "./mapper";
+import { AtomFeedSchema, RssFeedSchema } from "./schemas";
 
 const PROVIDER_NAME = "rss";
 
@@ -11,6 +11,14 @@ const parser = new XMLParser({
   parseTagValue: false,
   htmlEntities: true,
   isArray: (name) => name === "item",
+});
+
+const atomParser = new XMLParser({
+  ignoreAttributes: false,
+  attributeNamePrefix: "@_",
+  parseTagValue: false,
+  htmlEntities: true,
+  isArray: (name) => name === "entry",
 });
 
 type Deps = { fetchText?: (url: string) => Promise<string> };
@@ -29,14 +37,21 @@ export function createRssProvider(deps: Deps = {}): NewsProvider {
 
   return {
     async fetchFeed(feed: NewsFeed) {
-      const parsed = RssFeedSchema.safeParse(parser.parse(await fetchText(feed.url)));
-      if (!parsed.success) {
-        throw new ProviderError("Unrecognised response shape", {
+      const text = await fetchText(feed.url);
+      const unrecognised = () =>
+        new ProviderError("Unrecognised response shape", {
           provider: PROVIDER_NAME,
           endpoint: feed.id,
           params: {},
         });
+
+      if (feed.format === "atom") {
+        const parsed = AtomFeedSchema.safeParse(atomParser.parse(text));
+        if (!parsed.success) throw unrecognised();
+        return mapAtomEntries(parsed.data.feed.entry, feed);
       }
+      const parsed = RssFeedSchema.safeParse(parser.parse(text));
+      if (!parsed.success) throw unrecognised();
       return mapFeedItems(parsed.data.rss.channel.item, feed);
     },
   };
