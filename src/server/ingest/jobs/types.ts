@@ -1,10 +1,11 @@
 import type { IngestTarget } from "@/config/football";
 import type { Db } from "@/server/db/client";
-import type { FootballProvider } from "@/server/providers/types";
+import type { FootballProvider, PlayerPhotoProvider } from "@/server/providers/types";
 
 export type JobContext = {
   db: Db;
   provider: FootballProvider;
+  photos: PlayerPhotoProvider;
   target: IngestTarget;
   season: number;
 };

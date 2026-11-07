@@ -1,16 +1,10 @@
 import { z } from "zod";
-import type {
-  HomeScorer,
-  HomeStanding,
-  MatchStatus,
-  RaceTeam,
-  SeasonMatch,
-} from "@/domain/home";
+import type { HomeStanding, MatchStatus, SeasonMatch } from "@/domain/home";
 import type { Db } from "../client";
 
 export type TeamScope = { provider: string; teamExternalId: string; season: number };
 
-const BARCA_CTE = `
+export const BARCA_CTE = `
   with barca as (
     select internal_id as id from external_ids
     where entity_type = 'team' and provider = $1 and external_id = $2
@@ -23,6 +17,7 @@ const MatchRowSchema = z.object({
   competition: z.string(),
   competition_type: z.string(),
   round: z.string().nullable(),
+  opponent_id: z.string().nullable(),
   opponent_name: z.string().nullable(),
   opponent_logo: z.string().nullable(),
   is_home: z.boolean(),
@@ -38,6 +33,7 @@ export async function getSeasonMatches(db: Db, scope: TeamScope): Promise<Season
     `${BARCA_CTE}
      select f.id, f.kickoff_at, f.status, c.name as competition, c.type as competition_type,
        f.round,
+       o.id as opponent_id,
        coalesce(o.short_name, o.name) as opponent_name,
        o.logo_url as opponent_logo,
        f.home_team_id = barca.id as is_home,
@@ -67,9 +63,9 @@ export async function getSeasonMatches(db: Db, scope: TeamScope): Promise<Season
       isLeague: row.competition_type === "league",
       round: row.round,
       opponent:
-        row.opponent_name === null
+        row.opponent_id === null || row.opponent_name === null
           ? null
-          : { name: row.opponent_name, logoUrl: row.opponent_logo },
+          : { id: row.opponent_id, name: row.opponent_name, logoUrl: row.opponent_logo },
       isHome: row.is_home,
       goalsFor: row.goals_for,
       goalsAgainst: row.goals_against,
@@ -97,58 +93,6 @@ export async function getLeagueStanding(db: Db, scope: TeamScope): Promise<HomeS
     [scope.provider, scope.teamExternalId, scope.season],
   );
   return z.array(StandingRowSchema).parse(rows)[0] ?? null;
-}
-
-const RaceRowSchema = z.object({
-  name: z.string(),
-  points: z.number(),
-  is_barca: z.boolean(),
-});
-
-/** The top of the league table. */
-export async function getLeagueRace(db: Db, scope: TeamScope, limit: number): Promise<RaceTeam[]> {
-  const { rows } = await db.query(
-    `${BARCA_CTE}
-     select coalesce(t.short_name, t.name) as name, s.points,
-       coalesce(s.team_id = (select id from barca), false) as is_barca
-     from standings s
-     join teams t on t.id = s.team_id
-     join competitions c on c.id = s.competition_id
-     where s.season = $3 and c.type = 'league'
-     order by s.rank asc
-     limit $4`,
-    [scope.provider, scope.teamExternalId, scope.season, limit],
-  );
-  return z
-    .array(RaceRowSchema)
-    .parse(rows)
-    .map(({ is_barca: isBarca, ...rest }) => ({ ...rest, isBarca }));
-}
-
-const ScorerRowSchema = z.object({
-  name: z.string(),
-  goals: z.number(),
-  assists: z.number().nullable(),
-});
-
-export async function getTopLeagueScorers(
-  db: Db,
-  scope: TeamScope,
-  limit: number,
-): Promise<HomeScorer[]> {
-  const { rows } = await db.query(
-    `${BARCA_CTE}
-     select p.name, s.goals, s.assists
-     from player_season_stats s
-     join barca on barca.id = s.team_id
-     join players p on p.id = s.player_id
-     join competitions c on c.id = s.competition_id
-     where s.season = $3 and c.type = 'league'
-     order by s.goals desc, s.assists desc nulls last, p.name asc
-     limit $4`,
-    [scope.provider, scope.teamExternalId, scope.season, limit],
-  );
-  return z.array(ScorerRowSchema).parse(rows);
 }
 
 export async function getLastSuccessfulIngestAt(db: Db, provider: string): Promise<Date | null> {

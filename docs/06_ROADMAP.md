@@ -22,15 +22,23 @@ Each phase ends with something that runs. Tick boxes as they ship.
 
 **Done =** Supabase shows every Barça match of the season with scores, plus scorers and standings, updated daily automatically.
 
-## Phase 2 — Ask Barça (weekend 2)
-- [ ] Query functions + views needed by tools.
-- [ ] 8 tools + registry; system prompt v1.
-- [ ] `/api/ask` route: agent loop, streaming, limits, logging.
-- [ ] `/ask` UI: input, streamed answer, "data used" panel, loading/error/empty states.
-- [ ] Rate limit + daily cap.
+## Phase 2 — Ask Blaugrana (weekend 2)
+- [x] Query functions needed by tools.
+- [x] 7 tools + registry; system prompt v1.
+- [x] `/api/ask` route: agent loop, streaming, limits. Request logging waits on a write path.
+- [x] `/ask` UI: input, streamed answer, "data used" line, loading/error/empty states.
+- [x] Access code + per-instance rate limit (see decisions log).
+- [x] First live run with a real API key: 11 checks, one maths error found and fixed in the prompt.
 - [ ] 20-question eval set; ≥85% correct.
 
 **Done =** v1 definition of done in `01_PRODUCT_BRIEF.md` fully met.
+
+## Phase 2.5 — The Spanish press, in English
+- [x] RSS ingest (`npm run news`) with freshness check, dedupe and off-topic filter.
+- [x] AI translation, story grouping, certainty labels and a daily briefing.
+- [x] `/news` page, home preview, press on player cards, Barcelona v Madrid press filter.
+- [x] Fixtures calendar feed at `/calendar.ics`.
+- [x] First live translation run with a real API key.
 
 ## Phase 3 — App shell (1 weekend)
 - [ ] Home: next match countdown, last result, table position, form strip.

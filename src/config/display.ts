@@ -2,7 +2,7 @@
 
 export const DISPLAY_LOCALE = "en-GB";
 export const DISPLAY_TIME_ZONE = "Asia/Jerusalem";
-export const TOP_SCORERS_LIMIT = 5;
+export const TOP_SCORERS_LIMIT = 8;
 export const RACE_TEAMS_LIMIT = 4;
 
 /** Provider names fans do not use. Anything not listed shows as it arrives. */
@@ -10,3 +10,21 @@ export const COMPETITION_DISPLAY_NAMES: Record<string, string> = {
   "Primera Division": "La Liga",
   "UEFA Champions League": "Champions League",
 };
+
+export const POINTS_FOR = { W: 3, D: 1, L: 0 } as const;
+
+/** How long each stripe stays on screen when the season replays. */
+export const REPLAY_STEP_MS = 240;
+
+/** Includes the season, so last season's picks are never read back. */
+export const ENDING_PICKS_STORAGE_KEY = "barca-brain:ending-picks:2026";
+
+export const POSITION_LABELS = {
+  GK: "Goalkeeper",
+  DF: "Defender",
+  MF: "Midfielder",
+  FW: "Forward",
+} as const;
+
+/** Roughly a match with stoppages and half-time, for calendar entries. */
+export const MATCH_LENGTH_MINUTES = 115;
