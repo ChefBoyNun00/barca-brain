@@ -2473,35 +2473,6 @@ body {
     text-align: center;
   }
 
-  /* On the home page: a row you swipe through */
-  .match-rail {
-    display: flex;
-    gap: 0.875rem;
-    padding-block: 1rem 1.25rem;
-    margin-inline: -1rem;
-    padding-inline: 1rem;
-    overflow-x: auto;
-    scroll-snap-type: x proximity;
-    scrollbar-width: thin;
-    mask-image: linear-gradient(
-      90deg,
-      transparent,
-      #000 1.5rem,
-      #000 calc(100% - 1.5rem),
-      transparent
-    );
-  }
-
-  .match-rail .match-card {
-    flex: 0 0 min(16.5rem, 78vw);
-    scroll-snap-align: center;
-  }
-
-  .match-rail:focus-visible {
-    outline: 2px solid var(--primary);
-    outline-offset: 2px;
-  }
-
   @media (prefers-reduced-motion: reduce) {
     .match-card,
     .match-card:target,
@@ -2554,5 +2525,199 @@ body {
   }
   to {
     opacity: 1;
+  }
+}
+
+
+@layer components {
+  /* The season shirt: the match readout under it, its controls and its list */
+.wall:has(.wall-input:focus-visible) {
+    outline: 2px solid var(--primary);
+    outline-offset: 4px;
+  }
+
+.wall-input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+.wall-readout {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 1200px;
+    margin: 1.75rem auto 0;
+    padding-inline: 1rem;
+  }
+
+.match-detail {
+    min-height: 8.5rem;
+    text-align: center;
+    animation: fadeInScale 0.25s var(--ease-out) both;
+  }
+
+.match-meta {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--primary);
+  }
+
+.match-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem 0.75rem;
+    margin-top: 0.25rem;
+  }
+
+.match-side {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+/* The right-hand team reads name first, then crest, so each crest hugs its own name. */
+  .match-side:last-child {
+    flex-direction: row-reverse;
+  }
+
+.match-side img {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+  }
+
+.match-team {
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 4.5vw, 2rem);
+    font-weight: 900;
+    line-height: 1.05;
+    text-transform: uppercase;
+    color: var(--text-heading);
+  }
+
+.match-score {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 7vw, 3.75rem);
+    font-weight: 900;
+    line-height: 1.05;
+    text-transform: uppercase;
+    color: var(--text-heading);
+  }
+
+.match-note {
+    margin-top: 0.25rem;
+    font-size: 0.9rem;
+  }
+
+.wall-legend {
+    max-width: 44rem;
+    margin: 1rem auto 0;
+    padding-inline: 1rem;
+    font-size: 0.875rem;
+    text-align: center;
+  }
+
+.wall-table {
+    max-width: 44rem;
+    margin: 0.75rem auto 0;
+    padding-inline: 1rem;
+    font-size: 0.875rem;
+    text-align: center;
+  }
+
+.wall-table summary {
+    font-weight: 600;
+    color: var(--primary);
+    cursor: pointer;
+  }
+
+.wall-table ol {
+    margin-top: 0.75rem;
+    text-align: left;
+  }
+
+.wall-table li {
+    padding-block: 0.25rem;
+    border-top: 1px solid var(--border);
+  }
+
+/* The shirt's controls and crests */
+  .wall-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    margin-bottom: 1rem;
+  }
+
+.wall-record {
+    margin-left: auto;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-heading);
+    font-variant-numeric: tabular-nums;
+  }
+
+.wall-crests {
+    display: none;
+    gap: 2px;
+    margin-top: 1.25rem;
+    padding-inline: 1rem;
+    cursor: ew-resize;
+  }
+
+.wall-crests span {
+    display: grid;
+    flex: 1 1 0;
+    min-width: 0;
+    height: 28px;
+    place-items: center;
+    transition:
+      transform 150ms var(--ease-smooth),
+      opacity 150ms var(--ease-smooth);
+  }
+
+.wall-crests img {
+    width: 100%;
+    max-width: 24px;
+    height: auto;
+    max-height: 24px;
+    object-fit: contain;
+    pointer-events: none;
+  }
+
+.wall-crests span[data-selected="true"] {
+    transform: scale(1.5);
+  }
+
+.wall-crests span[data-dimmed="true"] {
+    opacity: 0.2;
+  }
+
+  @media (min-width: 768px) {
+.wall-crests {
+      display: flex;
+    }
+  }
+
+  .wall-table summary:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .season-more {
+    margin-top: 1rem;
+    text-align: center;
   }
 }

@@ -3,9 +3,10 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { CURRENT_SEASON } from "@/config/football";
 import { Countdown } from "./Countdown";
-import { MatchRail } from "../matches/MatchRail";
 import { HomeHero } from "./HomeHero";
 import { ResultsTicker } from "./ResultsTicker";
+import { SeasonSelectionProvider } from "./season-selection";
+import { WovenSeason } from "./WovenSeason";
 import { displayCompetition, formatKickoff, formatUpdatedAgo } from "./format";
 import { getHomeData } from "./get-home-data";
 import {
@@ -28,10 +29,6 @@ const EXPLORE = [
   { href: "/ask", title: "Ask", note: "Questions about the season." },
 ] as const;
 
-/** How many played matches, and how many to come, the home page's card row shows. */
-const RAIL_PLAYED = 5;
-const RAIL_UPCOMING = 4;
-
 /** Runs per request, so the page always reads the latest ingested data. */
 export async function HomeDashboard() {
   await connection();
@@ -51,12 +48,8 @@ export async function HomeDashboard() {
   const nextIndex = getNextMatchIndex(matches, now);
   const nextMatch = matches[nextIndex];
   const lastPlayedIndex = getLastPlayedIndex(matches);
-  const railStart = Math.max(0, lastPlayedIndex - RAIL_PLAYED + 1);
-  const railMatches = matches.slice(railStart, nextIndex + RAIL_UPCOMING);
-  const lastPlayed = matches[lastPlayedIndex];
-
   return (
-    <>
+    <SeasonSelectionProvider initialIndex={Math.max(lastPlayedIndex, 0)}>
       <ResultsTicker matches={matches} nextIndex={nextIndex} />
       <HomeHero
         season={CURRENT_SEASON}
@@ -66,17 +59,12 @@ export async function HomeDashboard() {
         standing={standing}
       />
 
-      <section aria-labelledby="latest" className="page-gutter section reveal">
-        <div className="section-head">
-          <h2 id="latest" className="section-title">
-            Latest &amp; next
-          </h2>
-          <Link href="/matches" className="chip chip-action">
-            All matches →
-          </Link>
-        </div>
-        <MatchRail matches={railMatches} focusId={lastPlayed?.id ?? null} />
-      </section>
+      <WovenSeason matches={matches} lastPlayedIndex={lastPlayedIndex} nextIndex={nextIndex} />
+      <div className="page-gutter season-more">
+        <Link href="/matches" className="chip chip-action">
+          Every match as cards →
+        </Link>
+      </div>
 
       {nextMatch && (
         <section aria-labelledby="next-up" className="poster reveal">
@@ -139,6 +127,6 @@ export async function HomeDashboard() {
           Credits
         </Link>
       </footer>
-    </>
+    </SeasonSelectionProvider>
   );
 }
