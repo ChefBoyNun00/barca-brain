@@ -4,8 +4,9 @@ import { useState } from "react";
 import { ChoiceChips, type Choice } from "@/components/ChoiceChips";
 import { POSITION_LABELS } from "@/config/display";
 import type { PlayerPosition, SquadPlayer } from "@/domain/home";
-import { PlayerFace } from "./PlayerFace";
-import { getPlayerTotals, sortSquad, type SquadSort } from "./squad-stats";
+import { Jersey } from "./Jersey";
+import { getJersey } from "./jersey-data";
+import { sortSquad, type SquadSort } from "./squad-stats";
 
 type PositionFilter = "all" | PlayerPosition;
 
@@ -18,37 +19,41 @@ const POSITION_CHOICES: Choice<PositionFilter>[] = [
 ];
 
 const SORT_CHOICES: Choice<SquadSort>[] = [
+  { id: "number", label: "By number" },
   { id: "goals", label: "Most goals" },
   { id: "youngest", label: "Youngest" },
   { id: "name", label: "A–Z" },
 ];
 
-function PlayerTile({ player, onOpen }: { player: SquadPlayer; onOpen: () => void }) {
-  const { goals, assists } = getPlayerTotals(player);
+function Hanger({ player, onOpen }: { player: SquadPlayer; onOpen: () => void }) {
+  const jersey = getJersey(player);
   const position = player.position ? POSITION_LABELS[player.position] : "Squad player";
   return (
-    <button type="button" className="player" onClick={onOpen}>
-      <span aria-hidden="true" className="player-cloth" />
-      <PlayerFace player={player} size={104} />
-      <span className="player-name">{player.name}</span>
-      <span className="player-position">{position}</span>
-      <span className="player-numbers">
-        {goals > 0
-          ? `${goals} goal${goals === 1 ? "" : "s"}${assists ? ` · ${assists} ast` : ""}`
-          : " "}
+    <button
+      type="button"
+      className="hanger"
+      onClick={onOpen}
+      aria-label={`${player.name}${jersey.number === null ? "" : `, number ${jersey.number}`}. ${position}. Open stats.`}
+    >
+      <span aria-hidden="true" className="hanger-hook" />
+      <Jersey jersey={jersey} mode="flip" />
+      {/* Touch screens cannot hover, so the name is also written underneath. */}
+      <span aria-hidden="true" className="hanger-caption">
+        {jersey.number === null ? jersey.printed : `${jersey.number} · ${jersey.printed}`}
       </span>
     </button>
   );
 }
 
-type SquadWallProps = {
+type WardrobeProps = {
   squad: SquadPlayer[];
   onOpen: (playerId: string) => void;
 };
 
-export function SquadWall({ squad, onOpen }: SquadWallProps) {
+/** The squad as shirts on a rail. Hover one to see its back, open it for the stats. */
+export function Wardrobe({ squad, onOpen }: WardrobeProps) {
   const [position, setPosition] = useState<PositionFilter>("all");
-  const [sort, setSort] = useState<SquadSort>("goals");
+  const [sort, setSort] = useState<SquadSort>("number");
   const shown = sortSquad(
     squad.filter((player) => position === "all" || player.position === position),
     sort,
@@ -59,7 +64,7 @@ export function SquadWall({ squad, onOpen }: SquadWallProps) {
       <h1 id="squad-title" className="section-title">
         The squad
       </h1>
-      <p className="section-note">Tap a player to open their card.</p>
+      <p className="section-note">Look at the back of a shirt, then open it for the numbers.</p>
       <div className="squad-controls">
         <ChoiceChips
           label="Filter by position"
@@ -69,13 +74,17 @@ export function SquadWall({ squad, onOpen }: SquadWallProps) {
         />
         <ChoiceChips label="Sort players" choices={SORT_CHOICES} value={sort} onChange={setSort} />
       </div>
-      <ul className="squad">
-        {shown.map((player) => (
-          <li key={player.id}>
-            <PlayerTile player={player} onOpen={() => onOpen(player.id)} />
-          </li>
-        ))}
-      </ul>
+      {shown.length === 0 ? (
+        <p className="section-note">No players in this group.</p>
+      ) : (
+        <ul className="wardrobe">
+          {shown.map((player) => (
+            <li key={player.id}>
+              <Hanger player={player} onOpen={() => onOpen(player.id)} />
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   );
 }

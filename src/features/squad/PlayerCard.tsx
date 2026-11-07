@@ -6,7 +6,8 @@ import { PLAYER_STORIES_LIMIT } from "@/config/news";
 import type { SquadPlayer } from "@/domain/home";
 import { displayCompetition, formatOptionalStat } from "../home/format";
 import { findPlayerStories, type Story } from "../news/stories";
-import { PlayerFace } from "./PlayerFace";
+import { Jersey } from "./Jersey";
+import { getJersey } from "./jersey-data";
 import {
   formatGoalsPerMatch,
   formatShareOfGoals,
@@ -69,7 +70,7 @@ export function PlayerCard({
     >
       <div className="player-card" key={player.id}>
         <div className="player-card-cloth">
-          <PlayerFace player={player} size={168} />
+          <Jersey jersey={getJersey(player)} mode="back" />
         </div>
         <div className="player-card-body">
           <h3 id="player-card-name" className="player-card-name">
@@ -78,7 +79,10 @@ export function PlayerCard({
           <p className="player-card-details">{details.join(" · ")}</p>
 
           {player.stats.length === 0 ? (
-            <p className="player-card-empty">No goals recorded this season yet.</p>
+            <p className="player-card-empty">
+              No goals or assists recorded this season yet. The free data only lists appearances
+              for players who have scored or assisted.
+            </p>
           ) : (
             <>
               <dl className="player-figures">
@@ -89,6 +93,10 @@ export function PlayerCard({
                 <div>
                   <dt>Assists</dt>
                   <dd>{formatOptionalStat(totals.assists)}</dd>
+                </div>
+                <div>
+                  <dt>Played</dt>
+                  <dd>{formatOptionalStat(totals.matches)}</dd>
                 </div>
                 {perMatch && (
                   <div>
@@ -140,15 +148,6 @@ export function PlayerCard({
                 ))}
               </ul>
             </div>
-          )}
-
-          {player.photo && (
-            <p className="player-credit">
-              Photo:{" "}
-              <a href={player.photo.pageUrl} target="_blank" rel="noreferrer">
-                {player.photo.credit ?? "Wikimedia Commons"}, {player.photo.license}
-              </a>
-            </p>
           )}
 
           <div className="player-card-actions">

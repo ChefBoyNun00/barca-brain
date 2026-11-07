@@ -1,4 +1,5 @@
 import type { SquadPlayer } from "@/domain/home";
+import { getJersey } from "./jersey-data";
 
 export type PlayerTotals = {
   goals: number;
@@ -6,7 +7,7 @@ export type PlayerTotals = {
   matches: number | null;
 };
 
-export type SquadSort = "goals" | "name" | "youngest";
+export type SquadSort = "number" | "goals" | "name" | "youngest";
 
 /** Blanks are skipped, not read as zero. All blank stays blank. */
 function sumKnown(values: (number | null)[]): number | null {
@@ -51,7 +52,12 @@ export function getInitials(name: string): string {
 
 const byName = (a: SquadPlayer, b: SquadPlayer) => a.name.localeCompare(b.name);
 
+const NO_NUMBER = Number.MAX_SAFE_INTEGER;
+const numberOf = (player: SquadPlayer) => getJersey(player).number ?? NO_NUMBER;
+
 const SORTERS: Record<SquadSort, (a: SquadPlayer, b: SquadPlayer) => number> = {
+  // Players without a number hang at the end of the rail.
+  number: (a, b) => numberOf(a) - numberOf(b) || byName(a, b),
   goals: (a, b) => getPlayerTotals(b).goals - getPlayerTotals(a).goals || byName(a, b),
   name: byName,
   // An unknown birth date sorts last rather than looking oldest or youngest.

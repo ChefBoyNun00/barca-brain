@@ -5,7 +5,7 @@ import type { SquadPlayer } from "@/domain/home";
 import type { Story } from "../news/stories";
 import { PlayerCard } from "./PlayerCard";
 import { sortSquad } from "./squad-stats";
-import { SquadWall } from "./SquadWall";
+import { Wardrobe } from "./Wardrobe";
 
 type SquadExplorerProps = {
   squad: SquadPlayer[];
@@ -14,11 +14,11 @@ type SquadExplorerProps = {
   stories: Story[];
 };
 
-/** The squad wall, with one player card that opens over it. */
+/** The wardrobe, with one player card that opens over it. */
 export function SquadExplorer({ squad, now, teamGoals, stories }: SquadExplorerProps) {
   const [openId, setOpenId] = useState<string | null>(null);
-  // The card's arrows follow the wall's default order, so the next player is the expected one.
-  const ordered = sortSquad(squad, "goals");
+  // The card's arrows follow the wardrobe's default order, so the next player is the expected one.
+  const ordered = sortSquad(squad, "number");
   const openIndex = ordered.findIndex((player) => player.id === openId);
   const openPlayer = ordered[openIndex];
 
@@ -38,7 +38,7 @@ export function SquadExplorer({ squad, now, teamGoals, stories }: SquadExplorerP
 
   return (
     <>
-      <SquadWall squad={squad} onOpen={setOpenId} />
+      <Wardrobe squad={squad} onOpen={setOpenId} />
       {openPlayer && (
         <PlayerCard
           player={openPlayer}

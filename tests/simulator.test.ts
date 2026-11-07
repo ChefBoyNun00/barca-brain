@@ -19,6 +19,7 @@ import {
   getPlayerTotals,
   sortSquad,
 } from "@/features/squad/squad-stats";
+import { getJersey } from "@/features/squad/jersey-data";
 
 function team(teamId: string, rank: number, points: number, played = 10): LeagueRow {
   return {
@@ -270,5 +271,23 @@ describe("squad stats", () => {
     expect(sortSquad(squad, "youngest").map((row) => row.name)).toEqual(["Young", "Old", "Blank"]);
     expect(sortSquad(squad, "goals")[0]?.name).toBe("Young");
     expect(sortSquad(squad, "name")[0]?.name).toBe("Blank");
+  });
+
+  it("prints the configured name and number on the back of a shirt", () => {
+    expect(getJersey({ name: "Lamine Yamal" })).toEqual({ number: 10, printed: "YAMAL" });
+    expect(getJersey({ name: "Pablo Gavira" })).toEqual({ number: 6, printed: "GAVI" });
+  });
+
+  it("falls back to the surname and no number for an unlisted player", () => {
+    expect(getJersey({ name: "Iker Rodríguez" })).toEqual({ number: null, printed: "RODRÍGUEZ" });
+  });
+
+  it("sorts by shirt number, with unnumbered players last", () => {
+    const squad = [player("Iker Rodríguez"), player("Pedri"), player("Joan García")];
+    expect(sortSquad(squad, "number").map((row) => row.name)).toEqual([
+      "Joan García",
+      "Pedri",
+      "Iker Rodríguez",
+    ]);
   });
 });

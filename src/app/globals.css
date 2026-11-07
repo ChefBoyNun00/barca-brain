@@ -297,8 +297,7 @@ body {
   .chat-retry:focus-visible,
   .poster-ask:focus-visible,
   .pick:focus-visible,
-  .player:focus-visible,
-  .board-row:focus-visible,
+  .hanger:focus-visible,
   .meeting:focus-visible,
   .nav a:focus-visible,
   .wall-table summary:focus-visible {
@@ -1331,120 +1330,6 @@ body {
     margin-top: 1rem;
   }
 
-  .squad {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
-    gap: 0.75rem;
-    margin-top: 1.25rem;
-  }
-
-  .player {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    padding: 1.75rem 0.5rem 0.75rem;
-    overflow: hidden;
-    text-align: center;
-    cursor: pointer;
-    background: #ffffff;
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    box-shadow: var(--shadow-md);
-    transition:
-      transform 300ms var(--ease-smooth),
-      box-shadow 300ms var(--ease-smooth);
-  }
-
-  .player:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 40px -12px rgba(124, 58, 237, 0.25);
-  }
-
-  .player-cloth {
-    position: absolute;
-    inset: 0 0 auto;
-    height: 5.25rem;
-    background: repeating-linear-gradient(
-      90deg,
-      var(--barca-garnet) 0 18px,
-      var(--barca-blue) 18px 36px
-    );
-    transition: height 300ms var(--ease-smooth);
-  }
-
-  .player:hover .player-cloth {
-    height: 6rem;
-  }
-
-  .player .face {
-    position: relative;
-    box-shadow: 0 0 0 4px #ffffff;
-  }
-
-  .player-name {
-    margin-top: 0.625rem;
-    font-family: var(--font-display);
-    font-size: 1.25rem;
-    font-weight: 800;
-    line-height: 1.1;
-    text-transform: uppercase;
-    color: var(--text-heading);
-  }
-
-  .player-position {
-    font-size: 0.8rem;
-  }
-
-  .player-numbers {
-    min-height: 1.25rem;
-    margin-top: 0.125rem;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--barca-garnet);
-  }
-
-  /* Scorers */
-  .board {
-    display: grid;
-    gap: 0.25rem;
-    margin-top: 1rem;
-  }
-
-  .board-row {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 0.25rem 0.75rem;
-    width: 100%;
-    padding: 0.5rem;
-    text-align: left;
-    cursor: pointer;
-    border-radius: 12px;
-    transition: background 150ms var(--ease-smooth);
-  }
-
-  .board-row:hover {
-    background: var(--primary-wash);
-  }
-
-  .board-row .face {
-    grid-row: 1 / 3;
-  }
-
-  .board-row .tally {
-    grid-row: 2;
-    grid-column: 2 / -1;
-    height: 20px;
-  }
-
-  .board-row .tally-number {
-    grid-row: 1;
-    grid-column: 3;
-  }
-
   /* Player card */
   .card-dialog {
     width: min(100vw - 2rem, 44rem);
@@ -1470,15 +1355,7 @@ body {
     display: grid;
     place-items: center;
     padding: 1.5rem;
-    background: repeating-linear-gradient(
-      90deg,
-      var(--barca-garnet) 0 28px,
-      var(--barca-blue) 28px 56px
-    );
-  }
-
-  .player-card-cloth .face {
-    box-shadow: 0 0 0 6px #ffffff;
+    background: var(--primary-wash);
   }
 
   .player-card-body {
@@ -1552,12 +1429,6 @@ body {
     color: var(--text-heading);
   }
 
-  .player-credit {
-    margin-top: 1rem;
-    font-size: 0.75rem;
-  }
-
-  .player-credit a,
   .credits a,
   main p a {
     color: var(--primary);
@@ -1614,23 +1485,6 @@ body {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .board-row {
-      grid-template-columns: auto 11rem minmax(0, 1fr) 6.5rem;
-    }
-
-    .board-row .face {
-      grid-row: 1;
-    }
-
-    .board-row .tally {
-      grid-row: 1;
-      grid-column: 3;
-    }
-
-    .board-row .tally-number {
-      grid-column: 4;
-      text-align: right;
-    }
   }
 
   @media (min-width: 1024px) {
@@ -2084,5 +1938,170 @@ body {
     display: block;
     margin-top: 0.25rem;
     font-size: 0.875rem;
+  }
+}
+
+@layer components {
+  /* The wardrobe: shirts hanging on a rail */
+  .wardrobe {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+    gap: 1.5rem 0.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .hanger {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding-top: 1.5rem;
+    cursor: pointer;
+  }
+
+  /* The rail runs across the top of every cell, so each row reads as one rail. */
+  .hanger::before {
+    content: "";
+    position: absolute;
+    inset: 0.5rem -0.25rem auto;
+    height: 4px;
+    background: var(--text-heading);
+    border-radius: 2px;
+    opacity: 0.18;
+  }
+
+  .hanger-hook {
+    position: absolute;
+    top: 0.1rem;
+    left: 50%;
+    width: 1.1rem;
+    height: 1.1rem;
+    margin-left: -0.55rem;
+    border: 3px solid var(--text-heading);
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    opacity: 0.5;
+  }
+
+  .jersey {
+    --jersey-clip: polygon(
+      31% 0,
+      40% 7%,
+      60% 7%,
+      69% 0,
+      100% 15%,
+      89% 35%,
+      78% 29%,
+      78% 100%,
+      22% 100%,
+      22% 29%,
+      11% 35%,
+      0 15%
+    );
+    display: block;
+    width: 100%;
+    max-width: 8rem;
+    aspect-ratio: 4 / 5;
+    container-type: inline-size;
+    perspective: 700px;
+    transform-origin: top center;
+    transition: transform 200ms var(--ease-smooth);
+  }
+
+  .hanger:hover .jersey,
+  .hanger:focus-visible .jersey {
+    transform: translateY(2px) scale(1.04);
+  }
+
+  .jersey-turn {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 600ms var(--ease-smooth);
+  }
+
+  .hanger:hover .jersey[data-mode="flip"] .jersey-turn,
+  .hanger:focus-visible .jersey[data-mode="flip"] .jersey-turn,
+  .jersey[data-mode="back"] .jersey-turn {
+    transform: rotateY(180deg);
+  }
+
+  .jersey-face {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    clip-path: var(--jersey-clip);
+    backface-visibility: hidden;
+  }
+
+  .jersey-front {
+    background: repeating-linear-gradient(
+      90deg,
+      var(--barca-blue) 0 10cqw,
+      var(--barca-garnet) 10cqw 20cqw
+    );
+  }
+
+  .jersey-collar {
+    width: 22cqw;
+    height: 9cqw;
+    border-radius: 0 0 50% 50%;
+    background: #f5c518;
+  }
+
+  .jersey-back {
+    padding-top: 22cqw;
+    color: #f5c518;
+    background: linear-gradient(180deg, #0a1f44, #14346b);
+    transform: rotateY(180deg);
+  }
+
+  .jersey-printed {
+    max-width: 56cqw;
+    font-family: var(--font-display);
+    font-size: 8cqw;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .jersey-number {
+    margin-top: 2cqw;
+    font-family: var(--font-display);
+    font-size: 38cqw;
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  .hanger-caption {
+    display: none;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-heading);
+  }
+
+  /* Touch screens cannot hover, so they get the name underneath instead. */
+  @media (hover: none) {
+    .hanger-caption {
+      display: block;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .jersey-turn,
+    .jersey {
+      transition: none;
+    }
+  }
+
+  .player-card-cloth .jersey {
+    width: 9rem;
   }
 }
