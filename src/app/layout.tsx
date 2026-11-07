@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Big_Shoulders, Inter } from "next/font/google";
+import { AskDrawer } from "@/features/ask/AskDrawer";
 import "./globals.css";
 
 const inter = Inter({
@@ -31,6 +32,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col">
         {children}
         <div aria-hidden="true" className="mosaic-band" />
+        <AskDrawer />
       </body>
     </html>
   );

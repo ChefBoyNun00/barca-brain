@@ -41,7 +41,6 @@ const SECTIONS: Section[] = [
     label: "nav.squad",
     icon: icon("M8 3L3 6l2 5 3-1v11h8V10l3 1 2-5-5-3a4 4 0 0 1-8 0z"),
   },
-  { href: "/ask", label: "nav.ask", icon: icon("M4 5h16v11H9l-5 4z") },
 ];
 
 function isActive(pathname: string, { href, also = [] }: Section): boolean {

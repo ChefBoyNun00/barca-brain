@@ -3539,3 +3539,117 @@ body {
   }
 }
 
+@layer components {
+  /* Ask Blaugrana: a button at the corner of every page, and a chat that slides in from the side */
+  .ask-launch {
+    position: fixed;
+    inset: auto 1rem 1rem auto;
+    z-index: 65;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem 0.5rem 0.625rem;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--barca-navy);
+    cursor: pointer;
+    background: var(--barca-gold);
+    border: 2px solid var(--barca-navy);
+    border-radius: 9999px;
+    box-shadow:
+      0 10px 24px -8px rgba(10, 18, 48, 0.55),
+      4px 4px 0 var(--barca-garnet);
+    transition: transform 200ms cubic-bezier(0.34, 1.5, 0.64, 1);
+  }
+
+  .ask-launch:hover {
+    transform: translate(-2px, -3px) rotate(-1.5deg);
+  }
+
+  .ask-launch:focus-visible {
+    outline: 3px solid var(--barca-navy);
+    outline-offset: 3px;
+  }
+
+  .ask-drawer {
+    width: min(100vw, 28rem);
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0 0 0 auto;
+    padding: 0;
+    overflow: hidden;
+    background: var(--off-white);
+    border: none;
+    border-left: 4px solid var(--barca-gold);
+  }
+
+  .ask-drawer[open] {
+    display: flex;
+    flex-direction: column;
+    animation: drawerIn 0.35s var(--ease-out) both;
+  }
+
+  .ask-drawer::backdrop {
+    background: rgba(10, 18, 48, 0.55);
+  }
+
+  .ask-drawer-head {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.875rem 1rem;
+    color: #ffffff;
+    background: var(--barca-navy);
+  }
+
+  .ask-drawer-head h2 {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .ask-drawer-close {
+    width: 2.25rem;
+    height: 2.25rem;
+    color: #ffffff;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 50%;
+  }
+
+  .ask-drawer-close:focus-visible {
+    outline: 2px solid var(--barca-gold);
+    outline-offset: 2px;
+  }
+
+  .ask-drawer-body {
+    flex: 1;
+    padding: 0 1rem 1rem;
+    overflow-y: auto;
+  }
+
+  @media (max-width: 639px) {
+    .ask-launch {
+      inset: auto 0.75rem 5.25rem auto;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ask-drawer[open] {
+      animation: none;
+    }
+  }
+}
+
+@keyframes drawerIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+

@@ -93,12 +93,16 @@ const en = {
     "Every stripe is a match. Every dot is a goal. A defeat tears the shirt, a diamond marks Europe, and the empty threads are still to be played.",
   "season.list": "See every match as a list",
 
+  "ask.launch": "Ask Blaugrana",
+  "ask.title": "Ask Blaugrana",
+  "ask.close": "Close",
+
   "lost.kicker": "404 · Page not found",
   "lost.title": "Offside!",
   "lost.note": "That page isn't on the pitch. The flag is up.",
   "lost.home": "Back to the home page",
   "lost.matches": "See the matches",
-  "loading": "Loading",
+  loading: "Loading",
 
   "matchday.matchday": "Matchday",
   "matchday.fulltime": "Full time",
@@ -195,12 +199,16 @@ const ca: Record<TextKey, string> = {
     "Cada franja és un partit. Cada punt és un gol. Una derrota esquinça la samarreta, un diamant marca Europa, i els fils buits són partits per jugar.",
   "season.list": "Mostra tots els partits en llista",
 
+  "ask.launch": "Pregunta al Blaugrana",
+  "ask.title": "Pregunta al Blaugrana",
+  "ask.close": "Tanca",
+
   "lost.kicker": "404 · Pàgina no trobada",
   "lost.title": "Fora de joc!",
   "lost.note": "Aquesta pàgina no és al camp. El linier ha aixecat la bandera.",
   "lost.home": "Torna a l'inici",
   "lost.matches": "Mira els partits",
-  "loading": "Carregant",
+  loading: "Carregant",
 
   "matchday.matchday": "Dia de partit",
   "matchday.fulltime": "Final del partit",

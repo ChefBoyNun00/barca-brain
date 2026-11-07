@@ -40,8 +40,16 @@ function toHistory(turns: Turn[], question: string) {
   return [...finished, { role: "user" as const, content: question }].slice(-(ASK_MAX_MESSAGES - 1));
 }
 
-export function AskChat() {
-  const firstQuestion = useSearchParams().get("q") ?? "";
+type AskChatProps = {
+  /** Replaces the starter questions, for example with ones that fit the page you are on. */
+  suggestions?: readonly string[];
+  /** The /ask page can be opened with ?q=... to ask something straight away. */
+  readQuestionFromUrl?: boolean;
+};
+
+export function AskChat({ suggestions = SUGGESTIONS, readQuestionFromUrl = true }: AskChatProps) {
+  const urlQuestion = useSearchParams().get("q") ?? "";
+  const firstQuestion = readQuestionFromUrl ? urlQuestion : "";
   const [turns, setTurns] = useState<Turn[]>([]);
   const [draft, setDraft] = useState(firstQuestion);
   const [isAnswering, setIsAnswering] = useState(false);
@@ -144,7 +152,7 @@ export function AskChat() {
             in plain English with the football context explained.
           </p>
           <ul className="chat-suggestions">
-            {SUGGESTIONS.map((suggestion) => (
+            {suggestions.map((suggestion) => (
               <li key={suggestion}>
                 <button
                   type="button"
