@@ -1,8 +1,18 @@
+import { Suspense } from "react";
+import { HomeDashboard } from "@/features/home/HomeDashboard";
+import { HomeSkeleton } from "@/features/home/HomeSkeleton";
+
 export default function Home() {
   return (
-    <main className="flex flex-1 flex-col items-center justify-center gap-2 p-8 text-center">
-      <h1 className="text-3xl font-semibold">Barça Brain</h1>
-      <p>Setting up. Match data and Ask Barça are on the way.</p>
-    </main>
+    <>
+      <nav aria-label="Main" className="nav">
+        <span className="brand">Barça Brain</span>
+      </nav>
+      <main className="flex-1">
+        <Suspense fallback={<HomeSkeleton />}>
+          <HomeDashboard />
+        </Suspense>
+      </main>
+    </>
   );
 }
