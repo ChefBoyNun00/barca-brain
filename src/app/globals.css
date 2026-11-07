@@ -1538,31 +1538,6 @@ body {
     font-weight: 600;
   }
 
-  .story-sources {
-    margin-top: 0.25rem;
-    font-size: 0.8rem;
-  }
-
-  .story-sources summary {
-    font-weight: 600;
-    color: var(--primary);
-    cursor: pointer;
-  }
-
-  .story-sources li {
-    padding-block: 0.375rem;
-    border-top: 1px solid var(--border);
-  }
-
-  .story-sources ul {
-    margin-top: 0.375rem;
-  }
-
-  .story-sources a {
-    color: var(--text-heading);
-    text-decoration: underline;
-  }
-
   .story-source-outlet {
     display: block;
   }
@@ -2994,98 +2969,6 @@ body {
     font-size: 0.875rem;
   }
 
-  .nw-card[data-variant="tile"] .nw-summary {
-    display: -webkit-box;
-    overflow: hidden;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-  }
-
-  .nw-card[data-variant="hero"] {
-    margin-top: 1.5rem;
-  }
-
-  .nw-card[data-variant="hero"] .story-art {
-    height: 13rem;
-  }
-
-  .nw-card[data-variant="hero"] .story-art-jersey .jersey {
-    width: 9rem;
-  }
-
-  .nw-card[data-variant="hero"] .nw-title {
-    font-size: clamp(1.9rem, 5vw, 3rem);
-    line-height: 1;
-  }
-
-  .nw-card[data-variant="hero"] .nw-summary {
-    font-size: 1rem;
-  }
-
-  .nw-row-wrap {
-    margin-top: 2.25rem;
-  }
-
-  .nw-row-title {
-    padding-left: 0.75rem;
-    font-family: var(--font-display);
-    font-size: 2rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    color: var(--text-heading);
-    border-left: 6px solid var(--barca-blue);
-  }
-
-  .nw-row-title[data-topic="transfers"] {
-    border-left-color: var(--barca-gold);
-  }
-
-  .nw-row-title[data-topic="injuries"] {
-    border-left-color: var(--barca-garnet);
-  }
-
-  .nw-row {
-    display: flex;
-    gap: 0.875rem;
-    padding-block: 1rem 0.75rem;
-    margin-inline: -1rem;
-    padding-inline: 1rem;
-    overflow-x: auto;
-    scroll-padding-inline: 1rem;
-    scroll-snap-type: x proximity;
-    scrollbar-width: thin;
-  }
-
-  .nw-row .nw-card {
-    flex: 0 0 min(18.5rem, 80vw);
-    scroll-snap-align: start;
-  }
-
-  .nw-row[data-open="true"] {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
-    margin-inline: 0;
-    padding-inline: 0;
-    overflow: visible;
-  }
-
-  @media (min-width: 768px) {
-    .nw-card[data-variant="hero"] {
-      display: grid;
-      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    }
-
-    .nw-card[data-variant="hero"] .story-art {
-      height: auto;
-      min-height: 17rem;
-    }
-
-    .nw-card[data-variant="hero"] .nw-card-body {
-      justify-content: center;
-      padding: 1.75rem;
-    }
-  }
-
   @media (prefers-reduced-motion: reduce) {
     .nw-card {
       animation: none;
@@ -4465,7 +4348,6 @@ body {
   }
 }
 
-
 @keyframes pipStitch {
   from {
     opacity: 0;
@@ -4545,5 +4427,1066 @@ body {
   }
   to {
     background-position: 140% 0;
+  }
+}
+
+@layer components {
+  /* ---------- The news: a front page, not a grid of squares ---------- */
+
+  .nw-section-title {
+    padding-left: 0.75rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.9rem, 5vw, 2.75rem);
+    font-weight: 900;
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--text-heading);
+    border-left: 6px solid var(--barca-garnet);
+  }
+
+  .insiders,
+  .videos,
+  .nw-feed,
+  .fans,
+  .board,
+  .sp-related {
+    margin-top: 3rem;
+  }
+
+  /* Breaking: a stadium ticker of the newest headlines */
+  .breaking {
+    display: flex;
+    align-items: stretch;
+    margin-top: 1.5rem;
+    overflow: hidden;
+    color: #ffffff;
+    background: var(--barca-navy);
+    border-radius: 14px;
+    animation: fadeInUp 0.5s var(--ease-out) both;
+  }
+
+  .breaking-label {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: var(--barca-garnet);
+  }
+
+  .breaking-label[data-live="false"] {
+    background: var(--barca-blue);
+  }
+
+  .breaking-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    background: #ffffff;
+    border-radius: 50%;
+    animation: livePulse 1.2s ease-in-out infinite;
+  }
+
+  .breaking-window {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
+  }
+
+  .breaking-track {
+    display: flex;
+    width: max-content;
+    padding-block: 0.625rem;
+    animation: marquee 70s linear infinite;
+  }
+
+  .breaking:hover .breaking-track,
+  .breaking:focus-within .breaking-track {
+    animation-play-state: paused;
+  }
+
+  .breaking-track li {
+    padding-inline: 1.25rem;
+  }
+
+  .breaking-item {
+    font-size: 0.9rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .breaking-item::before {
+    content: "";
+    display: inline-block;
+    width: 0.4rem;
+    height: 0.4rem;
+    margin-right: 0.75rem;
+    vertical-align: middle;
+    background: var(--barca-gold);
+    border-radius: 50%;
+  }
+
+  .breaking-item:hover {
+    color: var(--barca-gold);
+  }
+
+  /* The front page: the lead story, and the next biggest beside it */
+  .front {
+    display: grid;
+    gap: 1.25rem;
+    margin-top: 1.25rem;
+  }
+
+  .front-side {
+    padding: 1.25rem 1.25rem 0.5rem;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    box-shadow: var(--shadow-md);
+    animation: cardPop 0.5s var(--ease-out) 0.1s both;
+  }
+
+  .front-side-title {
+    padding-bottom: 0.5rem;
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: var(--text-heading);
+    border-bottom: 4px solid var(--barca-gold);
+  }
+
+  .front-list {
+    counter-reset: top;
+  }
+
+  .front-list li {
+    counter-increment: top;
+  }
+
+  .front-list li + li {
+    border-top: 1px solid var(--border);
+  }
+
+  .front-item {
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    column-gap: 0.5rem;
+    padding-block: 0.875rem;
+  }
+
+  .front-item::before {
+    content: counter(top);
+    grid-row: span 2;
+    font-family: var(--font-display);
+    font-size: 2.25rem;
+    font-weight: 900;
+    line-height: 0.9;
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--barca-garnet);
+  }
+
+  .front-item-title {
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--text-heading);
+  }
+
+  .front-item:hover .front-item-title {
+    text-decoration: underline;
+    text-decoration-color: var(--barca-gold);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+  }
+
+  .front-item-meta {
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  @media (min-width: 900px) {
+    .front {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+
+  /* Story cards: four shapes, so the page has rhythm */
+  .nw-card-link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    color: inherit;
+  }
+
+  .nw-card-link:focus-visible {
+    outline: 3px solid var(--barca-gold);
+    outline-offset: -3px;
+    border-radius: 18px;
+  }
+
+  .nw-card-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-top: auto;
+    padding-top: 0.625rem;
+  }
+
+  .nw-card-foot .story-outlets {
+    margin: 0;
+    padding: 0;
+  }
+
+  .nw-read {
+    font-size: 0.875rem;
+    font-weight: 800;
+    color: var(--barca-garnet);
+  }
+
+  .nw-card[data-size="tile"] .nw-summary {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  .nw-card[data-size="lead"] .story-art {
+    height: clamp(13rem, 32vw, 21rem);
+  }
+
+  .nw-card[data-size="lead"] .story-art-jersey .jersey {
+    width: 9rem;
+  }
+
+  .nw-card[data-size="lead"] .nw-card-body {
+    padding: 1.25rem 1.5rem 1.5rem;
+  }
+
+  .nw-card[data-size="lead"] .nw-title {
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    line-height: 0.98;
+  }
+
+  .nw-card[data-size="lead"] .nw-summary {
+    font-size: 1.05rem;
+    line-height: 1.55;
+  }
+
+  /* A colour block: no picture, a big headline, the club's stripes in the corner */
+  .nw-card[data-size="text"] {
+    --tone: var(--barca-navy);
+    position: relative;
+    color: rgba(255, 255, 255, 0.85);
+    background: var(--tone);
+    border: none;
+  }
+
+  .nw-card[data-size="text"][data-tone="garnet"] {
+    --tone: var(--barca-garnet);
+  }
+
+  .nw-card[data-size="text"][data-tone="blue"] {
+    --tone: var(--barca-blue);
+  }
+
+  .nw-card[data-size="text"]::after {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto auto;
+    width: 5rem;
+    height: 5rem;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.1) 0 8px,
+      transparent 8px 16px
+    );
+    mask-image: linear-gradient(225deg, #000, transparent 70%);
+  }
+
+  .nw-card[data-size="text"] .nw-card-body {
+    min-height: 15rem;
+    padding: 1.375rem;
+  }
+
+  .nw-card[data-size="text"] .nw-title {
+    font-size: 1.75rem;
+    color: #ffffff;
+  }
+
+  .nw-card[data-size="text"] .story-age,
+  .nw-card[data-size="text"] .story-outlets {
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .nw-card[data-size="text"] .scoop-avatar {
+    box-shadow: none;
+  }
+
+  .nw-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(16.5rem, 1fr));
+    grid-auto-flow: dense;
+    gap: 1rem;
+    margin-top: 1.25rem;
+  }
+
+  @media (min-width: 720px) {
+    .nw-card[data-size="wide"] {
+      grid-column: span 2;
+    }
+
+    .nw-card[data-size="wide"] .nw-card-link {
+      flex-direction: row;
+    }
+
+    .nw-card[data-size="wide"] .story-art {
+      flex: 0 0 45%;
+      height: auto;
+      min-height: 15rem;
+    }
+
+    .nw-card[data-size="wide"] .nw-title {
+      font-size: 1.9rem;
+    }
+  }
+
+  .nw-more {
+    display: block;
+    margin: 1.25rem auto 0;
+  }
+
+  /* How close a deal is: four segments, filled one after another */
+  .meter {
+    --on: var(--text-secondary);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .meter[data-step="2"] {
+    --on: var(--primary-light);
+  }
+
+  .meter[data-step="3"] {
+    --on: #e2457e;
+  }
+
+  .meter[data-step="4"] {
+    --on: var(--barca-gold);
+  }
+
+  .meter-track {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 3px;
+    width: 6rem;
+  }
+
+  .meter-segment {
+    height: 6px;
+    background: var(--off, rgba(127, 135, 155, 0.3));
+    border-radius: 3px;
+  }
+
+  .meter-segment[data-on="true"] {
+    background: var(--on);
+    transform-origin: left;
+    animation: threadDraw 0.35s var(--ease-out) backwards;
+  }
+
+  .meter-segment:nth-child(2) {
+    animation-delay: 90ms;
+  }
+
+  .meter-segment:nth-child(3) {
+    animation-delay: 180ms;
+  }
+
+  .meter-segment:nth-child(4) {
+    animation-delay: 270ms;
+  }
+
+  .meter-label {
+    font-size: 0.7rem;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--on);
+  }
+
+  /* The Here we go board */
+  .board {
+    position: relative;
+    padding: 1.75rem 1.25rem 1.25rem;
+    overflow: hidden;
+    color: #ffffff;
+    background: var(--barca-navy);
+    border-radius: 22px;
+  }
+
+  .board::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto auto;
+    width: 55%;
+    height: 100%;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      100deg,
+      rgba(165, 0, 68, 0.22) 0 34px,
+      rgba(0, 77, 152, 0.22) 34px 68px
+    );
+    mask-image: linear-gradient(90deg, transparent, #000 80%);
+  }
+
+  .board-head {
+    position: relative;
+  }
+
+  .board-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 7vw, 3.75rem);
+    font-weight: 900;
+    line-height: 0.92;
+    text-transform: uppercase;
+    color: var(--barca-gold);
+  }
+
+  .board-note {
+    margin-top: 0.375rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .board-list {
+    position: relative;
+    display: flex;
+    gap: 0.875rem;
+    margin-top: 1.25rem;
+    padding-bottom: 0.5rem;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+  }
+
+  .board-list li {
+    flex: 0 0 min(17rem, 78vw);
+    scroll-snap-align: start;
+    animation: cardPop 0.5s var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * 60ms);
+  }
+
+  .board-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    height: 100%;
+    padding: 1rem;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 16px;
+    transition:
+      transform 200ms var(--ease-smooth),
+      background 200ms var(--ease-smooth);
+  }
+
+  .board-card:hover {
+    background: rgba(255, 255, 255, 0.12);
+    transform: translateY(-3px);
+  }
+
+  .board-card .meter {
+    --off: rgba(255, 255, 255, 0.18);
+  }
+
+  .board-card .meter[data-step="1"] {
+    --on: #c3cad8;
+  }
+
+  .board-card-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    line-height: 1.25;
+  }
+
+  .board-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-top: auto;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  /* Scoop badges: initials in a disc, gold for Romano, blue for Ornstein */
+  .scoop {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+
+  .scoop-avatar {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    font-size: 0.62rem;
+    font-weight: 900;
+    color: var(--barca-navy);
+    background: var(--barca-gold);
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px #ffffff;
+  }
+
+  .scoop[data-by="ornstein"] .scoop-avatar {
+    color: #ffffff;
+    background: var(--barca-blue);
+  }
+
+  .scoop[data-size="large"] {
+    gap: 0.625rem;
+    font-size: 0.95rem;
+    color: var(--text-heading);
+  }
+
+  .scoop[data-size="large"] .scoop-avatar {
+    width: 2.6rem;
+    height: 2.6rem;
+    font-size: 0.9rem;
+  }
+
+  /* From the insiders */
+  .insiders-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+    gap: 1rem;
+    margin-top: 1.25rem;
+  }
+
+  .insider {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    padding: 1.25rem;
+    overflow: hidden;
+    color: inherit;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    box-shadow: var(--shadow-md);
+    transition:
+      transform 200ms var(--ease-smooth),
+      box-shadow 200ms var(--ease-smooth);
+  }
+
+  .insider::before {
+    content: "“";
+    position: absolute;
+    inset: -1.5rem 0.75rem auto auto;
+    font-family: var(--font-display);
+    font-size: 8rem;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--primary-wash);
+    pointer-events: none;
+  }
+
+  .insider:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 36px -14px rgba(0, 77, 152, 0.4);
+  }
+
+  .insider-title {
+    position: relative;
+    font-family: var(--font-display);
+    font-size: 1.45rem;
+    font-weight: 800;
+    line-height: 1.05;
+    text-transform: uppercase;
+    color: var(--text-heading);
+  }
+
+  .insider-summary {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 0.9rem;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  .insider-age {
+    margin-top: auto;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  /* Barça TV */
+  .video-row {
+    display: flex;
+    gap: 1rem;
+    margin: 1.25rem -1rem 0;
+    padding: 0 1rem 0.75rem;
+    overflow-x: auto;
+    scroll-padding-inline: 1rem;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+  }
+
+  .video {
+    flex: 0 0 min(22rem, 80vw);
+    scroll-snap-align: start;
+  }
+
+  .video-frame {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: var(--barca-navy);
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+  }
+
+  .video-frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .video-poster {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    padding: 0;
+    cursor: pointer;
+    border: 0;
+  }
+
+  .video-poster img {
+    object-fit: cover;
+    transition: transform 400ms var(--ease-smooth);
+  }
+
+  .video-poster:hover img {
+    transform: scale(1.05);
+  }
+
+  .video-poster:focus-visible {
+    outline: 3px solid var(--barca-gold);
+    outline-offset: -3px;
+  }
+
+  .video-play {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    margin: -1.75rem 0 0 -1.75rem;
+    background: var(--barca-garnet);
+    border-radius: 50%;
+    box-shadow: 0 8px 24px rgba(10, 18, 48, 0.45);
+    transition: transform 200ms var(--ease-smooth);
+  }
+
+  .video-poster:hover .video-play {
+    transform: scale(1.12);
+  }
+
+  .video-play svg {
+    width: 1.5rem;
+    margin-left: 3px;
+    fill: #ffffff;
+  }
+
+  .video-title {
+    display: -webkit-box;
+    margin-top: 0.625rem;
+    overflow: hidden;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--text-heading);
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .video-age {
+    font-size: 0.75rem;
+  }
+
+  /* The fans are saying: speech bubbles */
+  .fan-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+    gap: 0.625rem;
+    margin-top: 1.25rem;
+  }
+
+  .fan-list li {
+    animation: fadeInUp 0.5s var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * 50ms);
+  }
+
+  .fan {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    height: 100%;
+    padding: 0.875rem 1rem;
+    color: inherit;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 16px 16px 16px 4px;
+    transition:
+      border-color 150ms var(--ease-smooth),
+      transform 150ms var(--ease-smooth);
+  }
+
+  .fan:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+  }
+
+  .fan-title {
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--text-heading);
+  }
+
+  .fan-meta {
+    margin-top: auto;
+    font-size: 0.75rem;
+  }
+
+  /* ---------- One story, in full ---------- */
+  .sp-back {
+    display: inline-flex;
+    gap: 0.25rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--primary);
+  }
+
+  .sp-head {
+    max-width: 54rem;
+    margin-top: 1.25rem;
+  }
+
+  .sp-tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  .sp-topic {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #ffffff;
+    background: var(--barca-blue);
+    border-radius: 9999px;
+  }
+
+  .sp-topic[data-topic="transfers"] {
+    color: var(--barca-navy);
+    background: var(--barca-gold);
+  }
+
+  .sp-topic[data-topic="injuries"] {
+    background: var(--barca-garnet);
+  }
+
+  .sp-title {
+    margin-top: 0.875rem;
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 7vw, 4.75rem);
+    font-weight: 900;
+    line-height: 0.95;
+    text-transform: uppercase;
+    color: var(--text-heading);
+    animation: fadeInUp 0.6s var(--ease-out) both;
+  }
+
+  .sp-standfirst {
+    margin-top: 1rem;
+    font-size: clamp(1.1rem, 2.4vw, 1.35rem);
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--text-heading);
+    animation: fadeInUp 0.6s var(--ease-out) 0.08s both;
+  }
+
+  .sp-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.375rem 1rem;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .sp-art {
+    margin-top: 1.5rem;
+    overflow: hidden;
+    border-radius: 22px;
+  }
+
+  .sp-art .story-art {
+    height: clamp(11rem, 28vw, 19rem);
+  }
+
+  .sp-layout {
+    display: grid;
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+
+  .sp-body p {
+    font-size: 1.075rem;
+    line-height: 1.75;
+    color: #1c2540;
+  }
+
+  .sp-body p + p {
+    margin-top: 1.1rem;
+  }
+
+  .sp-body p:first-child::first-letter {
+    float: left;
+    margin: 0.3rem 0.6rem 0 0;
+    font-family: var(--font-display);
+    font-size: 4.25rem;
+    font-weight: 900;
+    line-height: 0.8;
+    color: var(--barca-garnet);
+  }
+
+  .sp-quote {
+    margin-block: 2rem;
+    padding: 1.25rem 1.5rem;
+    background: var(--primary-wash);
+    border-left: 6px solid var(--barca-garnet);
+    border-radius: 0 16px 16px 0;
+  }
+
+  .sp-quote blockquote {
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    font-weight: 800;
+    line-height: 1.15;
+    color: var(--text-heading);
+  }
+
+  .sp-quote figcaption {
+    margin-top: 0.625rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .sp-next {
+    margin-top: 2rem;
+    padding: 1.25rem 1.5rem;
+    color: var(--barca-navy);
+    background: var(--barca-gold);
+    border-radius: 18px;
+  }
+
+  .sp-next h2,
+  .sp-facts h2,
+  .sp-sources h2 {
+    font-size: 0.75rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .sp-next p {
+    margin-top: 0.375rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
+
+  .sp-ai-note {
+    margin-top: 1.5rem;
+    font-size: 0.8rem;
+  }
+
+  .sp-writing {
+    padding: 1rem 1.25rem;
+    font-weight: 600;
+    color: var(--primary);
+    background: var(--primary-wash);
+    border-radius: 14px;
+  }
+
+  .sp-coverage {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .sp-coverage li {
+    padding: 1rem 1.25rem;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+  }
+
+  .sp-coverage-outlet {
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--barca-garnet);
+  }
+
+  .sp-coverage-title {
+    margin-block: 0.25rem;
+    font-weight: 700;
+    color: var(--text-heading);
+  }
+
+  .sp-side {
+    display: grid;
+    gap: 1rem;
+    align-content: start;
+  }
+
+  /* Key facts: a sewn label, like the shirt's */
+  .sp-facts {
+    padding: 1.25rem;
+    background: #fbf6ea;
+    border: 2px dashed rgba(165, 0, 68, 0.35);
+    border-radius: 14px;
+    box-shadow:
+      0 0 0 5px #fbf6ea,
+      var(--shadow-md);
+  }
+
+  .sp-facts h2 {
+    color: var(--barca-garnet);
+  }
+
+  .sp-facts ul {
+    margin-top: 0.625rem;
+  }
+
+  .sp-facts li {
+    position: relative;
+    padding-left: 1.1rem;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--text-heading);
+  }
+
+  .sp-facts li + li {
+    margin-top: 0.5rem;
+  }
+
+  .sp-facts li::before {
+    content: "";
+    position: absolute;
+    inset: 0.45rem auto auto 0;
+    width: 0.45rem;
+    height: 0.45rem;
+    background: var(--barca-gold);
+    border-radius: 2px;
+  }
+
+  .sp-players {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+  }
+
+  .sp-ask {
+    display: block;
+    padding: 1rem 1.25rem;
+    font-weight: 800;
+    color: #ffffff;
+    background: linear-gradient(115deg, var(--barca-garnet), var(--barca-blue));
+    border-radius: 14px;
+    transition: transform 150ms var(--ease-smooth);
+  }
+
+  .sp-ask:hover {
+    transform: translateY(-2px);
+  }
+
+  .sp-sources {
+    padding: 1.125rem 1.25rem;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+  }
+
+  .sp-sources ul {
+    margin-top: 0.5rem;
+  }
+
+  .sp-sources li {
+    display: flex;
+    flex-direction: column;
+    padding-block: 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  .sp-sources li + li {
+    border-top: 1px solid var(--border);
+  }
+
+  .sp-sources a {
+    font-weight: 700;
+    color: var(--text-heading);
+    text-decoration: underline;
+    text-decoration-color: var(--primary-soft);
+    text-underline-offset: 3px;
+  }
+
+  .sp-sources span {
+    font-size: 0.75rem;
+  }
+
+  @media (min-width: 900px) {
+    .sp-layout {
+      grid-template-columns: minmax(0, 1fr) 20rem;
+      align-items: start;
+    }
+
+    .sp-side {
+      position: sticky;
+      top: 5.5rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .breaking-track {
+      animation: none;
+    }
+
+    .breaking-window {
+      overflow-x: auto;
+    }
   }
 }

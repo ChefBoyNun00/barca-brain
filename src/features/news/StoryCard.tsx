@@ -1,9 +1,21 @@
 import type { SquadPlayer } from "@/domain/home";
 import type { NewsCertainty } from "@/domain/news";
+import { T } from "@/i18n/language";
+import { ScoopBadge } from "./ScoopBadge";
 import { StoryArt } from "./StoryArt";
-import { formatStoryAge, isCoveredByBothCities, type Story } from "./stories";
+import { StoryLink } from "./StoryLink";
+import {
+  certaintyOf,
+  formatStoryAge,
+  headlineOf,
+  isCoveredByBothCities,
+  isUntranslated,
+  scoopOf,
+  standfirstOf,
+  type NewsStory,
+} from "./stories";
 
-const CERTAINTY_LABELS: Record<NewsCertainty, string> = {
+export const CERTAINTY_LABELS: Record<NewsCertainty, string> = {
   official: "Official",
   reported: "Reported",
   rumour: "Rumour",
@@ -11,70 +23,69 @@ const CERTAINTY_LABELS: Record<NewsCertainty, string> = {
   news: "News",
 };
 
-const SIDE_LABELS = {
-  barcelona: "Barcelona press",
-  madrid: "Madrid press",
-  national: "National press",
-  english: "English press",
-  official: "Club",
-} as const;
+/** wide: picture beside the words. text: no picture, a bold colour block. tile: the default. */
+export type CardSize = "lead" | "wide" | "tile" | "text";
 
 type StoryCardProps = {
-  story: Story;
+  story: NewsStory;
   squad: SquadPlayer[];
   now: Date;
-  variant: "hero" | "tile";
+  size: CardSize;
+  /** Cards on a coloured block take turns between the club colours. */
+  tone?: "garnet" | "blue" | "navy";
 };
 
-/** A story with its picture. The hero is the big one at the top, tiles sit in the rows. */
-export function StoryCard({ story, squad, now, variant }: StoryCardProps) {
-  const { lead, coverage, outlets } = story;
-  const isTranslated = lead.titleEn !== null;
-  const Title = variant === "hero" ? "h2" : "h3";
+/** One story. The whole card opens it. */
+export function StoryCard({ story, squad, now, size, tone }: StoryCardProps) {
+  const certainty = certaintyOf(story);
+  const scoop = scoopOf(story);
+  const standfirst = standfirstOf(story);
+  const untranslated = isUntranslated(story);
+  const Title = size === "lead" ? "h2" : "h3";
 
   return (
-    <article className="nw-card" data-variant={variant}>
-      <StoryArt story={story} squad={squad} size={variant} />
-      <div className="nw-card-body">
-        <div className="story-tags">
-          {lead.certainty && (
-            <span className="story-certainty" data-certainty={lead.certainty}>
-              {CERTAINTY_LABELS[lead.certainty]}
-            </span>
-          )}
-          {isCoveredByBothCities(story) && <span className="story-both">Both cities</span>}
-          <span className="story-age">{formatStoryAge(story.latestAt, now)}</span>
+    <article className="nw-card" data-size={size} data-tone={tone}>
+      <StoryLink story={story} className="nw-card-link">
+        {size !== "text" && (
+          <StoryArt story={story} squad={squad} size={size === "lead" ? "hero" : "tile"} />
+        )}
+        <div className="nw-card-body">
+          <div className="story-tags">
+            {certainty && (
+              <span className="story-certainty" data-certainty={certainty}>
+                {CERTAINTY_LABELS[certainty]}
+              </span>
+            )}
+            {isCoveredByBothCities(story) && <span className="story-both">Both cities</span>}
+            <span className="story-age">{formatStoryAge(story.latestAt, now)}</span>
+          </div>
+
+          <Title className="nw-title" lang={untranslated ? "es" : "en"}>
+            {headlineOf(story)}
+          </Title>
+          {standfirst && <p className="nw-summary">{standfirst}</p>}
+          {untranslated && <p className="story-pending">Still in Spanish: translation pending.</p>}
+
+          <div className="nw-card-foot">
+            {scoop ? (
+              <ScoopBadge by={scoop} />
+            ) : (
+              <span className="story-outlets">
+                {story.outlets.length > 1 ? (
+                  <T k="news.outlets" vars={{ count: story.outlets.length }} />
+                ) : (
+                  story.outlets[0]
+                )}
+              </span>
+            )}
+            {story.writeup && size === "lead" && (
+              <span className="nw-read">
+                <T k="news.readStory" /> →
+              </span>
+            )}
+          </div>
         </div>
-
-        <Title className="nw-title" lang={isTranslated ? "en" : "es"}>
-          {lead.titleEn ?? lead.titleOriginal}
-        </Title>
-        {lead.summaryEn && <p className="nw-summary">{lead.summaryEn}</p>}
-        {!isTranslated && <p className="story-pending">Still in Spanish: translation pending.</p>}
-
-        <p className="story-outlets">
-          {outlets.length > 1 ? `${outlets.length} outlets: ` : ""}
-          {outlets.slice(0, 3).join(", ")}
-          {outlets.length > 3 ? ` +${outlets.length - 3}` : ""}
-          {outlets.length === 1 && ` · ${SIDE_LABELS[lead.pressSide]}`}
-        </p>
-
-        <details className="story-sources">
-          <summary>{isTranslated ? "Original Spanish and sources" : "Sources"}</summary>
-          <ul>
-            {coverage.map((article) => (
-              <li key={article.id}>
-                <a href={article.url} target="_blank" rel="noreferrer">
-                  <span lang="es">{article.titleOriginal}</span>
-                </a>
-                <span className="story-source-outlet">
-                  {article.outlet} · {SIDE_LABELS[article.pressSide]}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </details>
-      </div>
+      </StoryLink>
     </article>
   );
 }

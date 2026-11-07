@@ -243,5 +243,13 @@ export const BRIEFING_MAX_STORIES = 30;
 export const NEWS_PAGE_LIMIT = 120;
 export const HOME_STORIES_LIMIT = 3;
 export const NEWS_VIDEOS_LIMIT = 8;
+/** Stories newer than this run along the breaking strip. */
+export const NEWS_BREAKING_HOURS = 3;
+export const NEWS_BREAKING_LIMIT = 8;
+export const NEWS_TOP_STORIES = 4;
+export const NEWS_BOARD_LIMIT = 10;
+export const NEWS_INSIDERS_LIMIT = 6;
+export const NEWS_RELATED_LIMIT = 4;
+export const STORY_PAGE_SOURCES_LIMIT = 40;
 export const NEWS_FAN_LIMIT = 8;
 export const PLAYER_STORIES_LIMIT = 3;

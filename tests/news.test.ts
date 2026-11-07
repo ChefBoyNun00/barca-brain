@@ -2,7 +2,13 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { NewsFeed } from "@/config/news";
 import type { NewsArticle } from "@/domain/news";
 import {
+  attachWriteups,
   filterStories,
+  hasStoryPage,
+  headlineOf,
+  isBreaking,
+  meterStepOf,
+  scoopOf,
   findPlayerStories,
   formatStoryAge,
   groupStories,
@@ -513,6 +519,48 @@ describe("grouping stories", () => {
   it("picks the story most outlets are running as the top story", () => {
     expect(pickHero(groupStories(mixed))?.id).toBe("rashford");
     expect(pickHero([])).toBeNull();
+  });
+
+  it("attaches write-ups by topic, and prefers their headline", () => {
+    const stories = attachWriteups(groupStories(mixed), [
+      { ...writtenStory, topic: "rashford", articleCount: 2, writtenAt: now },
+    ]);
+    expect(stories.map((story) => story.writeup?.headline ?? null)).toEqual([
+      "Barça win at the Metropolitano",
+      null,
+    ]);
+    expect(headlineOf(stories[0]!)).toBe("Barça win at the Metropolitano");
+    expect(headlineOf(stories[1]!)).toBe("Headline");
+  });
+
+  it("gives a page only to stories grouped under a real topic", () => {
+    const [grouped, catchAll] = groupStories(mixed);
+    expect(hasStoryPage(grouped!)).toBe(true);
+    expect(hasStoryPage(catchAll!)).toBe(false);
+  });
+
+  it("moves the deal meter from talk to report to insider to done", () => {
+    const step = (changes: Partial<NewsArticle>) =>
+      meterStepOf({ ...groupStories([article("x", changes)])[0]!, writeup: null });
+    expect(step({ certainty: "rumour" })).toBe(1);
+    expect(step({ certainty: "opinion" })).toBe(1);
+    expect(step({ certainty: "reported" })).toBe(2);
+    expect(step({ certainty: "reported", scoopBy: "romano" })).toBe(3);
+    expect(step({ certainty: "official" })).toBe(4);
+  });
+
+  it("credits the journalist when any outlet on the story does", () => {
+    const [story] = groupStories([article("a"), article("b", { scoopBy: "ornstein" })]);
+    expect(scoopOf(story!)).toBe("ornstein");
+  });
+
+  it("filters to the English press, and flags fresh stories as breaking", () => {
+    const stories = groupStories([
+      article("a", { topic: "a", pressSide: "english" }),
+      article("b", { topic: "b", publishedAt: hoursAgo(5) }),
+    ]);
+    expect(filterStories(stories, { category: "all", side: "english" })).toHaveLength(1);
+    expect(stories.map((story) => isBreaking(story, now, 3))).toEqual([true, false]);
   });
 
   it("says how old a story is", () => {

@@ -1,5 +1,5 @@
-import { NEWS_CATCH_ALL_TOPICS, type PressSide } from "@/config/news";
-import type { NewsArticle, NewsCategory, NewsCertainty } from "@/domain/news";
+import { NEWS_CATCH_ALL_TOPICS, type PressSide, type ScoopJournalist } from "@/config/news";
+import type { NewsArticle, NewsCategory, NewsCertainty, StoryWriteup } from "@/domain/news";
 
 /** One real-world story, however many outlets covered it. */
 export type Story = {
@@ -58,13 +58,13 @@ export function groupStories(articles: NewsArticle[]): Story[] {
 export const isCoveredByBothCities = (story: Story) =>
   story.sides.includes("barcelona") && story.sides.includes("madrid");
 
-export type SideFilter = "all" | "barcelona" | "madrid" | "both";
+export type SideFilter = "all" | "barcelona" | "madrid" | "english" | "both";
 export type CategoryFilter = "all" | NewsCategory;
 
-export function filterStories(
-  stories: Story[],
+export function filterStories<S extends Story>(
+  stories: S[],
   filters: { category: CategoryFilter; side: SideFilter },
-): Story[] {
+): S[] {
   return stories.filter((story) => {
     if (filters.category !== "all") {
       if (!story.coverage.some((article) => article.category === filters.category)) return false;
@@ -94,10 +94,57 @@ export type StoryTopic = NewsCategory;
 export const topicOf = (story: Story): StoryTopic => story.lead.category ?? "other";
 
 /** The top story: the one most outlets are running, among the freshest, then the newest. */
-export function pickHero(stories: Story[], freshest = 10): Story | null {
+export function pickHero<S extends Story>(stories: S[], freshest = 10): S | null {
   return (
     [...stories.slice(0, freshest)].sort(
       (a, b) => b.outlets.length - a.outlets.length || b.latestAt.getTime() - a.latestAt.getTime(),
     )[0] ?? null
   );
 }
+
+/** A story with its full write-up, once Claude has written one. */
+export type NewsStory = Story & { writeup: StoryWriteup | null };
+
+export function attachWriteups(stories: Story[], writeups: StoryWriteup[]): NewsStory[] {
+  const byTopic = new Map(writeups.map((writeup) => [writeup.topic, writeup]));
+  return stories.map((story) => ({ ...story, writeup: byTopic.get(story.id) ?? null }));
+}
+
+/** Only stories grouped under a real topic have a page of their own. */
+export const hasStoryPage = (story: Story) => story.lead.topic === story.id;
+
+export const headlineOf = (story: NewsStory) =>
+  story.writeup?.headline ?? story.lead.titleEn ?? story.lead.titleOriginal;
+
+export const standfirstOf = (story: NewsStory) =>
+  story.writeup?.standfirst ?? story.lead.summaryEn;
+
+export const certaintyOf = (story: NewsStory): NewsCertainty | null =>
+  story.writeup?.certainty ?? story.lead.certainty;
+
+/** The journalist whose reporting a story carries, if any outlet credits one. */
+export const scoopOf = (story: Story): ScoopJournalist | null =>
+  story.coverage.find((article) => article.scoopBy)?.scoopBy ?? null;
+
+/** Still waiting for translation, and not already in English. */
+export const isUntranslated = (story: Story) =>
+  story.lead.titleEn === null && story.lead.language !== "en";
+
+/**
+ * How close a deal is, as four steps: talk, a firm report, a named insider, done.
+ * Opinion and plain news sit at the first step, because neither moves a deal on.
+ */
+export type MeterStep = 1 | 2 | 3 | 4;
+
+export function meterStepOf(story: NewsStory): MeterStep {
+  const certainty = certaintyOf(story);
+  if (certainty === "official") return 4;
+  if (scoopOf(story) && certainty === "reported") return 3;
+  if (certainty === "reported") return 2;
+  return 1;
+}
+
+const HOUR_MS = 3_600_000;
+
+export const isBreaking = (story: Story, now: Date, hours: number) =>
+  now.getTime() - story.latestAt.getTime() < hours * HOUR_MS;

@@ -13,7 +13,7 @@ export function Briefing({ briefing, now }: BriefingProps) {
   return (
     <section aria-labelledby="briefing-title" className="briefing">
       <p className="briefing-kicker">
-        Today in the Spanish press · {briefing.storyCount} stories read ·{" "}
+        Today&apos;s briefing · {briefing.storyCount} stories read ·{" "}
         {formatStoryAge(briefing.createdAt, now)}
       </p>
       <h2 id="briefing-title" className="briefing-title">
@@ -34,7 +34,7 @@ export function Briefing({ briefing, now }: BriefingProps) {
           </ol>
         </details>
       )}
-      <p className="briefing-note">Written by AI from the headlines below. Check the sources.</p>
+      <p className="briefing-note">Written by AI from the stories on this page. Open any story for its sources.</p>
     </section>
   );
 }
