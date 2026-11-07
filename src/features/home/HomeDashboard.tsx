@@ -3,7 +3,9 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { CURRENT_SEASON } from "@/config/football";
 import { Countdown } from "./Countdown";
-import { displayCompetition, formatKickoff, formatSeason, formatUpdatedAgo } from "./format";
+import { HomeHero } from "./HomeHero";
+import { ResultsTicker } from "./ResultsTicker";
+import { displayCompetition, formatKickoff, formatUpdatedAgo } from "./format";
 import { getHomeData } from "./get-home-data";
 import { SeasonSelectionProvider } from "./season-selection";
 import {
@@ -56,18 +58,14 @@ export async function HomeDashboard({ selectedMatch }: HomeDashboardProps) {
 
   return (
     <SeasonSelectionProvider initialIndex={initialIndex}>
-      <header className="page-gutter pt-10 pb-8 sm:pt-16">
-        <p className="kicker">
-          Season {formatSeason(CURRENT_SEASON)} · {summary.played} of {matches.length} matches woven
-        </p>
-        <h1 className="display-title mt-3">
-          {headline.map((line) => (
-            <span key={line} className="block">
-              {line}
-            </span>
-          ))}
-        </h1>
-      </header>
+      <ResultsTicker matches={matches} nextIndex={nextIndex} />
+      <HomeHero
+        season={CURRENT_SEASON}
+        headline={headline}
+        summary={summary}
+        total={matches.length}
+        standing={standing}
+      />
 
       <WovenSeason matches={matches} lastPlayedIndex={lastPlayedIndex} nextIndex={nextIndex} />
 

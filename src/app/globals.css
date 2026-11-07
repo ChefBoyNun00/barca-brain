@@ -2,20 +2,22 @@
 
 :root {
   /* Vivid design system */
-  --primary: #7c3aed;
-  --primary-light: #a78bfa;
-  --primary-soft: #ede9fe;
-  --primary-wash: #f5f3ff;
-  --off-white: #faf9ff;
-  --text-heading: #1e1b4b;
-  --text-secondary: #6b7280;
-  --border: #e9e5f5;
+  --primary: #004d98;
+  --primary-light: #4f8fd6;
+  --primary-soft: #dbe8f8;
+  --primary-wash: #eef4fc;
+  --off-white: #f6f8fc;
+  --text-heading: #0a1230;
+  --text-secondary: #5b6477;
+  --border: #dde5f1;
 
   /* Barça colours: the shirt, the numbers and every data stripe. */
   --barca-garnet: #a50044;
   --barca-blue: #004d98;
+  --barca-gold: #edbb00;
+  --barca-navy: #0a1230;
 
-  --shadow-md: 0 4px 6px -1px rgba(124, 58, 237, 0.07), 0 2px 4px -2px rgba(124, 58, 237, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 77, 152, 0.08), 0 2px 4px -2px rgba(0, 77, 152, 0.06);
   --ease-out: cubic-bezier(0, 0, 0.2, 1);
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -40,9 +42,21 @@ body {
     top: 0;
     z-index: 50;
     padding: 0.875rem 1rem;
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(10, 18, 48, 0.94);
     backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
+  }
+
+  /* The edge of the nav is a strip of the shirt. */
+  .nav::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 3px;
+    background: repeating-linear-gradient(
+      90deg,
+      var(--barca-garnet) 0 32px,
+      var(--barca-blue) 32px 64px
+    );
   }
 
   .nav-inner {
@@ -59,7 +73,7 @@ body {
     gap: clamp(0.5rem, 2.5vw, 1.75rem);
     font-size: 0.875rem;
     font-weight: 600;
-    color: var(--text-heading);
+    color: rgba(255, 255, 255, 0.88);
   }
 
   .nav-links a {
@@ -69,16 +83,19 @@ body {
   }
 
   .nav-links a:hover {
-    color: var(--primary);
+    color: var(--barca-gold);
   }
 
   .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
     white-space: nowrap;
     font-family: var(--font-display);
     font-size: 1.5rem;
     font-weight: 800;
     letter-spacing: 0.01em;
-    color: var(--text-heading);
+    color: #ffffff;
   }
 
   .page-gutter {
@@ -190,7 +207,7 @@ body {
     left: 50%;
     width: 2px;
     margin-left: -1px;
-    background: repeating-linear-gradient(180deg, #c4b5fd 0 6px, transparent 6px 12px);
+    background: repeating-linear-gradient(180deg, #9db8dd 0 6px, transparent 6px 12px);
   }
 
   .stripe[data-next="true"]::before {
@@ -585,7 +602,7 @@ body {
     font-weight: 600;
     color: #ffffff;
     cursor: pointer;
-    background: linear-gradient(135deg, #7c3aed, #6366f1);
+    background: linear-gradient(135deg, var(--barca-blue), var(--primary-light));
     border-radius: 12px;
     transition:
       transform 200ms var(--ease-smooth),
@@ -594,7 +611,7 @@ body {
 
   .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.4);
+    box-shadow: 0 10px 25px -5px rgba(0, 77, 152, 0.4);
   }
 
   .skeleton {
@@ -1031,7 +1048,7 @@ body {
 
   .pick[data-pick="none"] .pick-stripe {
     background: var(--primary-wash);
-    outline: 2px dashed #c4b5fd;
+    outline: 2px dashed #9db8dd;
     outline-offset: -2px;
   }
 
@@ -1298,7 +1315,7 @@ body {
     font-weight: 600;
     color: var(--text-secondary);
     background: #ffffff;
-    outline: 1px dashed #c4b5fd;
+    outline: 1px dashed #9db8dd;
     outline-offset: -1px;
   }
 
@@ -1339,7 +1356,7 @@ body {
     padding: 0;
     overflow-y: auto;
     border-radius: 24px;
-    box-shadow: 0 20px 40px -12px rgba(124, 58, 237, 0.35);
+    box-shadow: 0 20px 40px -12px rgba(0, 77, 152, 0.35);
   }
 
   .card-dialog::backdrop {
@@ -2078,5 +2095,266 @@ body {
 
   .player-card-cloth .jersey {
     width: 9rem;
+  }
+}
+
+@layer components {
+  /* The hero: navy night, shirt stripes drifting behind, numbers that count up */
+  .hero {
+    position: relative;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    color: #ffffff;
+    background: var(--barca-navy);
+  }
+
+  .hero-stripes {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      90deg,
+      rgba(0, 77, 152, 0.75) 0 56px,
+      rgba(165, 0, 68, 0.75) 56px 112px
+    );
+    background-size: 224px 100%;
+    animation: stripeDrift 30s linear infinite;
+    mask-image: linear-gradient(100deg, transparent 5%, rgba(0, 0, 0, 0.9) 100%);
+  }
+
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(10, 18, 48, 0.1), rgba(10, 18, 48, 0.55));
+  }
+
+  .hero-inner {
+    position: relative;
+    z-index: 1;
+    padding-block: clamp(2rem, 6vw, 4.5rem) clamp(2rem, 5vw, 3.5rem);
+  }
+
+  .hero-top {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    animation: fadeInUp 0.5s var(--ease-out) both;
+  }
+
+  .hero-top img {
+    width: 3.5rem;
+    height: 3.5rem;
+    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.45));
+  }
+
+  .hero-kicker {
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--barca-gold);
+  }
+
+  .hero-title {
+    margin-top: 1rem;
+    font-family: var(--font-display);
+    font-size: clamp(2.75rem, 12vw, 9rem);
+    font-weight: 900;
+    line-height: 0.92;
+    text-transform: uppercase;
+    animation: fadeInUp 0.6s var(--ease-out) 0.05s both;
+  }
+
+  .hero-hot {
+    width: fit-content;
+    color: transparent;
+    background: linear-gradient(100deg, var(--barca-gold) 35%, #fff6c9 50%, var(--barca-gold) 65%);
+    background-size: 220% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: shimmer 5s linear infinite;
+  }
+
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+    gap: 0.75rem;
+    margin-top: clamp(1.5rem, 4vw, 2.5rem);
+  }
+
+  .hero-stat {
+    padding: 0.875rem 1rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-top: 3px solid var(--barca-gold);
+    border-radius: 14px;
+    backdrop-filter: blur(8px);
+    animation: fadeInUp 0.55s var(--ease-out) both;
+    transition: transform 200ms var(--ease-smooth);
+  }
+
+  .hero-stat:hover {
+    transform: translateY(-4px);
+  }
+
+  .hero-stat:nth-child(even) {
+    border-top-color: #ff4d8d;
+  }
+
+  .hero-stat-number {
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 7vw, 3.5rem);
+    font-weight: 900;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hero-stat-label {
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  /* The ticker: latest results, endlessly */
+  .ticker {
+    overflow: hidden;
+    color: #ffffff;
+    background: var(--barca-garnet);
+  }
+
+  .ticker-track {
+    display: flex;
+    width: max-content;
+    animation: marquee 48s linear infinite;
+  }
+
+  .ticker:hover .ticker-track {
+    animation-play-state: paused;
+  }
+
+  .ticker-copy,
+  .ticker-copy ul {
+    display: contents;
+  }
+
+  .ticker-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    border-right: 1px solid rgba(255, 255, 255, 0.25);
+  }
+
+  .ticker-item img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+  }
+
+  .ticker-outcome {
+    display: inline-grid;
+    place-items: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: var(--barca-navy);
+    background: #ffffff;
+    border-radius: 50%;
+  }
+
+  .ticker-outcome[data-outcome="W"] {
+    background: var(--barca-gold);
+  }
+
+  .ticker-outcome[data-outcome="L"] {
+    color: #ffffff;
+    background: var(--barca-navy);
+  }
+}
+
+@keyframes stripeDrift {
+  to {
+    background-position: 224px 0;
+  }
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-stripes,
+  .hero-hot,
+  .ticker-track {
+    animation: none;
+  }
+
+  .ticker {
+    overflow-x: auto;
+  }
+}
+
+@layer components {
+  .page-enter {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    animation: fadeInUp 0.45s var(--ease-out) both;
+  }
+
+  /* Explore tiles: a strip of the shirt on top, and they light up in club colours on hover. */
+  .explore-tile {
+    position: relative;
+    overflow: hidden;
+    padding-top: 1.75rem;
+  }
+
+  .explore-tile::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 6px;
+    background: repeating-linear-gradient(
+      90deg,
+      var(--barca-garnet) 0 14px,
+      var(--barca-blue) 14px 28px
+    );
+  }
+
+  .explore-tile:hover {
+    color: #ffffff;
+    background: linear-gradient(135deg, var(--barca-blue), var(--barca-garnet));
+    border-color: transparent;
+  }
+
+  .explore-tile:hover .explore-title,
+  .explore-tile:hover .explore-note {
+    color: #ffffff;
+  }
+
+  .explore-tile:hover .explore-title {
+    color: var(--barca-gold);
+  }
+
+  @media (max-width: 520px) {
+    .brand-name {
+      display: none;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter {
+    animation: none;
   }
 }
