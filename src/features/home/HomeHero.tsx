@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { BARCA_CREST_URL } from "@/config/display";
+import { STADIUM_PHOTO } from "@/config/photos";
 import type { HomeStanding } from "@/domain/home";
 import { CountUp } from "./CountUp";
 import type { TextKey } from "@/i18n/dictionary";
@@ -38,6 +39,15 @@ export function HomeHero({ season, summary, total, standing, matchday, now }: Ho
 
   return (
     <header className="hero" data-matchday={matchday.kind !== "none"}>
+      {/* The stadium sits under a dark wash, so white text keeps its contrast over any part of it. */}
+      <Image
+        className="hero-stadium"
+        src={STADIUM_PHOTO.src}
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+      />
       <div aria-hidden="true" className="hero-stripes" />
       <MatchdayBanner state={matchday} now={now} />
       <div className="page-gutter hero-inner">

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { DuoPhoto } from "@/components/DuoPhoto";
 import { BARCA_CREST_URL } from "@/config/display";
 import { T } from "@/i18n/language";
 import type { SquadPlayer } from "@/domain/home";
@@ -17,15 +18,22 @@ const TOPIC_ICONS: Record<StoryTopic, string> = {
 type StoryArtProps = { story: Story; squad: SquadPlayer[]; size: "hero" | "tile" };
 
 /**
- * The picture for a story. We do not copy outlets' photos, so it is made from what we own:
- * the shirt of the player the story is about, or the crest, over a colour for the topic.
+ * The picture for a story. We do not copy outlets' photos, so it is made from what we may use:
+ * the freely licensed photo of the player the story is about, else their shirt, else the crest,
+ * over a colour for the topic.
  */
 export function StoryArt({ story, squad, size }: StoryArtProps) {
   const topic = topicOf(story);
   const player = story.players.flatMap((name) => squad.find((p) => p.name === name) ?? [])[0];
 
   return (
-    <div className="story-art" data-topic={topic} data-size={size} aria-hidden="true">
+    <div
+      className="story-art"
+      data-topic={topic}
+      data-size={size}
+      data-photo={Boolean(player?.photo)}
+      aria-hidden="true"
+    >
       <Image
         className="story-art-crest"
         src={BARCA_CREST_URL}
@@ -34,7 +42,13 @@ export function StoryArt({ story, squad, size }: StoryArtProps) {
         height={160}
         unoptimized
       />
-      {player ? (
+      {player?.photo ? (
+        <DuoPhoto
+          player={player}
+          className="story-art-photo"
+          sizes={size === "hero" ? "(min-width: 1024px) 60vw, 100vw" : "(min-width: 768px) 33vw, 100vw"}
+        />
+      ) : player ? (
         <span className="story-art-jersey">
           <Jersey jersey={getJersey(player)} keeper={player.position === "GK"} mode="back" />
         </span>

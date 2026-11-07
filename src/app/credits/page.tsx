@@ -32,7 +32,7 @@ export default function CreditsPage() {
           País, El Mundo and Google News. Translations and labels are written by AI and can be
           wrong. Every story links to the outlet that published it.
         </p>
-        <h2 className="credits-heading">Player photos</h2>
+        <h2 className="credits-heading">Photos</h2>
         <p className="max-w-2xl">
           Photos come from Wikimedia Commons under free licences, and are cropped to fit. Each link
           opens the original with its full licence.

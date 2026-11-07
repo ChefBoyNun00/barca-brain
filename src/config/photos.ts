@@ -25,3 +25,17 @@ export const PHOTO_RETRY_AFTER_DAYS = 7;
 export const PLAYER_SEARCH_NAMES: Record<string, string> = {
   "Pablo Gavira": "Gavi",
 };
+
+/**
+ * The stadium behind the home page. Saved in public/ so it never depends on Wikimedia being up.
+ * CC BY-SA asks for the author, the licence and a link, so the credits page lists all three.
+ */
+export const STADIUM_PHOTO = {
+  src: "/images/camp-nou.jpg",
+  alt: "The Camp Nou stands, with Més que un club spelled out in the seats",
+  credit: "Luis Miguel Bugallo Sánchez (Lmbuga)",
+  license: "CC BY-SA 3.0",
+  licenseUrl: "https://creativecommons.org/licenses/by-sa/3.0",
+  pageUrl:
+    "https://commons.wikimedia.org/wiki/File:2014._Camp_Nou._M%C3%A9s_que_un_club._Barcelona_B40.jpg",
+} as const;

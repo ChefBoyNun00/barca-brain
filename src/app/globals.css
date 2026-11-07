@@ -17,6 +17,13 @@
   --barca-gold: #edbb00;
   --barca-navy: #0a1230;
 
+  /* Photo pass: night surfaces, the blaugrana gradient and the wash that keeps text readable on photos. */
+  --night: #060b1f;
+  --grad-blaugrana: linear-gradient(150deg, var(--barca-garnet) 0%, #5a1f6e 45%, var(--barca-blue) 100%);
+  --photo-tint: linear-gradient(160deg, #c3005a 0%, #3b2a8f 50%, #0060c0 100%);
+  --scrim-up: linear-gradient(0deg, rgba(6, 11, 31, 0.96) 0%, rgba(6, 11, 31, 0.72) 32%, rgba(6, 11, 31, 0) 62%);
+  --shadow-photo: 0 18px 40px -18px rgba(10, 18, 48, 0.55), 0 2px 6px rgba(10, 18, 48, 0.18);
+
   --shadow-md: 0 4px 6px -1px rgba(0, 77, 152, 0.08), 0 2px 4px -2px rgba(0, 77, 152, 0.06);
   --ease-out: cubic-bezier(0, 0, 0.2, 1);
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
@@ -190,12 +197,13 @@ body {
     position: absolute;
     inset-block: 0;
     left: 50%;
-    width: 2px;
-    margin-left: -1px;
-    background: repeating-linear-gradient(180deg, #9db8dd 0 6px, transparent 6px 12px);
-    background-size: 100% 12px;
+    width: 4px;
+    margin-left: -2px;
+    background: repeating-linear-gradient(180deg, #cfe0ff 0 8px, transparent 8px 14px);
+    background-size: 100% 14px;
+    filter: drop-shadow(0 0 4px rgba(157, 184, 221, 0.9));
     /* the needle runs down the seam: stitches march, staggered so the wall ripples */
-    animation: stitchRun 1.6s linear infinite;
+    animation: stitchRun 0.9s linear infinite;
     animation-delay: calc(var(--i, 0) * -37ms);
   }
 
@@ -206,9 +214,10 @@ body {
     background: linear-gradient(180deg, var(--barca-garnet), var(--primary), var(--barca-blue));
     border-radius: 4px 4px 0 0;
     background-size: 100% 200%;
+    box-shadow: 0 0 18px rgba(237, 187, 0, 0.55);
     animation:
-      threadPulse 1.8s ease-in-out infinite,
-      threadFlow 2.4s linear infinite;
+      threadPulse 1.4s ease-in-out infinite,
+      threadFlow 1.4s linear infinite;
   }
 
   .stripe[data-selected="true"] {
@@ -383,12 +392,22 @@ body {
   /* The thread fills as kick-off nears, then glows in the final hour */
   .countdown-thread {
     position: relative;
-    width: min(100%, 22rem);
-    height: 3px;
+    width: min(100%, 26rem);
+    height: 6px;
     margin-top: 1rem;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.18);
-    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+  }
+
+  .countdown-thread::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+    background-size: 30% 100%;
+    background-repeat: no-repeat;
+    animation: liveThread 2.2s linear infinite;
   }
 
   .countdown-thread::before {
@@ -633,7 +652,7 @@ body {
 
 @keyframes stitchRun {
   to {
-    background-position: 0 12px;
+    background-position: 0 14px;
   }
 }
 
@@ -873,8 +892,8 @@ body {
     top: 50%;
     right: 100%;
     width: 6px;
-    height: 2px;
-    margin-top: -1px;
+    height: 4px;
+    margin-top: -2px;
     background: var(--barca-blue);
     transform-origin: right;
     animation: threadDraw 0.3s var(--ease-out) backwards;
@@ -1932,25 +1951,32 @@ body {
   .hero-stripes {
     position: absolute;
     inset: 0;
-    /* Two layers: the warp (shirt stripes) drifts sideways, the weft (fine cross threads) drifts down */
+    /* Three layers: the weft (fine cross threads) drifts down, a gold seam runs between the
+       stripes, and the warp (wide shirt stripes) drifts sideways under it. */
     background:
       repeating-linear-gradient(
         0deg,
-        rgba(255, 255, 255, 0.07) 0 1px,
+        rgba(255, 255, 255, 0.12) 0 1px,
         transparent 1px 6px
       ),
       repeating-linear-gradient(
         90deg,
-        rgba(0, 77, 152, 0.75) 0 56px,
-        rgba(165, 0, 68, 0.75) 56px 112px
+        transparent 0 93px,
+        rgba(237, 187, 0, 0.6) 93px 96px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        rgba(0, 77, 152, 0.92) 0 96px,
+        rgba(165, 0, 68, 0.92) 96px 192px
       );
     background-size:
       100% 24px,
-      224px 100%;
+      96px 100%,
+      384px 100%;
     animation:
-      stripeWeaveIn 1.4s var(--ease-out) both,
-      stripeDrift 30s linear 1.4s infinite;
-    mask-image: linear-gradient(100deg, transparent 5%, rgba(0, 0, 0, 0.9) 100%);
+      stripeWeaveIn 1.2s var(--ease-out) both,
+      stripeDrift 12s linear 1.2s infinite;
+    mask-image: linear-gradient(100deg, rgba(0, 0, 0, 0.3) 0%, #000 55%);
   }
 
   /* A soft band of light slides across the cloth now and then, like a shirt catching the floodlights */
@@ -1958,10 +1984,10 @@ body {
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.16) 50%, transparent 65%);
+    background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, 0.34) 50%, transparent 62%);
     background-size: 250% 100%;
     background-position: 160% 0;
-    animation: clothSheen 9s ease-in-out 2s infinite;
+    animation: clothSheen 4.5s ease-in-out 1.2s infinite;
   }
 
   .hero::after {
@@ -2127,7 +2153,8 @@ body {
   to {
     background-position:
       0 24px,
-      224px 0;
+      384px 0,
+      384px 0;
   }
 }
 
@@ -3108,7 +3135,7 @@ body {
   }
 
   .hero[data-matchday="true"] .hero-stripes {
-    animation-duration: 9s;
+    animation-duration: 6s;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -3490,7 +3517,7 @@ body {
     content: "";
     position: absolute;
     inset: auto 0 0;
-    height: 3px;
+    height: 5px;
     background: linear-gradient(90deg, transparent, var(--barca-garnet), var(--barca-blue), transparent);
     background-size: 40% 100%;
     background-repeat: no-repeat;
@@ -3734,14 +3761,32 @@ body {
     grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
   }
 
+  /* Each tile is a scrap of the shirt: navy cloth with faint stripes, a coloured hem,
+     arriving one after another and lifting when you point at it. */
   .num-tile {
+    position: relative;
     display: flex;
     flex-direction: column;
-    padding: 1rem;
+    gap: 0.375rem;
+    padding: 1.25rem 1.125rem 1rem;
+    overflow: hidden;
     color: #ffffff;
-    background: var(--barca-navy);
+    background:
+      repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.035) 0 18px, transparent 18px 36px),
+      linear-gradient(160deg, #13235a 0%, var(--barca-navy) 70%);
     border-bottom: 5px solid var(--barca-gold);
-    border-radius: 6px;
+    border-radius: 10px;
+    box-shadow: 0 10px 24px -14px rgba(10, 18, 48, 0.7);
+    transition:
+      transform 200ms var(--ease-smooth),
+      box-shadow 200ms var(--ease-smooth);
+    animation: fadeInUp 0.5s var(--ease-out) backwards;
+    animation-delay: calc(var(--i, 0) * 60ms);
+  }
+
+  .num-tile:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 30px -14px rgba(10, 18, 48, 0.8);
   }
 
   .num-tile:nth-child(3n + 2) {
@@ -3754,7 +3799,7 @@ body {
 
   .num-tile-value {
     font-family: var(--font-display);
-    font-size: 3rem;
+    font-size: clamp(2.75rem, 6vw, 3.75rem);
     font-weight: 900;
     line-height: 1;
     color: var(--barca-gold);
@@ -3769,36 +3814,40 @@ body {
     color: rgba(255, 255, 255, 0.75);
   }
 
+  /* The points pace: one big number on the club colours, with a stitched edge. */
   .pace {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
-    gap: 0.25rem 0.75rem;
-    padding: 1rem 1.25rem;
+    gap: 0.25rem 1rem;
+    padding: 1.25rem 1.5rem;
     margin-top: 1rem;
-    background: #ffffff;
-    border: 2px dashed var(--barca-blue);
-    border-radius: 8px;
+    color: #ffffff;
+    background: var(--grad-blaugrana);
+    border-radius: 12px;
+    outline: 2px dashed rgba(255, 255, 255, 0.35);
+    outline-offset: -8px;
+    box-shadow: 0 14px 30px -16px rgba(90, 31, 110, 0.8);
   }
 
   .pace-label {
     font-weight: 800;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--text-heading);
   }
 
   .pace-value {
     font-family: var(--font-display);
-    font-size: 3rem;
+    font-size: clamp(3rem, 8vw, 4.5rem);
     font-weight: 900;
     line-height: 1;
-    color: var(--barca-garnet);
+    color: var(--barca-gold);
   }
 
   .pace-note {
     flex-basis: 100%;
     font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.85);
   }
 
   .stats-heading {
@@ -3828,13 +3877,30 @@ body {
     color: var(--text-heading);
   }
 
+  /* Wins, draws and defeats in one bar that sweeps in from the left, each part showing its count. */
   .split-bar {
     display: flex;
-    height: 1.25rem;
-    margin-top: 0.25rem;
+    height: 1.75rem;
+    margin-top: 0.375rem;
     overflow: hidden;
     border-radius: 9999px;
     background: var(--border);
+    transform-origin: left;
+    animation: barFill 0.9s var(--ease-out) 0.2s backwards;
+  }
+
+  .split-bar > span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #ffffff;
+  }
+
+  .split-bar > span + span {
+    box-shadow: inset 2px 0 0 rgba(255, 255, 255, 0.6);
   }
 
   .split-bar span[data-part="W"] {
@@ -3842,6 +3908,7 @@ body {
   }
 
   .split-bar span[data-part="D"] {
+    color: var(--barca-navy);
     background: var(--barca-gold);
   }
 
@@ -3851,10 +3918,12 @@ body {
 
   .halves {
     display: flex;
-    height: 4.5rem;
+    height: 5rem;
     margin-top: 1rem;
     overflow: hidden;
-    border-radius: 8px;
+    border-radius: 12px;
+    transform-origin: left;
+    animation: barFill 0.9s var(--ease-out) 0.2s backwards;
   }
 
   .halves div {
@@ -3880,7 +3949,7 @@ body {
 
   .halves strong {
     font-family: var(--font-display);
-    font-size: 2rem;
+    font-size: 2.5rem;
     line-height: 1;
   }
 
@@ -3917,17 +3986,52 @@ body {
     margin-top: 0.75rem;
   }
 
+  .leaders li {
+    animation: fadeInUp 0.45s var(--ease-out) backwards;
+    animation-delay: calc(var(--i, 0) * 70ms + 150ms);
+  }
+
   .leaders a {
     display: grid;
-    grid-template-columns: 2.25rem minmax(0, 1fr) 4.5rem 2rem;
+    grid-template-columns: 2.25rem minmax(0, 1fr) minmax(4.5rem, 30%) 2rem;
     align-items: center;
     gap: 0.625rem;
-    padding: 0.375rem 0.5rem;
-    border-radius: 8px;
-    transition: background 150ms var(--ease-smooth);
+    padding: 0.5rem 0.625rem;
+    border-radius: 10px;
+    transition:
+      background 150ms var(--ease-smooth),
+      transform 150ms var(--ease-smooth);
   }
 
   .leaders a:hover {
+    transform: translateX(3px);
+  }
+
+  /* The leader of each list gets the navy shirt and a gold number. */
+  .leaders li[data-first="true"] a {
+    padding-block: 0.75rem;
+    color: #ffffff;
+    background: linear-gradient(120deg, var(--barca-navy), #1d2f66);
+  }
+
+  .leaders li[data-first="true"] .leaders-number,
+  .leaders li[data-first="true"] .leaders-value {
+    color: var(--barca-gold);
+  }
+
+  .leaders li[data-first="true"] .leaders-name {
+    color: #ffffff;
+  }
+
+  .leaders li[data-first="true"] .leaders-bar {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .leaders li[data-first="true"] .leaders-bar span {
+    background: linear-gradient(90deg, var(--barca-gold), #ffd84d);
+  }
+
+  .leaders li:not([data-first="true"]) a:hover {
     background: var(--primary-wash);
   }
 
@@ -3948,7 +4052,7 @@ body {
   }
 
   .leaders-bar {
-    height: 0.5rem;
+    height: 0.75rem;
     overflow: hidden;
     background: var(--border);
     border-radius: 9999px;
@@ -3959,6 +4063,9 @@ body {
     height: 100%;
     background: linear-gradient(90deg, var(--barca-blue), var(--barca-garnet));
     border-radius: 9999px;
+    transform-origin: left;
+    animation: barFill 0.8s var(--ease-out) backwards;
+    animation-delay: calc(var(--i, 0) * 70ms + 300ms);
   }
 
   .leaders-value {
@@ -5488,5 +5595,137 @@ body {
     .breaking-window {
       overflow-x: auto;
     }
+  }
+}
+
+/* ------------------------------------------------------------------
+   Photo pass: real photos, tinted in blaugrana.
+   Rules (docs/10_DESIGN_SYSTEM.md): text on a photo always sits on a
+   scrim; photos are tinted so mixed kits read as one set; motion is
+   transform and opacity only.
+   ------------------------------------------------------------------ */
+@layer components {
+  /* A photo tinted in blaugrana. The tint is a layer on top, so it can fade out on hover. */
+  .duo {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    isolation: isolate;
+    background: var(--grad-blaugrana);
+  }
+
+  .duo img {
+    object-fit: cover;
+    object-position: center 20%;
+    filter: contrast(1.08) saturate(0.9);
+    transition: transform 600ms var(--ease-smooth);
+  }
+
+  .duo[data-photo="true"]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--photo-tint);
+    mix-blend-mode: color;
+    transition: opacity 450ms var(--ease-smooth);
+    pointer-events: none;
+  }
+
+  .duo-initials {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 9vw, 5.5rem);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    color: rgba(255, 255, 255, 0.92);
+    background:
+      radial-gradient(circle at 30% 20%, rgba(237, 187, 0, 0.28), transparent 55%),
+      var(--grad-blaugrana);
+  }
+
+  /* Home hero: the stadium under a dark wash, the shirt stripes woven over it. */
+  .hero {
+    background: var(--night);
+  }
+
+  .hero-stadium {
+    object-fit: cover;
+    object-position: center 40%;
+    filter: saturate(1.1);
+    animation: stadiumIn 1.6s var(--ease-out) both;
+  }
+
+  .hero .hero-stripes {
+    opacity: 0.8;
+  }
+
+  /* Darkest where the headline sits, lighter on the right where the stands show through. */
+  .hero::after {
+    background:
+      linear-gradient(90deg, rgba(6, 11, 31, 0.92) 0%, rgba(6, 11, 31, 0.7) 40%, rgba(6, 11, 31, 0.3) 100%),
+      linear-gradient(180deg, rgba(6, 11, 31, 0.1) 0%, rgba(6, 11, 31, 0.8) 100%);
+  }
+
+  .hero-title {
+    text-shadow: 0 4px 30px rgba(6, 11, 31, 0.6);
+  }
+
+  /* The gold line is painted through its letters, so a text shadow would show through and dull it. */
+  .hero-title .hero-hot {
+    text-shadow: none;
+    filter: drop-shadow(0 4px 24px rgba(6, 11, 31, 0.55));
+  }
+
+  /* News: a story about a player shows the player. */
+  .story-art-photo {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* The big story box is very wide and the photos are tall, so the photo takes the right half
+     and fades in from the topic colour, which keeps the whole head in frame. */
+  .story-art[data-size="hero"] .story-art-photo {
+    left: auto;
+    width: 55%;
+    mask-image: linear-gradient(90deg, transparent 0%, #000 40%);
+  }
+
+  /* Story art is wide and the photos are tall, so aim lower to keep the whole face in frame. */
+  .story-art-photo img {
+    object-position: center 30%;
+  }
+
+  .story-art[data-photo="true"]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(6, 11, 31, 0.55), transparent 55%);
+    pointer-events: none;
+  }
+
+  .story-art[data-photo="true"] .story-art-crest {
+    z-index: 1;
+  }
+
+  .story-art-badge {
+    z-index: 2;
+  }
+
+  .nw-card:hover .story-art-photo::after {
+    opacity: 0;
+  }
+
+  .nw-card:hover .story-art-photo img {
+    transform: scale(1.04);
+  }
+}
+
+@keyframes stadiumIn {
+  from {
+    opacity: 0;
+    transform: scale(1.08);
   }
 }

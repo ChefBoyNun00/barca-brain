@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import { connection } from "next/server";
 import { LEAGUE_MATCHES } from "@/config/football";
 import type { SquadPlayer } from "@/domain/home";
@@ -12,9 +13,10 @@ import { buildSeasonNumbers, projectPoints, type Record3 } from "./season-stats"
 
 const TOP_PLAYERS = 5;
 
-function Tile({ label, value }: { label: TextKey; value: string | number }) {
+/** `index` staggers the entrance, so the tiles arrive one after another. */
+function Tile({ label, value, index }: { label: TextKey; value: string | number; index: number }) {
   return (
-    <div className="num-tile">
+    <div className="num-tile" style={{ "--i": index } as CSSProperties}>
       <span className="num-tile-value">{value}</span>
       <span className="num-tile-label">
         <T k={label} />
@@ -44,7 +46,9 @@ function RecordBar({ label, record }: { label: TextKey; record: Record3 }) {
         aria-label={`${record.wins} W ${record.draws} D ${record.losses} L`}
       >
         {parts.map(({ key, count }) => (
-          <span key={key} data-part={key} style={{ flexGrow: count / total }} />
+          <span key={key} data-part={key} style={{ flexGrow: count / total }}>
+            {count > 0 && <span aria-hidden="true">{count}</span>}
+          </span>
         ))}
       </div>
     </div>
@@ -74,8 +78,8 @@ function Leaders({
         <T k={title} />
       </h3>
       <ol>
-        {ranked.map(({ player, value }) => (
-          <li key={player.id}>
+        {ranked.map(({ player, value }, index) => (
+          <li key={player.id} data-first={index === 0} style={{ "--i": index } as CSSProperties}>
             <Link href={`/squad/${player.id}`}>
               <span className="leaders-number">{getJersey(player).number ?? "–"}</span>
               <span className="leaders-name">{player.name}</span>
@@ -137,14 +141,14 @@ export async function StatsPage() {
       </p>
 
       <div className="num-grid">
-        <Tile label="stats.played" value={numbers.played} />
-        <Tile label="stats.wins" value={numbers.wins} />
-        <Tile label="stats.draws" value={numbers.draws} />
-        <Tile label="stats.defeats" value={numbers.losses} />
-        <Tile label="stats.goalsFor" value={numbers.goalsFor} />
-        <Tile label="stats.goalsAgainst" value={numbers.goalsAgainst} />
-        <Tile label="stats.difference" value={difference > 0 ? `+${difference}` : difference} />
-        <Tile label="stats.cleanSheets" value={numbers.cleanSheets} />
+        <Tile label="stats.played" value={numbers.played} index={0} />
+        <Tile label="stats.wins" value={numbers.wins} index={1} />
+        <Tile label="stats.draws" value={numbers.draws} index={2} />
+        <Tile label="stats.defeats" value={numbers.losses} index={3} />
+        <Tile label="stats.goalsFor" value={numbers.goalsFor} index={4} />
+        <Tile label="stats.goalsAgainst" value={numbers.goalsAgainst} index={5} />
+        <Tile label="stats.difference" value={difference > 0 ? `+${difference}` : difference} index={6} />
+        <Tile label="stats.cleanSheets" value={numbers.cleanSheets} index={7} />
       </div>
 
       {pace !== null && (
@@ -193,9 +197,9 @@ export async function StatsPage() {
         <T k="stats.runs" />
       </h2>
       <div className="num-grid num-grid-three">
-        <Tile label="stats.longestWinning" value={numbers.longestWinning} />
-        <Tile label="stats.longestUnbeaten" value={numbers.longestUnbeaten} />
-        <Tile label="stats.currentUnbeaten" value={numbers.currentUnbeaten} />
+        <Tile label="stats.longestWinning" value={numbers.longestWinning} index={0} />
+        <Tile label="stats.longestUnbeaten" value={numbers.longestUnbeaten} index={1} />
+        <Tile label="stats.currentUnbeaten" value={numbers.currentUnbeaten} index={2} />
       </div>
 
       {standout.length > 0 && (
