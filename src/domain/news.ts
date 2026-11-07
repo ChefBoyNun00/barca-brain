@@ -48,3 +48,19 @@ export type NewsBriefing = {
   bullets: BriefingBullet[];
   storyCount: number;
 };
+
+export type StoryQuote = { text: string; speaker: string; outlet: string };
+
+/** The full story, written in our own words from every outlet's coverage. */
+export type StoryWriteup = {
+  topic: string;
+  headline: string;
+  standfirst: string;
+  body: string[];
+  keyFacts: string[];
+  quotes: StoryQuote[];
+  whatsNext: string | null;
+  certainty: NewsCertainty;
+  articleCount: number;
+  writtenAt: Date;
+};

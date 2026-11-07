@@ -6,6 +6,7 @@ import {
   type NewsArticle,
   type NewsBriefing,
   type NewsMedia,
+  type StoryWriteup,
 } from "@/domain/news";
 import type { Db } from "../client";
 
@@ -141,4 +142,62 @@ export async function getLatestBriefing(db: Db): Promise<NewsBriefing | null> {
     bullets: row.bullets,
     storyCount: row.story_count,
   };
+}
+
+const StoryRowSchema = z.object({
+  topic: z.string(),
+  headline: z.string(),
+  standfirst: z.string(),
+  body: z.array(z.string()),
+  key_facts: z.array(z.string()),
+  quotes: z.array(z.object({ text: z.string(), speaker: z.string(), outlet: z.string() })),
+  whats_next: z.string().nullable(),
+  certainty: z.enum(NEWS_CERTAINTIES),
+  article_count: z.number(),
+  written_at: z.coerce.date(),
+});
+
+const toWriteups = (rows: unknown): StoryWriteup[] =>
+  z
+    .array(StoryRowSchema)
+    .parse(rows)
+    .map((row) => ({
+      topic: row.topic,
+      headline: row.headline,
+      standfirst: row.standfirst,
+      body: row.body,
+      keyFacts: row.key_facts,
+      quotes: row.quotes,
+      whatsNext: row.whats_next,
+      certainty: row.certainty,
+      articleCount: row.article_count,
+      writtenAt: row.written_at,
+    }));
+
+const STORY_COLUMNS = `topic, headline, standfirst, body, key_facts, quotes, whats_next,
+  certainty, article_count, written_at`;
+
+/** The write-ups for the given stories. Stories not written yet are simply missing. */
+export async function getStoryWriteups(db: Db, topics: string[]): Promise<StoryWriteup[]> {
+  if (topics.length === 0) return [];
+  const { rows } = await db.query(
+    `select ${STORY_COLUMNS} from news_stories where topic = any($1::text[])`,
+    [topics],
+  );
+  return toWriteups(rows);
+}
+
+/** One story for its own page: the write-up, if there is one, and all its coverage. */
+export async function getStoryPage(db: Db, topic: string, limit: number) {
+  const [stories, articles] = await Promise.all([
+    db.query(`select ${STORY_COLUMNS} from news_stories where topic = $1`, [topic]),
+    db.query(
+      `select ${ARTICLE_COLUMNS} from news_articles
+       where kind = 'article' and is_relevant is not false and topic = $1
+       order by published_at desc
+       limit $2`,
+      [topic, limit],
+    ),
+  ]);
+  return { writeup: toWriteups(stories.rows)[0] ?? null, articles: toArticles(articles.rows) };
 }

@@ -1,4 +1,10 @@
-import type { BriefingBullet, NewsCategory, NewsCertainty } from "@/domain/news";
+import type { PressSide, ScoopJournalist } from "@/config/news";
+import type {
+  BriefingBullet,
+  NewsCategory,
+  NewsCertainty,
+  StoryWriteup,
+} from "@/domain/news";
 
 export type ArticleToTranslate = {
   id: string;
@@ -27,6 +33,21 @@ export type StoryForBriefing = {
   certainty: string | null;
 };
 
+/** One outlet's coverage of a story, as the story writer sees it. */
+export type StorySource = {
+  outlet: string;
+  pressSide: PressSide;
+  publishedAt: string;
+  headline: string;
+  summary: string | null;
+  originalHeadline: string;
+  originalSnippet: string | null;
+  certainty: string | null;
+  scoopBy: ScoopJournalist | null;
+};
+
+export type WrittenStory = Omit<StoryWriteup, "topic" | "articleCount" | "writtenAt">;
+
 export type GeneratedBriefing = { headline: string; bullets: BriefingBullet[] };
 
 /** What the news job needs from a language model. Faked in tests. */
@@ -36,4 +57,5 @@ export interface NewsAi {
     context: { squad: string[]; topics: string[] },
   ): Promise<Translation[]>;
   writeBriefing(stories: StoryForBriefing[]): Promise<GeneratedBriefing>;
+  writeStory(topic: string, sources: StorySource[]): Promise<WrittenStory>;
 }

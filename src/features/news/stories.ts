@@ -1,4 +1,4 @@
-import type { PressSide } from "@/config/news";
+import { NEWS_CATCH_ALL_TOPICS, type PressSide } from "@/config/news";
 import type { NewsArticle, NewsCategory, NewsCertainty } from "@/domain/news";
 
 /** One real-world story, however many outlets covered it. */
@@ -30,7 +30,7 @@ function pickLead(articles: NewsArticle[]): NewsArticle {
 }
 
 /** The model can still reach for a catch-all, which must not merge unrelated stories. */
-const CATCH_ALL_TOPICS = new Set(["other", "general", "news", "misc"]);
+const CATCH_ALL_TOPICS = new Set(NEWS_CATCH_ALL_TOPICS);
 
 const unique = <T>(items: T[]) => [...new Set(items)];
 

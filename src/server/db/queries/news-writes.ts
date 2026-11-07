@@ -1,7 +1,8 @@
 import { z } from "zod";
 import type { FeedKind, PressSide, ScoopJournalist } from "@/config/news";
+import { NEWS_CATCH_ALL_TOPICS, SCOOP_JOURNALISTS } from "@/config/news";
 import type { BriefingBullet } from "@/domain/news";
-import type { Translation } from "@/server/news/types";
+import type { StorySource, Translation, WrittenStory } from "@/server/news/types";
 import type { FeedArticle } from "@/server/providers/types";
 import type { Db } from "../client";
 
@@ -162,6 +163,103 @@ export async function saveBriefing(
   ]);
 }
 
+const TopicToWriteSchema = z.array(
+  z.object({ topic: z.string(), coverage: z.number(), latest: z.coerce.date() }),
+);
+
+/**
+ * Stories with no write-up yet, or with more coverage than they were written from.
+ * The biggest go first, so a capped run spends its budget where most outlets are.
+ */
+export async function getTopicsToWrite(db: Db, days: number, limit: number) {
+  const { rows } = await db.query(
+    `select a.topic, count(*)::int as coverage, max(a.published_at) as latest
+     from news_articles a
+     left join news_stories s on s.topic = a.topic
+     where a.kind = 'article' and a.is_relevant and a.topic is not null
+       and a.topic <> all($3::text[])
+       and a.published_at > now() - make_interval(days => $1)
+     group by a.topic, s.article_count
+     having s.article_count is null or s.article_count < count(*)
+     order by count(*) desc, max(a.published_at) desc
+     limit $2`,
+    [days, limit, NEWS_CATCH_ALL_TOPICS],
+  );
+  return TopicToWriteSchema.parse(rows);
+}
+
+const StorySourceRowSchema = z.object({
+  outlet: z.string(),
+  press_side: z.enum(["barcelona", "madrid", "national", "english", "official"]),
+  published_at: z.coerce.date(),
+  title_en: z.string(),
+  summary_en: z.string().nullable(),
+  title_original: z.string(),
+  snippet_original: z.string().nullable(),
+  certainty: z.string().nullable(),
+  scoop_by: z.enum(SCOOP_JOURNALISTS.map((journalist) => journalist.id)).nullable(),
+});
+
+export async function getStorySources(
+  db: Db,
+  topic: string,
+  limit: number,
+): Promise<StorySource[]> {
+  const { rows } = await db.query(
+    `select outlet, press_side, published_at, title_en, summary_en, title_original,
+            snippet_original, certainty, scoop_by
+     from news_articles
+     where kind = 'article' and is_relevant and topic = $1 and title_en is not null
+     order by published_at desc
+     limit $2`,
+    [topic, limit],
+  );
+  return z
+    .array(StorySourceRowSchema)
+    .parse(rows)
+    .map((row) => ({
+      outlet: row.outlet,
+      pressSide: row.press_side,
+      publishedAt: row.published_at.toISOString(),
+      headline: row.title_en,
+      summary: row.summary_en,
+      originalHeadline: row.title_original,
+      originalSnippet: row.snippet_original,
+      certainty: row.certainty,
+      scoopBy: row.scoop_by,
+    }));
+}
+
+export async function saveStory(
+  db: Db,
+  story: WrittenStory & { topic: string; articleCount: number; latestArticleAt: Date },
+): Promise<void> {
+  await db.query(
+    `insert into news_stories
+       (topic, headline, standfirst, body, key_facts, quotes, whats_next, certainty,
+        article_count, latest_article_at, written_at)
+     values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, now())
+     on conflict (topic) do update set
+       headline = excluded.headline, standfirst = excluded.standfirst, body = excluded.body,
+       key_facts = excluded.key_facts, quotes = excluded.quotes,
+       whats_next = excluded.whats_next, certainty = excluded.certainty,
+       article_count = excluded.article_count, latest_article_at = excluded.latest_article_at,
+       written_at = now()`,
+    [
+      story.topic,
+      story.headline,
+      story.standfirst,
+      story.body,
+      story.keyFacts,
+      JSON.stringify(story.quotes),
+      story.whatsNext,
+      story.certainty,
+      story.articleCount,
+      story.latestArticleAt,
+    ],
+  );
+}
+
 export async function deleteOldNews(db: Db, keepDays: number): Promise<void> {
   await db.query(`delete from news_articles where published_at < now() - make_interval(days => $1)`, [
     keepDays,
@@ -169,4 +267,8 @@ export async function deleteOldNews(db: Db, keepDays: number): Promise<void> {
   await db.query(`delete from news_briefings where created_at < now() - make_interval(days => $1)`, [
     keepDays,
   ]);
+  await db.query(
+    `delete from news_stories where latest_article_at < now() - make_interval(days => $1)`,
+    [keepDays],
+  );
 }

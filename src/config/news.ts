@@ -227,6 +227,14 @@ export const NEWS_TRANSLATE_BATCH_SIZE = 15;
 export const NEWS_TRANSLATE_PER_RUN = 90;
 export const NEWS_RECENT_TOPICS_LIMIT = 40;
 
+/** Labels the model can still reach for, which must never merge unrelated stories. */
+export const NEWS_CATCH_ALL_TOPICS = ["other", "general", "news", "misc"];
+
+/** Full write-ups per run, biggest stories first, so cost stays bounded. */
+export const NEWS_STORIES_PER_RUN = 12;
+/** The most coverage one write-up is written from. */
+export const NEWS_STORY_SOURCES_LIMIT = 25;
+
 export const BRIEFING_EVERY_HOURS = 6;
 export const BRIEFING_WINDOW_HOURS = 24;
 export const BRIEFING_MIN_STORIES = 3;

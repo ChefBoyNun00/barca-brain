@@ -13,6 +13,8 @@ import {
   getLatestBriefing,
   getRecentArticles,
   getRecentMedia,
+  getStoryPage,
+  getStoryWriteups,
   searchArticles,
 } from "@/server/db/queries/news";
 import { makeDedupeKey, prepareArticles } from "@/server/news/prepare";
@@ -244,12 +246,23 @@ const translation = (id: string, changes: Partial<Translation> = {}): Translatio
   ...changes,
 });
 
+const writtenStory = {
+  headline: "Barça win at the Metropolitano",
+  standfirst: "A late goal settles it.",
+  body: ["Barça won.", "Mundo Deportivo says it was deserved."],
+  keyFacts: ["Final score 2-1"],
+  quotes: [{ text: "We were brave", speaker: "Hansi Flick", outlet: "Mundo Deportivo" }],
+  whatsNext: "The international break.",
+  certainty: "news" as const,
+};
+
 const fakeAi = (changes: Partial<NewsAi> = {}): NewsAi => ({
   translate: async (articles) => articles.map((article) => translation(article.id)),
   writeBriefing: async () => ({
     headline: "A big day",
     bullets: [{ text: "Barça won.", topic: null }],
   }),
+  writeStory: async () => writtenStory,
   ...changes,
 });
 
@@ -266,7 +279,7 @@ describe("the news job", () => {
   }, 30_000);
   afterAll(() => created.pg.close());
   beforeEach(async () => {
-    await created.pg.exec("delete from news_articles; delete from news_briefings;");
+    await created.pg.exec("delete from news_articles; delete from news_briefings; delete from news_stories;");
   });
 
   const run = (provider: NewsProvider, ai: NewsAi | null, feeds = [directFeed]) =>
@@ -346,6 +359,47 @@ describe("the news job", () => {
     expect(partly.status).toBe("success");
     expect(partly.feeds[0]?.error).toBe("HTTP 500");
     expect((await run(shaky, null, [directFeed])).status).toBe("failed");
+  });
+
+  it("writes one full story per topic, and rewrites it only when more coverage arrives", async () => {
+    const topics: string[] = [];
+    const ai = fakeAi({ writeStory: async (topic) => (topics.push(topic), writtenStory) });
+    const first = await run(providerOf(three), ai);
+    expect(first).toMatchObject({ status: "success", storiesWritten: 1, storyErrors: [] });
+    expect(topics).toEqual(["barca-win"]);
+
+    const { writeup, articles } = await getStoryPage(created.database, "barca-win", 10);
+    expect(articles).toHaveLength(3);
+    expect(writeup).toMatchObject({ ...writtenStory, articleCount: 3, topic: "barca-win" });
+    expect(await getStoryWriteups(created.database, ["barca-win", "missing"])).toHaveLength(1);
+
+    expect((await run(providerOf(three), ai)).storiesWritten).toBe(0);
+    const fourth = feedArticle({ url: "https://a.test/4", title: "Barça noticia 4" });
+    expect((await run(providerOf([...three, fourth]), ai)).storiesWritten).toBe(1);
+    expect((await getStoryPage(created.database, "barca-win", 10)).writeup?.articleCount).toBe(4);
+  });
+
+  it("never writes a story for a catch-all topic", async () => {
+    const ai = fakeAi({
+      translate: async (articles) =>
+        articles.map((article) => translation(article.id, { topic: "other" })),
+    });
+    expect((await run(providerOf(three), ai)).storiesWritten).toBe(0);
+  });
+
+  it("keeps the other stories when one fails, and reports it", async () => {
+    let n = 0;
+    const ai = fakeAi({
+      translate: async (articles) =>
+        articles.map((article) => translation(article.id, { topic: `story-${n++}` })),
+      writeStory: async (topic) => {
+        if (topic === "story-1") throw new Error("cut off");
+        return writtenStory;
+      },
+    });
+    const result = await run(providerOf(three), ai);
+    expect(result).toMatchObject({ status: "failed", storiesWritten: 2 });
+    expect(result.storyErrors).toEqual(["story-1: cut off"]);
   });
 
   it("stores videos and fan threads apart, and never sends them to be translated", async () => {

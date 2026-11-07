@@ -5,6 +5,7 @@ import { NEWS_MAX_OUTPUT_TOKENS, NEWS_MODEL } from "@/config/ai";
 import { NEWS_CATEGORIES, NEWS_CERTAINTIES } from "@/domain/news";
 import type { NewsAi } from "@/server/news/types";
 import { TRANSLATE_NEWS_PROMPT, WRITE_BRIEFING_PROMPT } from "./prompts/news.v2";
+import { WRITE_STORY_PROMPT } from "./prompts/stories.v1";
 
 const TranslationsSchema = z.object({
   articles: z.array(
@@ -24,6 +25,16 @@ const TranslationsSchema = z.object({
 const BriefingSchema = z.object({
   headline: z.string(),
   bullets: z.array(z.object({ text: z.string(), topic: z.string().nullable() })),
+});
+
+const StorySchema = z.object({
+  headline: z.string(),
+  standfirst: z.string(),
+  body: z.array(z.string()),
+  keyFacts: z.array(z.string()),
+  quotes: z.array(z.object({ text: z.string(), speaker: z.string(), outlet: z.string() })),
+  whatsNext: z.string().nullable(),
+  certainty: z.enum(NEWS_CERTAINTIES),
 });
 
 /** Structured output guarantees the shape. A refusal or cut-off leaves it empty. */
@@ -58,6 +69,19 @@ export function createNewsAi(client: Anthropic): NewsAi {
         messages: [{ role: "user", content: JSON.stringify({ stories }) }],
       });
       return requireParsed(response.parsed_output, response.stop_reason);
+    },
+
+    async writeStory(topic, sources) {
+      const response = await client.messages.parse({
+        model: NEWS_MODEL,
+        max_tokens: NEWS_MAX_OUTPUT_TOKENS,
+        system: WRITE_STORY_PROMPT,
+        output_config: { effort: "low", format: zodOutputFormat(StorySchema) },
+        messages: [{ role: "user", content: JSON.stringify({ topic, sources }) }],
+      });
+      const story = requireParsed(response.parsed_output, response.stop_reason);
+      if (story.body.length === 0) throw new Error(`Empty story for ${topic}`);
+      return story;
     },
   };
 }

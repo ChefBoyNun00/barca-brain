@@ -7,6 +7,8 @@ import {
   NEWS_KEEP_DAYS,
   NEWS_MAX_AGE_DAYS,
   NEWS_RECENT_TOPICS_LIMIT,
+  NEWS_STORIES_PER_RUN,
+  NEWS_STORY_SOURCES_LIMIT,
   NEWS_TRANSLATE_BATCH_SIZE,
   NEWS_TRANSLATE_PER_RUN,
   type NewsFeed,
@@ -18,9 +20,12 @@ import {
   getRecentTopics,
   getSquadNames,
   getStoriesForBriefing,
+  getStorySources,
+  getTopicsToWrite,
   getUntranslatedArticles,
   insertArticle,
   saveBriefing,
+  saveStory,
   saveTranslation,
 } from "@/server/db/queries/news-writes";
 import type { NewsProvider } from "@/server/providers/types";
@@ -34,6 +39,8 @@ export type NewsRunResult = {
   feeds: FeedResult[];
   translated: number;
   translationErrors: string[];
+  storiesWritten: number;
+  storyErrors: string[];
   briefing: "written" | "not needed" | "skipped" | "failed";
 };
 
@@ -86,6 +93,26 @@ async function translateNew(db: Db, ai: NewsAi) {
   return { translated, errors };
 }
 
+/** Each story is written on its own, so one failure leaves the rest, and it is retried next run. */
+async function writeStories(db: Db, ai: NewsAi) {
+  const topics = await getTopicsToWrite(db, NEWS_MAX_AGE_DAYS, NEWS_STORIES_PER_RUN);
+  const errors: string[] = [];
+  let written = 0;
+  for (const { topic, coverage, latest } of topics) {
+    try {
+      const sources = await getStorySources(db, topic, NEWS_STORY_SOURCES_LIMIT);
+      if (sources.length === 0) continue;
+      const story = await ai.writeStory(topic, sources);
+      // All the coverage counts, not only what was sent, so it is rewritten only when more arrives.
+      await saveStory(db, { ...story, topic, articleCount: coverage, latestArticleAt: latest });
+      written += 1;
+    } catch (error) {
+      errors.push(`${topic}: ${messageOf(error)}`);
+    }
+  }
+  return { written, errors };
+}
+
 async function refreshBriefing(db: Db, ai: NewsAi): Promise<NewsRunResult["briefing"]> {
   const hoursSince = await getHoursSinceBriefing(db);
   if (hoursSince !== null && hoursSince < BRIEFING_EVERY_HOURS) return "not needed";
@@ -110,16 +137,22 @@ export async function runNews({ db, provider, ai, feeds, now = new Date() }: New
   const { translated, errors } = ai
     ? await translateNew(db, ai)
     : { translated: 0, errors: [] as string[] };
+  const stories = ai
+    ? await writeStories(db, ai)
+    : { written: 0, errors: [] as string[] };
   const briefing = ai ? await refreshBriefing(db, ai) : "skipped";
   await deleteOldNews(db, NEWS_KEEP_DAYS);
 
   const allFeedsFailed = feedResults.every((result) => result.error);
-  const failed = allFeedsFailed || errors.length > 0 || briefing === "failed";
+  const failed =
+    allFeedsFailed || errors.length > 0 || stories.errors.length > 0 || briefing === "failed";
   return {
     status: failed ? "failed" : "success",
     feeds: feedResults,
     translated,
     translationErrors: errors,
+    storiesWritten: stories.written,
+    storyErrors: stories.errors,
     briefing,
   } satisfies NewsRunResult;
 }
