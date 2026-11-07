@@ -17,11 +17,11 @@ import {
 } from "@/features/home/season-story";
 import {
   getLastSuccessfulIngestAt,
-  getLeagueRace,
   getLeagueStanding,
   getSeasonMatches,
-  getTopLeagueScorers,
 } from "@/server/db/queries/home";
+import { getLeagueTable } from "@/server/db/queries/league-table";
+import { getSquad } from "@/server/db/queries/squad";
 import { createEmptyDatabase, createIngestedDatabase } from "./helpers/ingested-database";
 
 const scope = { provider: "football-data", teamExternalId: "81", season: 2026 };
@@ -40,7 +40,7 @@ function played(
     competition: "Primera Division",
     isLeague: true,
     round: "Matchday 1",
-    opponent: { name: "Rival", logoUrl: null },
+    opponent: { id: "rival", name: "Rival", logoUrl: null },
     isHome: true,
     goalsFor,
     goalsAgainst,
@@ -107,16 +107,39 @@ describe("home queries on ingested data", () => {
     expect(standing?.competition).not.toMatch(/champions/i);
   });
 
-  it("returns the top of the race with Barça marked", async () => {
-    const race = await getLeagueRace(created.database, scope, 4);
-    expect(race.map((team) => team.points)).toEqual([30, 28, 27, 23]);
-    expect(race.filter((team) => team.isBarca).map((team) => team.name)).toEqual(["Barça"]);
+  it("returns the whole league table with crests and Barça marked", async () => {
+    const table = await getLeagueTable(created.database, scope);
+    expect(table).toHaveLength(20);
+    expect(table.slice(0, 4).map((team) => team.points)).toEqual([30, 28, 27, 23]);
+    expect(table.filter((team) => team.isBarca).map((team) => team.name)).toEqual(["Barça"]);
+    expect(table.every((team) => team.logoUrl)).toBe(true);
+    expect(table[0]).toMatchObject({ played: 11, won: 10, drawn: 0, lost: 1, goalsFor: 46 });
   });
 
-  it("lists only Barça league scorers, best first, up to the limit", async () => {
-    const scorers = await getTopLeagueScorers(created.database, scope, 5);
-    expect(scorers).toHaveLength(5);
-    expect(scorers[0]).toMatchObject({ name: "Raphinha", goals: 15 });
+  it("links a league opponent to its table row", async () => {
+    const [matches, table] = await Promise.all([
+      getSeasonMatches(created.database, scope),
+      getLeagueTable(created.database, scope),
+    ]);
+    const atleti = table.find((team) => team.name === "Atleti");
+    const meetings = matches.filter((match) => match.opponent?.id === atleti?.teamId);
+    expect(meetings).toHaveLength(2);
+  });
+
+  it("returns the squad, with stats split by competition", async () => {
+    const squad = await getSquad(created.database, scope);
+    expect(squad).toHaveLength(31);
+    const raphinha = squad.find((player) => player.name === "Raphinha");
+    expect(raphinha?.stats.find((row) => row.isLeague)).toMatchObject({ goals: 15 });
+    expect(raphinha?.birthDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(squad.filter((player) => player.stats.length === 0).length).toBeGreaterThan(0);
+  });
+
+  it("hides a photo that has no licence details", async () => {
+    await created.pg.query(`update players set photo_url = 'https://x.test/a.jpg'`);
+    const squad = await getSquad(created.database, scope);
+    expect(squad.every((player) => player.photo === null)).toBe(true);
+    await created.pg.query(`update players set photo_url = null`);
   });
 
   it("reports when data last updated", async () => {
@@ -136,8 +159,8 @@ describe("home queries on an empty database", () => {
     const { database } = created;
     expect(await getSeasonMatches(database, scope)).toEqual([]);
     expect(await getLeagueStanding(database, scope)).toBeNull();
-    expect(await getLeagueRace(database, scope, 4)).toEqual([]);
-    expect(await getTopLeagueScorers(database, scope, 5)).toEqual([]);
+    expect(await getLeagueTable(database, scope)).toEqual([]);
+    expect(await getSquad(database, scope)).toEqual([]);
     expect(await getLastSuccessfulIngestAt(database, "football-data")).toBeNull();
   });
 });

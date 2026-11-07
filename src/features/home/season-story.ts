@@ -1,5 +1,5 @@
 import type { HomeStanding, SeasonMatch } from "@/domain/home";
-import { displayCompetition } from "./format";
+import { displayCompetition, formatMatchDate } from "./format";
 
 export type MatchOutcome = "W" | "D" | "L";
 
@@ -33,6 +33,30 @@ export function getMatchOutcome(match: SeasonMatch): MatchOutcome | null {
   if (!isScored(match)) return null;
   if (match.goalsFor === match.goalsAgainst) return "D";
   return match.goalsFor > match.goalsAgainst ? "W" : "L";
+}
+
+const OUTCOME_WORDS: Record<MatchOutcome, string> = { W: "Win", D: "Draw", L: "Defeat" };
+
+export function describeOutcome(outcome: MatchOutcome): string {
+  return OUTCOME_WORDS[outcome];
+}
+
+/** One plain sentence per match, for screen readers and the list view. */
+export function describeMatch(match: SeasonMatch): string {
+  const opponent = match.opponent?.name ?? "Opponent to be decided";
+  const venue = match.isHome ? "at home" : "away";
+  const outcome = getMatchOutcome(match);
+  if (!outcome) return `${opponent}, ${venue}, ${formatMatchDate(match.kickoffAt)}, not played yet`;
+  return `${OUTCOME_WORDS[outcome]}, ${match.goalsFor}–${match.goalsAgainst} ${venue} to ${opponent}, ${formatMatchDate(match.kickoffAt)}`;
+}
+
+/** The provider lists form newest first. Returned oldest first, to read left to right. */
+export function parseForm(form: string | null): MatchOutcome[] {
+  if (!form) return [];
+  return form
+    .split(",")
+    .filter((item): item is MatchOutcome => item === "W" || item === "D" || item === "L")
+    .reverse();
 }
 
 export function getLastPlayedIndex(matches: SeasonMatch[]): number {
@@ -87,7 +111,7 @@ function describeRank(standing: HomeStanding): string {
   return standing.rank === 1 ? `Top of ${league}.` : `${ordinal(standing.rank)} in ${league}.`;
 }
 
-function ordinal(rank: number): string {
+export function ordinal(rank: number): string {
   const lastTwo = rank % 100;
   if (lastTwo >= 11 && lastTwo <= 13) return `${rank}th`;
   const suffix = { 1: "st", 2: "nd", 3: "rd" }[rank % 10] ?? "th";

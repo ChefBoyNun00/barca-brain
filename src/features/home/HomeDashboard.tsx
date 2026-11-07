@@ -1,15 +1,18 @@
 import Image from "next/image";
+import Link from "next/link";
 import { connection } from "next/server";
 import { CURRENT_SEASON } from "@/config/football";
+import { HOME_STORIES_LIMIT } from "@/config/news";
+import { Briefing } from "../news/Briefing";
+import { groupStories } from "../news/stories";
+import { StoryCard } from "../news/StoryCard";
+import { SquadExplorer } from "../squad/SquadExplorer";
 import { Countdown } from "./Countdown";
-import {
-  displayCompetition,
-  formatKickoff,
-  formatOptionalStat,
-  formatSeason,
-  formatUpdatedAgo,
-} from "./format";
+import { displayCompetition, formatKickoff, formatSeason, formatUpdatedAgo } from "./format";
 import { getHomeData } from "./get-home-data";
+import { LeagueTable } from "./LeagueTable";
+import { SeasonEnding } from "./SeasonEnding";
+import { SeasonSelectionProvider } from "./season-selection";
 import {
   buildFacts,
   buildHeadline,
@@ -17,13 +20,14 @@ import {
   getNextMatchIndex,
   summariseSeason,
 } from "./season-story";
-import { Tally } from "./Tally";
+import { TaleOfTheTape } from "./TaleOfTheTape";
 import { WovenSeason } from "./WovenSeason";
 
 /** Runs per request, so the page always reads the latest ingested data. */
 export async function HomeDashboard() {
   await connection();
-  const { now, matches, standing, race, topScorers, lastUpdatedAt } = await getHomeData();
+  const { now, matches, standing, table, squad, articles, briefing, lastUpdatedAt } =
+    await getHomeData();
 
   if (matches.length === 0) {
     return (
@@ -39,11 +43,11 @@ export async function HomeDashboard() {
   const facts = buildFacts(summary);
   const nextIndex = getNextMatchIndex(matches, now);
   const nextMatch = matches[nextIndex];
-  const leaderPoints = Math.max(...race.map((team) => team.points), 0);
-  const mostGoals = Math.max(...topScorers.map((scorer) => scorer.goals), 0);
+  const lastPlayedIndex = getLastPlayedIndex(matches);
+  const stories = groupStories(articles);
 
   return (
-    <>
+    <SeasonSelectionProvider initialIndex={Math.max(lastPlayedIndex, 0)}>
       <header className="page-gutter pt-10 pb-8 sm:pt-16">
         <p className="kicker">
           Season {formatSeason(CURRENT_SEASON)} · {summary.played} of {matches.length} matches woven
@@ -57,11 +61,7 @@ export async function HomeDashboard() {
         </h1>
       </header>
 
-      <WovenSeason
-        matches={matches}
-        lastPlayedIndex={getLastPlayedIndex(matches)}
-        nextIndex={nextIndex}
-      />
+      <WovenSeason matches={matches} lastPlayedIndex={lastPlayedIndex} nextIndex={nextIndex} />
 
       {nextMatch && (
         <section aria-labelledby="next-up" className="poster reveal">
@@ -83,9 +83,38 @@ export async function HomeDashboard() {
               · {formatKickoff(nextMatch.kickoffAt)}
             </p>
             <Countdown kickoffAt={nextMatch.kickoffAt} serverNow={now} />
+            <TaleOfTheTape table={table} matches={matches} opponentId={nextMatch.opponent?.id} />
+            <Link
+              className="poster-ask"
+              href={{ pathname: "/ask", query: { q: "Preview the next match for me" } }}
+            >
+              Ask Blaugrana for a preview →
+            </Link>
           </div>
         </section>
       )}
+
+      {stories.length > 0 && (
+        <section aria-labelledby="press" className="page-gutter section reveal">
+          <h2 id="press" className="section-title">
+            The press, in English
+          </h2>
+          <p className="section-note">What Spain is saying, so you don&apos;t have to read Spanish.</p>
+          {briefing && <Briefing briefing={briefing} now={now} />}
+          <div className="stories">
+            {stories.slice(0, HOME_STORIES_LIMIT).map((story) => (
+              <StoryCard key={story.id} story={story} squad={squad} now={now} />
+            ))}
+          </div>
+          <Link href="/news" className="chip chip-action press-more">
+            All the news →
+          </Link>
+        </section>
+      )}
+
+      <SeasonEnding matches={matches} table={table} />
+
+      <LeagueTable table={table} matches={matches} />
 
       {facts.length > 0 && (
         <section aria-labelledby="story" className="page-gutter section reveal">
@@ -104,61 +133,21 @@ export async function HomeDashboard() {
         </section>
       )}
 
-      {race.length > 0 && (
-        <section aria-labelledby="race" className="page-gutter section reveal">
-          <h2 id="race" className="section-title">
-            The race
-          </h2>
-          <p className="section-note">
-            {displayCompetition(standing?.competition ?? "League")}. One stripe, one point.
-          </p>
-          <ul className="tally-rows">
-            {race.map((team) => (
-              <li key={team.name}>
-                <span className="tally-name" data-strong={team.isBarca}>
-                  {team.name}
-                </span>
-                <Tally count={team.points} max={leaderPoints} muted={!team.isBarca} />
-                <span className="tally-number">{team.points}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {topScorers.length > 0 && (
-        <section aria-labelledby="scorers" className="page-gutter section reveal">
-          <h2 id="scorers" className="section-title">
-            Who&apos;s weaving
-          </h2>
-          <p className="section-note">League goals. One stripe, one goal.</p>
-          <ul className="tally-rows">
-            {topScorers.map((scorer) => (
-              <li key={scorer.name}>
-                <span className="tally-name" data-strong="true">
-                  {scorer.name}
-                </span>
-                <Tally count={scorer.goals} max={mostGoals} />
-                <span className="tally-number">
-                  {scorer.goals}
-                  <span className="tally-extra">
-                    {" "}
-                    · {formatOptionalStat(scorer.assists)} ast
-                  </span>
-                </span>
-              </li>
-            ))}
-          </ul>
-          <p className="section-note">
-            Assists only cover goalscorers, and a dash means the data gave no figure.
-          </p>
-        </section>
-      )}
+      <SquadExplorer squad={squad} now={now} teamGoals={summary.goalsFor} stories={stories} />
 
       <footer className="page-gutter pb-12 text-center text-sm">
         {lastUpdatedAt && `${formatUpdatedAgo(lastUpdatedAt, now)}. `}Scores can lag behind real
         time.
+        <br />
+        Unofficial fan project, not affiliated with FC Barcelona.{" "}
+        <a href="/calendar.ics" className="footer-link">
+          Add fixtures to your calendar
+        </a>{" "}
+        ·{" "}
+        <Link href="/credits" className="footer-link">
+          Credits
+        </Link>
       </footer>
-    </>
+    </SeasonSelectionProvider>
   );
 }

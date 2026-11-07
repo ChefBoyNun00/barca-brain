@@ -1,31 +1,29 @@
-import { RACE_TEAMS_LIMIT, TOP_SCORERS_LIMIT } from "@/config/display";
-import { getEnvVars } from "@/config/env";
-import { CURRENT_SEASON, INGEST_TARGETS } from "@/config/football";
+import { NEWS_PAGE_LIMIT } from "@/config/news";
 import type { HomeData } from "@/domain/home";
 import { getAppDatabase } from "@/server/db/app-database";
 import {
   getLastSuccessfulIngestAt,
-  getLeagueRace,
   getLeagueStanding,
   getSeasonMatches,
-  getTopLeagueScorers,
 } from "@/server/db/queries/home";
+import { getLeagueTable } from "@/server/db/queries/league-table";
+import { getLatestBriefing, getRecentArticles } from "@/server/db/queries/news";
+import { getSquad } from "@/server/db/queries/squad";
+import { getCurrentTeamScope } from "@/server/db/team-scope";
 
 export async function getHomeData(): Promise<HomeData> {
-  const { FOOTBALL_PROVIDER: provider } = getEnvVars(["FOOTBALL_PROVIDER"]);
-  const target = INGEST_TARGETS[provider];
-  if (!target) throw new Error(`No team configured for provider ${provider}`);
-
+  const scope = getCurrentTeamScope();
   const db = getAppDatabase();
-  const scope = { provider, teamExternalId: target.teamId, season: CURRENT_SEASON };
 
-  const [matches, standing, race, topScorers, lastUpdatedAt] = await Promise.all([
+  const [matches, standing, table, squad, articles, briefing, lastUpdatedAt] = await Promise.all([
     getSeasonMatches(db, scope),
     getLeagueStanding(db, scope),
-    getLeagueRace(db, scope, RACE_TEAMS_LIMIT),
-    getTopLeagueScorers(db, scope, TOP_SCORERS_LIMIT),
-    getLastSuccessfulIngestAt(db, provider),
+    getLeagueTable(db, scope),
+    getSquad(db, scope),
+    getRecentArticles(db, NEWS_PAGE_LIMIT),
+    getLatestBriefing(db),
+    getLastSuccessfulIngestAt(db, scope.provider),
   ]);
 
-  return { now: new Date(), matches, standing, race, topScorers, lastUpdatedAt };
+  return { now: new Date(), matches, standing, table, squad, articles, briefing, lastUpdatedAt };
 }
