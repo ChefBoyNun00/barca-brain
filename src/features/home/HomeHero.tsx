@@ -4,6 +4,8 @@ import type { HomeStanding } from "@/domain/home";
 import { CountUp } from "./CountUp";
 import { formatSeason } from "./format";
 import type { SeasonSummary } from "./season-story";
+import { MatchdayBanner } from "./MatchdayBanner";
+import type { MatchdayState } from "./matchday";
 
 const ordinalSuffix = (rank: number): string => {
   const suffixes: Record<string, string> = { one: "st", two: "nd", few: "rd", other: "th" };
@@ -16,10 +18,20 @@ type HomeHeroProps = {
   summary: SeasonSummary;
   total: number;
   standing: HomeStanding | null;
+  matchday: MatchdayState;
+  now: Date;
 };
 
 /** The first thing you see: where Barça stand, in big numbers that count up. */
-export function HomeHero({ season, headline, summary, total, standing }: HomeHeroProps) {
+export function HomeHero({
+  season,
+  headline,
+  summary,
+  total,
+  standing,
+  matchday,
+  now,
+}: HomeHeroProps) {
   const tiles = [
     ...(standing
       ? [
@@ -34,8 +46,9 @@ export function HomeHero({ season, headline, summary, total, standing }: HomeHer
   ];
 
   return (
-    <header className="hero">
+    <header className="hero" data-matchday={matchday.kind !== "none"}>
       <div aria-hidden="true" className="hero-stripes" />
+      <MatchdayBanner state={matchday} now={now} />
       <div className="page-gutter hero-inner">
         <div className="hero-top">
           <Image src={BARCA_CREST_URL} alt="FC Barcelona" width={64} height={64} unoptimized />

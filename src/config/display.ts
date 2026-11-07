@@ -29,3 +29,6 @@ export const POSITION_LABELS = {
 
 /** Roughly a match with stoppages and half-time, for calendar entries. */
 export const MATCH_LENGTH_MINUTES = 115;
+
+/** The opponent's name, as the data provider spells it, that turns a match into El Clásico. */
+export const CLASICO_RIVAL = "Real Madrid";

@@ -4,6 +4,7 @@ import { connection } from "next/server";
 import { CURRENT_SEASON } from "@/config/football";
 import { Countdown } from "./Countdown";
 import { HomeHero } from "./HomeHero";
+import { getMatchdayState } from "./matchday";
 import { ResultsTicker } from "./ResultsTicker";
 import { SeasonSelectionProvider } from "./season-selection";
 import { WovenSeason } from "./WovenSeason";
@@ -57,6 +58,8 @@ export async function HomeDashboard() {
         summary={summary}
         total={matches.length}
         standing={standing}
+        matchday={getMatchdayState(matches, now)}
+        now={now}
       />
 
       <WovenSeason matches={matches} lastPlayedIndex={lastPlayedIndex} nextIndex={nextIndex} />
