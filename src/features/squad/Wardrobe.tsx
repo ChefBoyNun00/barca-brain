@@ -6,9 +6,10 @@ import { POSITION_LABELS } from "@/config/display";
 import type { PlayerPosition, SquadPlayer } from "@/domain/home";
 import { Jersey } from "./Jersey";
 import { getJersey } from "./jersey-data";
+import { isLaMasia } from "./la-masia";
 import { sortSquad, type SquadSort } from "./squad-stats";
 
-type PositionFilter = "all" | PlayerPosition;
+type PositionFilter = "all" | "masia" | PlayerPosition;
 
 const POSITION_CHOICES: Choice<PositionFilter>[] = [
   { id: "all", label: "Everyone" },
@@ -16,6 +17,7 @@ const POSITION_CHOICES: Choice<PositionFilter>[] = [
   { id: "DF", label: "Defenders" },
   { id: "MF", label: "Midfield" },
   { id: "FW", label: "Forwards" },
+  { id: "masia", label: "La Masia" },
 ];
 
 const SORT_CHOICES: Choice<SquadSort>[] = [
@@ -28,14 +30,20 @@ const SORT_CHOICES: Choice<SquadSort>[] = [
 function Hanger({ player, onOpen }: { player: SquadPlayer; onOpen: () => void }) {
   const jersey = getJersey(player);
   const position = player.position ? POSITION_LABELS[player.position] : "Squad player";
+  const masia = isLaMasia(player);
   return (
     <button
       type="button"
       className="hanger"
       onClick={onOpen}
-      aria-label={`${player.name}${jersey.number === null ? "" : `, number ${jersey.number}`}. ${position}. Open stats.`}
+      aria-label={`${player.name}${jersey.number === null ? "" : `, number ${jersey.number}`}. ${position}${masia ? ", La Masia graduate" : ""}. Open stats.`}
     >
       <span aria-hidden="true" className="hanger-hook" />
+      {masia && (
+        <span aria-hidden="true" className="hanger-masia" title="La Masia graduate">
+          M
+        </span>
+      )}
       <Jersey jersey={jersey} keeper={player.position === "GK"} mode="flip" />
       {/* Touch screens cannot hover, so the name is also written underneath. */}
       <span aria-hidden="true" className="hanger-caption">
@@ -55,7 +63,10 @@ export function Wardrobe({ squad, onOpen }: WardrobeProps) {
   const [position, setPosition] = useState<PositionFilter>("all");
   const [sort, setSort] = useState<SquadSort>("number");
   const shown = sortSquad(
-    squad.filter((player) => position === "all" || player.position === position),
+    squad.filter((player) => {
+      if (position === "all") return true;
+      return position === "masia" ? isLaMasia(player) : player.position === position;
+    }),
     sort,
   );
 

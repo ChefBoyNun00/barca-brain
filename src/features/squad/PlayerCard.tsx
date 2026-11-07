@@ -8,6 +8,7 @@ import { displayCompetition, formatOptionalStat } from "../home/format";
 import { findPlayerStories, type Story } from "../news/stories";
 import { Jersey } from "./Jersey";
 import { getJersey } from "./jersey-data";
+import { isLaMasia } from "./la-masia";
 import {
   formatGoalsPerMatch,
   formatShareOfGoals,
@@ -77,6 +78,7 @@ export function PlayerCard({
             {player.name}
           </h3>
           <p className="player-card-details">{details.join(" · ")}</p>
+          {isLaMasia(player) && <p className="player-masia">La Masia graduate</p>}
 
           {player.stats.length === 0 ? (
             <p className="player-card-empty">

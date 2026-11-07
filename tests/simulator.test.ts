@@ -20,6 +20,7 @@ import {
   sortSquad,
 } from "@/features/squad/squad-stats";
 import { getJersey } from "@/features/squad/jersey-data";
+import { isLaMasia } from "@/features/squad/la-masia";
 
 function team(teamId: string, rank: number, points: number, played = 10): LeagueRow {
   return {
@@ -289,5 +290,10 @@ describe("squad stats", () => {
       "Pedri",
       "Iker Rodríguez",
     ]);
+  });
+
+  it("tags La Masia graduates and no one else", () => {
+    expect(isLaMasia({ name: "Lamine Yamal" })).toBe(true);
+    expect(isLaMasia({ name: "Raphinha" })).toBe(false);
   });
 });
