@@ -2,7 +2,8 @@
 
 export const DISPLAY_LOCALE = "en-GB";
 export const DISPLAY_TIME_ZONE = "Asia/Jerusalem";
-export const TOP_SCORERS_LIMIT = 8;
+/** Barça's crest, from the same crest host as every opponent's. */
+export const BARCA_CREST_URL = "https://crests.football-data.org/81.png";
 export const RACE_TEAMS_LIMIT = 4;
 
 /** Provider names fans do not use. Anything not listed shows as it arrives. */

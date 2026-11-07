@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState, type PointerEvent } from "react";
 import { ChoiceChips } from "@/components/ChoiceChips";
-import { REPLAY_STEP_MS } from "@/config/display";
+import { BARCA_CREST_URL, REPLAY_STEP_MS } from "@/config/display";
 import type { SeasonMatch } from "@/domain/home";
 import { displayCompetition, formatKickoff, formatMatchDate } from "./format";
 import { SEASON_FILTERS } from "./season-filters";
@@ -57,11 +57,24 @@ function Stripe({ match, index, isNext, isSelected, isDimmed, isUnwoven }: Strip
   );
 }
 
+/** A crest always sits next to its own team's name, whichever side that team is on. */
+function MatchSide({ name, logoUrl }: { name: string; logoUrl: string | null }) {
+  return (
+    <span className="match-side">
+      {logoUrl && <Image src={logoUrl} alt="" width={56} height={56} unoptimized />}
+      <span className="match-team">{name}</span>
+    </span>
+  );
+}
+
 function MatchDetail({ match }: { match: SeasonMatch }) {
   const outcome = getMatchOutcome(match);
   const hasHalfTime = match.halfTimeFor !== null && match.halfTimeAgainst !== null;
-  const barca = "Barça";
-  const opponent = match.opponent?.name ?? "To be decided";
+  const barca = { name: "Barça", logoUrl: BARCA_CREST_URL as string | null };
+  const opponent = {
+    name: match.opponent?.name ?? "To be decided",
+    logoUrl: match.opponent?.logoUrl ?? null,
+  };
   const [left, right] = match.isHome ? [barca, opponent] : [opponent, barca];
   const [leftGoals, rightGoals] = match.isHome
     ? [match.goalsFor, match.goalsAgainst]
@@ -73,18 +86,9 @@ function MatchDetail({ match }: { match: SeasonMatch }) {
         {[displayCompetition(match.competition), match.round].filter(Boolean).join(" · ")}
       </p>
       <div className="match-line">
-        {match.opponent?.logoUrl && (
-          <Image src={match.opponent.logoUrl} alt="" width={56} height={56} unoptimized />
-        )}
-        {outcome ? (
-          <p className="match-score">
-            {left} {leftGoals}–{rightGoals} {right}
-          </p>
-        ) : (
-          <p className="match-score">
-            {left} v {right}
-          </p>
-        )}
+        <MatchSide name={left.name} logoUrl={left.logoUrl} />
+        <p className="match-score">{outcome ? `${leftGoals}–${rightGoals}` : "v"}</p>
+        <MatchSide name={right.name} logoUrl={right.logoUrl} />
       </div>
       <p className="match-note">
         {outcome

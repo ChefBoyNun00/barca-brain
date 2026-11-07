@@ -327,10 +327,30 @@ body {
     margin-top: 0.25rem;
   }
 
-  .match-line img {
+  .match-side {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* The right-hand team reads name first, then crest, so each crest hugs its own name. */
+  .match-side:last-child {
+    flex-direction: row-reverse;
+  }
+
+  .match-side img {
     width: 44px;
     height: 44px;
     object-fit: contain;
+  }
+
+  .match-team {
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 4.5vw, 2rem);
+    font-weight: 900;
+    line-height: 1.05;
+    text-transform: uppercase;
+    color: var(--text-heading);
   }
 
   .match-score {
