@@ -12,17 +12,22 @@ const display = Big_Shoulders({
   subsets: ["latin"],
 });
 
+/** Link previews need full addresses. Vercel tells us the live one; locally it is localhost. */
+const siteUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : "http://localhost:3000";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "Barça Brain",
   description: "An FC Barcelona app you can talk to.",
+  openGraph: { images: ["/card/season"], siteName: "Barça Brain" },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={`${inter.variable} ${display.variable} h-full antialiased`}
-    >
+    <html lang="en" className={`${inter.variable} ${display.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

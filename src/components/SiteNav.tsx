@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { BARCA_CREST_URL } from "@/config/display";
 
 type Section = { href: string; label: string; icon: ReactNode; also?: string[] };
@@ -46,9 +46,7 @@ function isActive(pathname: string, { href, also = [] }: Section): boolean {
   return [href, ...also].some((path) => pathname === path || pathname.startsWith(`${path}/`));
 }
 
-export function SiteNav() {
-  const pathname = usePathname();
-
+function NavShell({ pathname }: { pathname: string }) {
   return (
     <>
       <nav aria-label="Main" className="nav">
@@ -88,5 +86,22 @@ export function SiteNav() {
         </ul>
       </nav>
     </>
+  );
+}
+
+/** Reads the current page, so the active tab lights up. */
+function ActiveNav() {
+  return <NavShell pathname={usePathname()} />;
+}
+
+/**
+ * The address is only known at request time on pages like /matches/[id], so it loads inside
+ * Suspense. Until it does, the nav shows with no tab lit, so it is never missing.
+ */
+export function SiteNav() {
+  return (
+    <Suspense fallback={<NavShell pathname="" />}>
+      <ActiveNav />
+    </Suspense>
   );
 }

@@ -27,6 +27,7 @@ const EXPLORE = [
     note: "Play out the rest of the season.",
   },
   { href: "/news", title: "The press", note: "Spanish news, in English." },
+  { href: "/shirt", title: "Your shirt", note: "Put your name on the back." },
   { href: "/ask", title: "Ask", note: "Questions about the season." },
 ] as const;
 

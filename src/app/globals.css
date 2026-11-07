@@ -3201,3 +3201,112 @@ body {
   }
 }
 
+@layer components {
+  .match-card-share,
+  .player-share {
+    align-self: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--primary);
+  }
+
+  .match-card-share:hover,
+  .player-share:hover {
+    text-decoration: underline;
+  }
+
+  .player-share {
+    display: inline-block;
+    margin-top: 0.875rem;
+  }
+
+  .share-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.25rem;
+  }
+
+  .share-preview {
+    width: 100%;
+    max-width: 40rem;
+    margin-top: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow-md);
+  }
+
+  .share-match {
+    max-width: 22rem;
+    margin-top: 1.5rem;
+  }
+
+  .shirt-maker {
+    display: grid;
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+
+  .shirt-preview {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    padding: 2rem 1rem;
+    background: var(--barca-navy);
+    border-radius: 20px;
+  }
+
+  .shirt-preview .jersey {
+    width: min(42vw, 15rem);
+    max-width: none;
+  }
+
+  .shirt-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+  }
+
+  .shirt-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-heading);
+  }
+
+  .shirt-form input {
+    padding: 0.75rem 1rem;
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-heading);
+    background: #ffffff;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .shirt-form input:focus-visible {
+    outline: 3px solid var(--barca-gold);
+    outline-offset: 2px;
+    border-color: var(--barca-blue);
+  }
+
+  .shirt-note {
+    font-size: 0.875rem;
+  }
+
+  @media (min-width: 768px) {
+    .shirt-maker {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      align-items: start;
+    }
+  }
+}
+

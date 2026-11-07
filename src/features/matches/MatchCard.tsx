@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { BARCA_CREST_URL } from "@/config/display";
 import type { SeasonMatch } from "@/domain/home";
 import { displayCompetition, formatKickoff, formatMatchDate } from "../home/format";
@@ -16,7 +17,9 @@ function Side({ team }: { team: Team }) {
 }
 
 /** One match as a card. The home side is on the left, as on a scoreboard. */
-export function MatchCard({ match, index }: { match: SeasonMatch; index: number }) {
+type MatchCardProps = { match: SeasonMatch; index: number; showShare?: boolean };
+
+export function MatchCard({ match, index, showShare = true }: MatchCardProps) {
   const outcome = getMatchOutcome(match);
   const barca: Team = { name: "Barça", logoUrl: BARCA_CREST_URL };
   const opponent: Team = {
@@ -63,6 +66,11 @@ export function MatchCard({ match, index }: { match: SeasonMatch; index: number 
               .join(" · ")
           : `${match.isHome ? "Home" : "Away"} · ${formatKickoff(match.kickoffAt)}`}
       </p>
+      {showShare && (
+        <Link className="match-card-share" href={`/matches/${match.id}`}>
+          Share ↗
+        </Link>
+      )}
     </article>
   );
 }

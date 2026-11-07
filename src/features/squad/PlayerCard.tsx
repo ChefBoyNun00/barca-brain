@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, type KeyboardEvent, type MouseEvent } from "react";
 import { POSITION_LABELS } from "@/config/display";
 import { PLAYER_STORIES_LIMIT } from "@/config/news";
@@ -151,6 +152,10 @@ export function PlayerCard({
               </ul>
             </div>
           )}
+
+          <Link className="player-share" href={`/squad/${player.id}`}>
+            Share this player ↗
+          </Link>
 
           <div className="player-card-actions">
             <button
