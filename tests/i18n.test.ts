@@ -13,7 +13,7 @@ describe("translations", () => {
     expect(translate("en", "hero.kicker", { season: "2026–27", played: 15, total: 46 })).toBe(
       "Més que un club · Season 2026–27 · 15 of 46 played",
     );
-    expect(translate("ca", "headline.wins", { wins: 13, played: 15 })).toBe("13 victòries de 15.");
+    expect(translate("he", "headline.wins", { wins: 13, played: 15 })).toBe("13 ניצחונות מתוך 15.");
   });
 
   it("writes ordinals the way each language does", () => {
@@ -23,8 +23,8 @@ describe("translations", () => {
     expect(translate("en", "headline.rank", { rank: 11, league: "La Liga" })).toBe(
       "11th in La Liga.",
     );
-    expect(translate("ca", "headline.rank", { rank: 2, league: "La Liga" })).toBe("2n a La Liga.");
-    expect(translate("ca", "headline.rank", { rank: 5, league: "La Liga" })).toBe("5è a La Liga.");
+    expect(translate("he", "headline.rank", { rank: 2, league: "La Liga" })).toBe("מקום 2 ב־La Liga.");
+    expect(translate("he", "headline.rank", { rank: 11, league: "La Liga" })).toBe("מקום 11 ב־La Liga.");
   });
 
   it("leaves a placeholder visible rather than printing undefined", () => {
@@ -34,7 +34,7 @@ describe("translations", () => {
   it("keeps every placeholder the English text has", () => {
     const placeholders = (text: string) => [...text.matchAll(/\{(\w+)/g)].map((m) => m[1]).sort();
     for (const key of Object.keys(DICTIONARY.en) as TextKey[]) {
-      expect(placeholders(DICTIONARY.ca[key])).toEqual(placeholders(DICTIONARY.en[key]));
+      expect(placeholders(DICTIONARY.he[key])).toEqual(placeholders(DICTIONARY.en[key]));
     }
   });
 });

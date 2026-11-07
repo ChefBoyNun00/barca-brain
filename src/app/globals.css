@@ -3342,7 +3342,7 @@ body {
 }
 
 @layer components {
-  /* Català / English */
+  /* עברית / English */
   .lang-toggle {
     display: inline-flex;
     padding: 2px;
@@ -5728,4 +5728,45 @@ body {
     opacity: 0;
     transform: scale(1.08);
   }
+}
+
+/* Hebrew: its own font (the Latin ones have no Hebrew letters), and right-to-left layout.
+   Flex and grid rows mirror by themselves. Charts that run in time order (the season wall,
+   form guide, results ticker, bars) stay left to right, because their animations and the
+   wall's drag-to-scrub are measured from the left edge. */
+html[lang="he"] {
+  --font-inter: var(--font-hebrew);
+  --font-display: var(--font-hebrew);
+}
+
+html[lang="he"] body {
+  /* Hebrew letters are not spaced out like capitals; letter-spacing breaks them apart. */
+  letter-spacing: normal;
+}
+
+html[lang="he"] [class] {
+  letter-spacing: normal;
+}
+
+[dir="rtl"] .wall,
+[dir="rtl"] .form-pips,
+[dir="rtl"] .ticker,
+[dir="rtl"] .split-bar,
+[dir="rtl"] .halves,
+[dir="rtl"] .leaders-bar,
+[dir="rtl"] .countdown-thread {
+  direction: ltr;
+}
+
+/* Section headings carry their coloured edge on the reading side. */
+[dir="rtl"] .stats-heading,
+[dir="rtl"] .leaders-title {
+  border-left: 0;
+  border-right: 6px solid var(--barca-gold);
+  padding-left: 0;
+  padding-right: 0.75rem;
+}
+
+[dir="rtl"] .leaders-title {
+  border-right-color: var(--barca-garnet);
 }

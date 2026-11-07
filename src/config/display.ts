@@ -35,3 +35,6 @@ export const CLASICO_RIVAL = "Real Madrid";
 
 /** Remembers, for this visit only, that the intro has already played. */
 export const INTRO_STORAGE_KEY = "barca-brain:intro";
+
+/** Remembers the visitor's language in this browser. Read before the first paint as well. */
+export const LANGUAGE_STORAGE_KEY = "barca-brain:language";

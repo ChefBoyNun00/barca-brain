@@ -1,9 +1,16 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { LANGUAGES, translate, type Language, type TextKey, type TextVars } from "./dictionary";
+import { LANGUAGE_STORAGE_KEY as STORAGE_KEY } from "@/config/display";
+import {
+  LANGUAGES,
+  RTL_LANGUAGES,
+  translate,
+  type Language,
+  type TextKey,
+  type TextVars,
+} from "./dictionary";
 
-const STORAGE_KEY = "barca-brain:language";
 const CHANGE_EVENT = "barca-brain:language-change";
 
 function read(): Language {
@@ -36,6 +43,8 @@ export function setLanguage(language: Language) {
     // Without storage the choice lasts until the page reloads.
   }
   document.documentElement.lang = language;
+  // Hebrew reads right to left, so the whole layout mirrors.
+  document.documentElement.dir = RTL_LANGUAGES.includes(language) ? "rtl" : "ltr";
   window.dispatchEvent(new Event(CHANGE_EVENT));
 }
 

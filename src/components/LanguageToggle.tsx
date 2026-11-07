@@ -3,11 +3,11 @@
 import { setLanguage, useLanguage } from "@/i18n/language";
 
 const OPTIONS = [
-  { id: "ca", label: "CA", name: "Català" },
+  { id: "he", label: "עב", name: "עברית" },
   { id: "en", label: "EN", name: "English" },
 ] as const;
 
-/** Català / English. Remembers the choice in this browser. */
+/** עברית / English. Remembers the choice in this browser. */
 export function LanguageToggle() {
   const language = useLanguage();
   return (
