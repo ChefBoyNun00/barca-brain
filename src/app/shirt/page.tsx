@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { PageLoader } from "@/components/PageLoader";
 import { SiteNav } from "@/components/SiteNav";
 import { ShirtMaker } from "@/features/share/ShirtMaker";
 import { cleanShirtInput } from "@/features/share/shirt-input";
@@ -31,9 +32,7 @@ export default function ShirtPage({ searchParams }: Props) {
         <p className="kicker">Més que un club</p>
         <h1 className="display-title mt-3">Your shirt</h1>
         <p className="mt-4 max-w-2xl">Put your name on the back. Then show it off.</p>
-        <Suspense
-          fallback={<div role="status" aria-label="Loading" className="skeleton mt-8 h-96" />}
-        >
+        <Suspense fallback={<PageLoader label="Loading" />}>
           <Maker searchParams={searchParams} />
         </Suspense>
       </main>

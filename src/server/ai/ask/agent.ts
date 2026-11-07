@@ -1,6 +1,6 @@
 import type Anthropic from "@anthropic-ai/sdk";
 import { ASK_MAX_OUTPUT_TOKENS, ASK_MAX_TOOL_ROUNDS, ASK_MODEL } from "@/config/ai";
-import { ASK_BLAUGRANA_PROMPT } from "../prompts/ask-blaugrana.v1";
+import { ASK_BLAUGRANA_PROMPT } from "../prompts/ask-blaugrana.v2";
 import type { AskContext } from "./tools/define";
 import { ASK_TOOLS } from "./tools/registry";
 

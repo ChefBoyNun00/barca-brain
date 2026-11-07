@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { PageLoader } from "@/components/PageLoader";
 import { SiteNav } from "@/components/SiteNav";
 import { SquadPage } from "@/features/squad/SquadPage";
 
@@ -13,13 +14,7 @@ export default function SquadRoute() {
     <>
       <SiteNav />
       <main className="flex-1 pb-16">
-        <Suspense
-          fallback={
-            <div role="status" aria-label="Loading" className="page-gutter section">
-              <div className="skeleton h-96" />
-            </div>
-          }
-        >
+        <Suspense fallback={<PageLoader label="Loading" />}>
           <SquadPage />
         </Suspense>
       </main>

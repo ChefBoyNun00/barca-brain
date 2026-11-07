@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { PageLoader } from "@/components/PageLoader";
 import { SiteNav } from "@/components/SiteNav";
 import { T } from "@/i18n/language";
 import { NewsPage } from "@/features/news/NewsPage";
@@ -24,11 +25,7 @@ export default function News() {
           Spanish and Catalan press, translated. Labels show how solid each story is, and every card
           links back to the source.
         </p>
-        <Suspense
-          fallback={
-            <div role="status" aria-label="Loading the press" className="skeleton mt-8 h-96" />
-          }
-        >
+        <Suspense fallback={<PageLoader label="Loading the press" />}>
           <NewsPage />
         </Suspense>
       </main>

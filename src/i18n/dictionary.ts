@@ -93,6 +93,13 @@ const en = {
     "Every stripe is a match. Every dot is a goal. A defeat tears the shirt, a diamond marks Europe, and the empty threads are still to be played.",
   "season.list": "See every match as a list",
 
+  "lost.kicker": "404 · Page not found",
+  "lost.title": "Offside!",
+  "lost.note": "That page isn't on the pitch. The flag is up.",
+  "lost.home": "Back to the home page",
+  "lost.matches": "See the matches",
+  "loading": "Loading",
+
   "matchday.matchday": "Matchday",
   "matchday.fulltime": "Full time",
   "matchday.clasico": "El Clásico",
@@ -187,6 +194,13 @@ const ca: Record<TextKey, string> = {
   "season.legend":
     "Cada franja és un partit. Cada punt és un gol. Una derrota esquinça la samarreta, un diamant marca Europa, i els fils buits són partits per jugar.",
   "season.list": "Mostra tots els partits en llista",
+
+  "lost.kicker": "404 · Pàgina no trobada",
+  "lost.title": "Fora de joc!",
+  "lost.note": "Aquesta pàgina no és al camp. El linier ha aixecat la bandera.",
+  "lost.home": "Torna a l'inici",
+  "lost.matches": "Mira els partits",
+  "loading": "Carregant",
 
   "matchday.matchday": "Dia de partit",
   "matchday.fulltime": "Final del partit",

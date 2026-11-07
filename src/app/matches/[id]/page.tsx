@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { connection } from "next/server";
+import { PageLoader } from "@/components/PageLoader";
 import { SiteNav } from "@/components/SiteNav";
 import { describeMatch } from "@/features/home/season-story";
 import { MatchCard } from "@/features/matches/MatchCard";
@@ -54,9 +55,7 @@ export default function MatchPage({ params }: Props) {
       <main className="page-gutter flex-1 pt-10 pb-16">
         <p className="kicker">Share a match</p>
         <h1 className="display-title mt-3">The match</h1>
-        <Suspense
-          fallback={<div role="status" aria-label="Loading" className="skeleton mt-8 h-96" />}
-        >
+        <Suspense fallback={<PageLoader label="Loading" />}>
           <Detail params={params} />
         </Suspense>
       </main>

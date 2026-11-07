@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { connection } from "next/server";
+import { PageLoader } from "@/components/PageLoader";
 import { SiteNav } from "@/components/SiteNav";
 import { ShareBar } from "@/features/share/ShareBar";
 import { getSquadData } from "@/features/squad/get-squad-data";
@@ -42,9 +43,7 @@ export default function PlayerPage({ params }: Props) {
       <main className="page-gutter flex-1 pt-10 pb-16">
         <p className="kicker">Share a player</p>
         <h1 className="display-title mt-3">The player</h1>
-        <Suspense
-          fallback={<div role="status" aria-label="Loading" className="skeleton mt-8 h-96" />}
-        >
+        <Suspense fallback={<PageLoader label="Loading" />}>
           <Detail params={params} />
         </Suspense>
       </main>

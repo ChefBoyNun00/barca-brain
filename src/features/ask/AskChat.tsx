@@ -20,6 +20,7 @@ const SUGGESTIONS = [
   "How do we do when we're behind at half-time?",
   "Preview the next match for me",
   "Compare Lamine Yamal and Raphinha this season",
+  "Explain the next match to a friend who has never watched football",
   "Which transfer rumours are worth believing?",
 ];
 

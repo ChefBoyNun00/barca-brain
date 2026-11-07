@@ -291,3 +291,13 @@ describe("the calendar", () => {
     expect(calendar).not.toContain("m3@");
   });
 });
+
+describe("the Ask Blaugrana prompt", () => {
+  it("keeps v1's rules about facts and adds a voice on top", async () => {
+    const { ASK_BLAUGRANA_PROMPT: v1 } = await import("@/server/ai/prompts/ask-blaugrana.v1");
+    const { ASK_BLAUGRANA_PROMPT: v2 } = await import("@/server/ai/prompts/ask-blaugrana.v2");
+    expect(v2.startsWith(v1)).toBe(true);
+    expect(v2).toContain("Never answer a number");
+    expect(v2).toContain("never about numbers");
+  });
+});
