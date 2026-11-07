@@ -17,7 +17,7 @@ Each phase ends with something that runs. Tick boxes as they ship.
 - [x] Jobs: fixtures → squad → scorers → standings.
 - [x] Runner logs every run to `ingest_runs`, enforces request budget.
 - [x] `npm run ingest` works locally; re-running produces no duplicates.
-- [ ] GitHub Actions workflow runs ingest daily (e.g. 04:00 Israel time).
+- [x] GitHub Actions workflow runs ingest daily (e.g. 04:00 Israel time).
 - [x] Mapper unit tests using recorded JSON in `tests/fixtures/`.
 
 **Done =** Supabase shows every Barça match of the season with scores, plus scorers and standings, updated daily automatically.
