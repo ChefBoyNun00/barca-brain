@@ -3310,3 +3310,36 @@ body {
   }
 }
 
+@layer components {
+  /* Català / English */
+  .lang-toggle {
+    display: inline-flex;
+    padding: 2px;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 9999px;
+  }
+
+  .lang-toggle button {
+    padding: 0.125rem 0.625rem;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: rgba(255, 255, 255, 0.75);
+    cursor: pointer;
+    border-radius: 9999px;
+    transition:
+      color 150ms var(--ease-smooth),
+      background 150ms var(--ease-smooth);
+  }
+
+  .lang-toggle button[aria-pressed="true"] {
+    color: var(--barca-navy);
+    background: var(--barca-gold);
+  }
+
+  .lang-toggle button:focus-visible {
+    outline: 2px solid var(--barca-gold);
+    outline-offset: 2px;
+  }
+}
+

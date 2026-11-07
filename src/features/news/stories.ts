@@ -32,14 +32,13 @@ function pickLead(articles: NewsArticle[]): NewsArticle {
 /** The model can still reach for a catch-all, which must not merge unrelated stories. */
 const CATCH_ALL_TOPICS = new Set(["other", "general", "news", "misc"]);
 
-const unique = <T,>(items: T[]) => [...new Set(items)];
+const unique = <T>(items: T[]) => [...new Set(items)];
 
 /** Articles arrive newest first. Untranslated ones have no topic, so each stands alone. */
 export function groupStories(articles: NewsArticle[]): Story[] {
   const groups = new Map<string, NewsArticle[]>();
   for (const article of articles) {
-    const key =
-      article.topic && !CATCH_ALL_TOPICS.has(article.topic) ? article.topic : article.id;
+    const key = article.topic && !CATCH_ALL_TOPICS.has(article.topic) ? article.topic : article.id;
     groups.set(key, [...(groups.get(key) ?? []), article]);
   }
   return [...groups.entries()]

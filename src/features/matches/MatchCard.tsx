@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { BARCA_CREST_URL } from "@/config/display";
 import type { SeasonMatch } from "@/domain/home";
+import { T } from "@/i18n/language";
 import { displayCompetition, formatKickoff, formatMatchDate } from "../home/format";
 import { describeMatch, describeOutcome, getMatchOutcome } from "../home/season-story";
 
@@ -56,19 +57,21 @@ export function MatchCard({ match, index, showShare = true }: MatchCardProps) {
         <Side team={right} />
       </div>
       <p className="match-card-foot">
-        {outcome
-          ? [
-              formatMatchDate(match.kickoffAt),
-              match.isHome ? "Home" : "Away",
-              hasHalfTime && `HT ${match.halfTimeFor}–${match.halfTimeAgainst}`,
-            ]
-              .filter(Boolean)
-              .join(" · ")
-          : `${match.isHome ? "Home" : "Away"} · ${formatKickoff(match.kickoffAt)}`}
+        {outcome ? (
+          <>
+            {formatMatchDate(match.kickoffAt)} ·{" "}
+            <T k={match.isHome ? "match.home" : "match.away"} />
+            {hasHalfTime && ` · HT ${match.halfTimeFor}–${match.halfTimeAgainst}`}
+          </>
+        ) : (
+          <>
+            <T k={match.isHome ? "match.home" : "match.away"} /> · {formatKickoff(match.kickoffAt)}
+          </>
+        )}
       </p>
       {showShare && (
         <Link className="match-card-share" href={`/matches/${match.id}`}>
-          Share ↗
+          <T k="match.share" />
         </Link>
       )}
     </article>

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { BARCA_CREST_URL } from "@/config/display";
+import { T } from "@/i18n/language";
 import type { SquadPlayer } from "@/domain/home";
 import { Jersey } from "../squad/Jersey";
 import { getJersey } from "../squad/jersey-data";
@@ -11,14 +12,6 @@ const TOPIC_ICONS: Record<StoryTopic, string> = {
   match: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 8l3 2-1 4h-4l-1-4z",
   club: "M12 3l8 3v6c0 5-4 8-8 9-4-1-8-4-8-9V6z",
   other: "M4 4h13v16H6a2 2 0 0 1-2-2zM8 8h6M8 12h6",
-};
-
-export const TOPIC_LABELS: Record<StoryTopic, string> = {
-  transfers: "Transfers",
-  injuries: "Injuries",
-  match: "Matches",
-  club: "Club",
-  other: "More news",
 };
 
 type StoryArtProps = { story: Story; squad: SquadPlayer[]; size: "hero" | "tile" };
@@ -50,7 +43,9 @@ export function StoryArt({ story, squad, size }: StoryArtProps) {
           <path d={TOPIC_ICONS[topic]} />
         </svg>
       )}
-      <span className="story-art-badge">{TOPIC_LABELS[topic]}</span>
+      <span className="story-art-badge">
+        <T k={`news.${topic}`} />
+      </span>
     </div>
   );
 }

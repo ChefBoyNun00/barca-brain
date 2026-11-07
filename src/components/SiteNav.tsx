@@ -5,8 +5,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 import { BARCA_CREST_URL } from "@/config/display";
+import type { TextKey } from "@/i18n/dictionary";
+import { useT } from "@/i18n/language";
+import { LanguageToggle } from "./LanguageToggle";
 
-type Section = { href: string; label: string; icon: ReactNode; also?: string[] };
+type Section = { href: string; label: TextKey; icon: ReactNode; also?: string[] };
 
 const icon = (paths: string) => (
   <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" className="tab-icon">
@@ -16,29 +19,29 @@ const icon = (paths: string) => (
 
 /** The main features, in the order fans reach for them. Add a page here to add a tab. */
 const SECTIONS: Section[] = [
-  { href: "/", label: "Home", icon: icon("M3 11l9-8 9 8v10H15v-7H9v7H3z") },
+  { href: "/", label: "nav.home", icon: icon("M3 11l9-8 9 8v10H15v-7H9v7H3z") },
   {
     href: "/news",
-    label: "News",
+    label: "nav.news",
     icon: icon("M4 4h13v16H6a2 2 0 0 1-2-2zM17 8h3v10a2 2 0 0 1-2 2M8 8h6M8 12h6M8 16h4"),
   },
   {
     href: "/table",
-    label: "Table",
+    label: "nav.table",
     icon: icon("M4 5h16M4 10h16M4 15h16M4 20h10"),
     also: ["/season"],
   },
   {
     href: "/matches",
-    label: "Matches",
+    label: "nav.matches",
     icon: icon("M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14H3zM3 10h18M8 2v4M16 2v4"),
   },
   {
     href: "/squad",
-    label: "Squad",
+    label: "nav.squad",
     icon: icon("M8 3L3 6l2 5 3-1v11h8V10l3 1 2-5-5-3a4 4 0 0 1-8 0z"),
   },
-  { href: "/ask", label: "Ask", icon: icon("M4 5h16v11H9l-5 4z") },
+  { href: "/ask", label: "nav.ask", icon: icon("M4 5h16v11H9l-5 4z") },
 ];
 
 function isActive(pathname: string, { href, also = [] }: Section): boolean {
@@ -47,6 +50,7 @@ function isActive(pathname: string, { href, also = [] }: Section): boolean {
 }
 
 function NavShell({ pathname }: { pathname: string }) {
+  const t = useT();
   return (
     <>
       <nav aria-label="Main" className="nav">
@@ -62,11 +66,12 @@ function NavShell({ pathname }: { pathname: string }) {
                   href={section.href}
                   aria-current={isActive(pathname, section) ? "page" : undefined}
                 >
-                  {section.label}
+                  {t(section.label)}
                 </Link>
               </li>
             ))}
           </ul>
+          <LanguageToggle />
         </div>
       </nav>
       {/* On phones the same links sit at the bottom, where a thumb can reach them. */}
@@ -79,7 +84,7 @@ function NavShell({ pathname }: { pathname: string }) {
                 aria-current={isActive(pathname, section) ? "page" : undefined}
               >
                 {section.icon}
-                <span>{section.label}</span>
+                <span>{t(section.label)}</span>
               </Link>
             </li>
           ))}

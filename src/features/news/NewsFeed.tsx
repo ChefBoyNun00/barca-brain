@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { Segmented } from "@/components/Segmented";
-import type { Choice } from "@/components/ChoiceChips";
 import type { SquadPlayer } from "@/domain/home";
-import { TOPIC_LABELS } from "./StoryArt";
+import type { TextKey } from "@/i18n/dictionary";
+import { useT } from "@/i18n/language";
 import { StoryCard } from "./StoryCard";
 import {
   filterStories,
@@ -15,11 +15,11 @@ import {
   type StoryTopic,
 } from "./stories";
 
-const SIDE_CHOICES: Choice<SideFilter>[] = [
-  { id: "all", label: "All press" },
-  { id: "barcelona", label: "Barcelona" },
-  { id: "madrid", label: "Madrid" },
-  { id: "both", label: "Both" },
+const SIDE_CHOICES: { id: SideFilter; label: TextKey }[] = [
+  { id: "all", label: "news.all" },
+  { id: "barcelona", label: "news.barcelona" },
+  { id: "madrid", label: "news.madrid" },
+  { id: "both", label: "news.both" },
 ];
 
 const TOPIC_ORDER: StoryTopic[] = ["transfers", "match", "injuries", "club", "other"];
@@ -30,6 +30,7 @@ const ROW_LIMIT = 8;
 type NewsFeedProps = { stories: Story[]; squad: SquadPlayer[]; now: Date };
 
 export function NewsFeed({ stories, squad, now }: NewsFeedProps) {
+  const t = useT();
   const [side, setSide] = useState<SideFilter>("all");
   const [open, setOpen] = useState<ReadonlySet<StoryTopic>>(new Set());
   const shown = filterStories(stories, { category: "all", side });
@@ -51,12 +52,17 @@ export function NewsFeed({ stories, squad, now }: NewsFeedProps) {
   return (
     <>
       <div className="news-bar">
-        <Segmented label="Filter by press" choices={SIDE_CHOICES} value={side} onChange={setSide} />
+        <Segmented
+          label="Filter by press"
+          choices={SIDE_CHOICES.map(({ id, label }) => ({ id, label: t(label) }))}
+          value={side}
+          onChange={setSide}
+        />
         {rows.length > 1 && (
           <nav aria-label="Jump to a topic" className="news-jump">
             {rows.map(({ topic, stories: rowStories }) => (
               <a key={topic} href={`#topic-${topic}`} className="chip">
-                {TOPIC_LABELS[topic]} · {rowStories.length}
+                {t(`news.${topic}`)} · {rowStories.length}
               </a>
             ))}
           </nav>
@@ -80,7 +86,7 @@ export function NewsFeed({ stories, squad, now }: NewsFeedProps) {
               >
                 <div className="section-head">
                   <h2 id={`row-${topic}`} className="nw-row-title" data-topic={topic}>
-                    {TOPIC_LABELS[topic]}
+                    {t(`news.${topic}`)}
                   </h2>
                   {rowStories.length > ROW_LIMIT && (
                     <button
@@ -88,7 +94,9 @@ export function NewsFeed({ stories, squad, now }: NewsFeedProps) {
                       className="chip chip-action"
                       onClick={() => toggle(topic)}
                     >
-                      {isOpen ? "Show fewer" : `Show all ${rowStories.length}`}
+                      {isOpen
+                        ? t("news.showFewer")
+                        : t("news.showAll", { count: rowStories.length })}
                     </button>
                   )}
                 </div>

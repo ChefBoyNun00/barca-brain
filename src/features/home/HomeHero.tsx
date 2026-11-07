@@ -2,19 +2,17 @@ import Image from "next/image";
 import { BARCA_CREST_URL } from "@/config/display";
 import type { HomeStanding } from "@/domain/home";
 import { CountUp } from "./CountUp";
+import type { TextKey } from "@/i18n/dictionary";
+import { T } from "@/i18n/language";
 import { formatSeason } from "./format";
-import type { SeasonSummary } from "./season-story";
+import { buildHeadlineParts, type SeasonSummary } from "./season-story";
 import { MatchdayBanner } from "./MatchdayBanner";
 import type { MatchdayState } from "./matchday";
 
-const ordinalSuffix = (rank: number): string => {
-  const suffixes: Record<string, string> = { one: "st", two: "nd", few: "rd", other: "th" };
-  return suffixes[new Intl.PluralRules("en", { type: "ordinal" }).select(rank)] ?? "th";
-};
+type Tile = { label: TextKey; value: number; suffix?: string; ordinalSuffix?: boolean };
 
 type HomeHeroProps = {
   season: number;
-  headline: string[];
   summary: SeasonSummary;
   total: number;
   standing: HomeStanding | null;
@@ -23,26 +21,19 @@ type HomeHeroProps = {
 };
 
 /** The first thing you see: where Barça stand, in big numbers that count up. */
-export function HomeHero({
-  season,
-  headline,
-  summary,
-  total,
-  standing,
-  matchday,
-  now,
-}: HomeHeroProps) {
-  const tiles = [
-    ...(standing
-      ? [
-          { label: "League position", value: standing.rank, suffix: ordinalSuffix(standing.rank) },
-          { label: "Points", value: standing.points, suffix: "" },
-        ]
-      : []),
-    { label: "Wins", value: summary.wins, suffix: "" },
-    { label: "Draws", value: summary.draws, suffix: "" },
-    { label: "Defeats", value: summary.losses, suffix: "" },
-    { label: "Goals scored", value: summary.goalsFor, suffix: "" },
+export function HomeHero({ season, summary, total, standing, matchday, now }: HomeHeroProps) {
+  const leagueTiles: Tile[] = standing
+    ? [
+        { label: "hero.position", value: standing.rank, ordinalSuffix: true },
+        { label: "hero.points", value: standing.points },
+      ]
+    : [];
+  const tiles: Tile[] = [
+    ...leagueTiles,
+    { label: "hero.wins", value: summary.wins },
+    { label: "hero.draws", value: summary.draws },
+    { label: "hero.defeats", value: summary.losses },
+    { label: "hero.goals", value: summary.goalsFor },
   ];
 
   return (
@@ -53,27 +44,32 @@ export function HomeHero({
         <div className="hero-top">
           <Image src={BARCA_CREST_URL} alt="FC Barcelona" width={64} height={64} unoptimized />
           <p className="hero-kicker">
-            Més que un club · Season {formatSeason(season)} · {summary.played} of {total} played
+            <T
+              k="hero.kicker"
+              vars={{ season: formatSeason(season), played: summary.played, total }}
+            />
           </p>
         </div>
         <h1 className="hero-title">
-          {headline.map((line, index) => (
-            <span key={line} className={index === 0 ? "block" : "block hero-hot"}>
-              {line}
+          {buildHeadlineParts(summary, standing).map(({ key, vars }, index) => (
+            <span key={key} className={index === 0 ? "block" : "block hero-hot"}>
+              <T k={key} vars={vars} />
             </span>
           ))}
         </h1>
         <dl className="hero-stats">
-          {tiles.map(({ label, value, suffix }, index) => (
+          {tiles.map(({ label, value, suffix, ordinalSuffix }, index) => (
             <div
               key={label}
               className="hero-stat"
               style={{ animationDelay: `${0.25 + index * 0.08}s` }}
             >
               <dd className="hero-stat-number">
-                <CountUp value={value} suffix={suffix} />
+                <CountUp value={value} suffix={suffix} ordinalSuffix={ordinalSuffix} />
               </dd>
-              <dt className="hero-stat-label">{label}</dt>
+              <dt className="hero-stat-label">
+                <T k={label} />
+              </dt>
             </div>
           ))}
         </dl>

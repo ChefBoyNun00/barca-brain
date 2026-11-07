@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { ChoiceChips, type Choice } from "@/components/ChoiceChips";
+import { ChoiceChips } from "@/components/ChoiceChips";
+import type { TextKey } from "@/i18n/dictionary";
+import { useT } from "@/i18n/language";
 import { POSITION_LABELS } from "@/config/display";
 import type { PlayerPosition, SquadPlayer } from "@/domain/home";
 import { Jersey } from "./Jersey";
@@ -11,20 +13,20 @@ import { sortSquad, type SquadSort } from "./squad-stats";
 
 type PositionFilter = "all" | "masia" | PlayerPosition;
 
-const POSITION_CHOICES: Choice<PositionFilter>[] = [
-  { id: "all", label: "Everyone" },
-  { id: "GK", label: "Keepers" },
-  { id: "DF", label: "Defenders" },
-  { id: "MF", label: "Midfield" },
-  { id: "FW", label: "Forwards" },
-  { id: "masia", label: "La Masia" },
+const POSITION_CHOICES: { id: PositionFilter; label: TextKey }[] = [
+  { id: "all", label: "squad.everyone" },
+  { id: "GK", label: "squad.keepers" },
+  { id: "DF", label: "squad.defenders" },
+  { id: "MF", label: "squad.midfield" },
+  { id: "FW", label: "squad.forwards" },
+  { id: "masia", label: "squad.masia" },
 ];
 
-const SORT_CHOICES: Choice<SquadSort>[] = [
-  { id: "number", label: "By number" },
-  { id: "goals", label: "Most goals" },
-  { id: "youngest", label: "Youngest" },
-  { id: "name", label: "A–Z" },
+const SORT_CHOICES: { id: SquadSort; label: TextKey }[] = [
+  { id: "number", label: "sort.number" },
+  { id: "goals", label: "sort.goals" },
+  { id: "youngest", label: "sort.youngest" },
+  { id: "name", label: "sort.name" },
 ];
 
 function Hanger({ player, onOpen }: { player: SquadPlayer; onOpen: () => void }) {
@@ -60,6 +62,7 @@ type WardrobeProps = {
 
 /** The squad as shirts on a rail. Hover one to see its back, open it for the stats. */
 export function Wardrobe({ squad, onOpen }: WardrobeProps) {
+  const t = useT();
   const [position, setPosition] = useState<PositionFilter>("all");
   const [sort, setSort] = useState<SquadSort>("number");
   const shown = sortSquad(
@@ -73,17 +76,22 @@ export function Wardrobe({ squad, onOpen }: WardrobeProps) {
   return (
     <section id="squad" aria-labelledby="squad-title" className="page-gutter section reveal">
       <h1 id="squad-title" className="section-title">
-        The squad
+        {t("squad.title")}
       </h1>
-      <p className="section-note">Look at the back of a shirt, then open it for the numbers.</p>
+      <p className="section-note">{t("squad.note")}</p>
       <div className="squad-controls">
         <ChoiceChips
           label="Filter by position"
-          choices={POSITION_CHOICES}
+          choices={POSITION_CHOICES.map(({ id, label }) => ({ id, label: t(label) }))}
           value={position}
           onChange={setPosition}
         />
-        <ChoiceChips label="Sort players" choices={SORT_CHOICES} value={sort} onChange={setSort} />
+        <ChoiceChips
+          label="Sort players"
+          choices={SORT_CHOICES.map(({ id, label }) => ({ id, label: t(label) }))}
+          value={sort}
+          onChange={setSort}
+        />
       </div>
       {shown.length === 0 ? (
         <p className="section-note">No players in this group.</p>

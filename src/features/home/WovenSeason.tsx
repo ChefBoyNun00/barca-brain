@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { useEffect, useRef, useState, type PointerEvent } from "react";
 import { Segmented } from "@/components/Segmented";
+import type { TextKey } from "@/i18n/dictionary";
+import { useT } from "@/i18n/language";
 import { BARCA_CREST_URL, REPLAY_STEP_MS } from "@/config/display";
 import type { SeasonMatch } from "@/domain/home";
 import { displayCompetition, formatKickoff, formatMatchDate } from "./format";
@@ -105,15 +107,17 @@ function MatchDetail({ match }: { match: SeasonMatch }) {
   );
 }
 
-function describeRecord(matches: SeasonMatch[]): string {
+function describeRecord(matches: SeasonMatch[], t: ReturnType<typeof useT>): string {
   const { played, wins, draws, losses, goalsFor } = summariseSeason(matches);
-  if (played === 0) return "Nothing played yet";
-  return `${wins}W ${draws}D ${losses}L · ${goalsFor} goal${goalsFor === 1 ? "" : "s"}`;
+  if (played === 0) return t("season.nothing");
+  const vars = { wins, draws, losses, goals: goalsFor };
+  return goalsFor === 1 ? t("season.recordOne", vars) : t("season.record", vars);
 }
 
 type WovenSeasonProps = { matches: SeasonMatch[]; lastPlayedIndex: number; nextIndex: number };
 
 export function WovenSeason({ matches, lastPlayedIndex, nextIndex }: WovenSeasonProps) {
+  const t = useT();
   const { selected, select } = useSeasonSelection();
   const [filterId, setFilterId] = useState("all");
   const [isReplaying, setIsReplaying] = useState(false);
@@ -165,18 +169,21 @@ export function WovenSeason({ matches, lastPlayedIndex, nextIndex }: WovenSeason
       <div className="page-gutter wall-controls">
         <Segmented
           label="Show matches from"
-          choices={SEASON_FILTERS}
+          choices={SEASON_FILTERS.map(({ id }) => ({ id, label: t(`filter.${id}` as TextKey) }))}
           value={filterId}
           onChange={setFilterId}
         />
         <p className="wall-record" aria-live="polite">
           {isReplaying
-            ? `After ${selected + 1}: ${describeRecord(matches.slice(0, selected + 1))}`
-            : describeRecord(shown)}
+            ? t("season.after", {
+                n: selected + 1,
+                record: describeRecord(matches.slice(0, selected + 1), t),
+              })
+            : describeRecord(shown, t)}
         </p>
         {lastPlayedIndex >= 0 && (
           <button type="button" className="chip chip-action" onClick={toggleReplay}>
-            {isReplaying ? "Stop" : "▶ Replay the season"}
+            {isReplaying ? t("season.stop") : t("season.replay")}
           </button>
         )}
       </div>
@@ -243,13 +250,10 @@ export function WovenSeason({ matches, lastPlayedIndex, nextIndex }: WovenSeason
         </button>
       </div>
 
-      <p className="wall-legend">
-        Every stripe is a match. Every dot is a goal. A defeat tears the shirt, a diamond marks
-        Europe, and the empty threads are still to be played.
-      </p>
+      <p className="wall-legend">{t("season.legend")}</p>
 
       <details className="wall-table">
-        <summary>See every match as a list</summary>
+        <summary>{t("season.list")}</summary>
         <ol>
           {matches.map((item) => (
             <li key={item.id}>{describeMatch(item)}</li>

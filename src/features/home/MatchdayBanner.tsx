@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { BARCA_CREST_URL } from "@/config/display";
+import { T } from "@/i18n/language";
 import { displayCompetition, formatKickoff } from "./format";
 import { MatchClock } from "./MatchClock";
 import type { MatchdayState } from "./matchday";
@@ -18,7 +19,11 @@ export function MatchdayBanner({ state, now }: { state: MatchdayState; now: Date
   const { match, isClasico, kind } = state;
   const opponent = match.opponent?.name ?? "To be decided";
   const outcome = getMatchOutcome(match);
-  const label = isClasico ? "El Clásico" : kind === "fulltime" ? "Full time" : "Matchday";
+  const labelKey = isClasico
+    ? "matchday.clasico"
+    : kind === "fulltime"
+      ? "matchday.fulltime"
+      : "matchday.matchday";
   const venue = match.isHome ? "At home" : "Away";
   // The home side is on the left, with its crest, as on a scoreboard.
   const opponentCrest = match.opponent?.logoUrl ?? null;
@@ -32,12 +37,18 @@ export function MatchdayBanner({ state, now }: { state: MatchdayState; now: Date
       data-kind={kind}
       data-clasico={isClasico}
       data-outcome={outcome ?? "none"}
-      aria-label={`${label}: Barça and ${opponent}`}
+      aria-label={`Barça v ${opponent}`}
     >
       <div className="page-gutter matchday-inner">
         <p className="matchday-label">
           {kind === "live" && <span aria-hidden="true" className="matchday-dot" />}
-          {kind === "live" ? `${label} · in play` : label}
+          <T k={labelKey} />
+          {kind === "live" && (
+            <>
+              {" · "}
+              <T k="matchday.inPlay" />
+            </>
+          )}
         </p>
 
         <div className="matchday-teams">

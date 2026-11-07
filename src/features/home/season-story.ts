@@ -1,3 +1,4 @@
+import type { TextKey, TextVars } from "@/i18n/dictionary";
 import type { HomeStanding, SeasonMatch } from "@/domain/home";
 import { displayCompetition, formatMatchDate } from "./format";
 
@@ -125,4 +126,29 @@ export function buildHeadline(summary: SeasonSummary, standing: HomeStanding | n
   if (summary.played === 0) return [...lines, "The season starts here."];
   const wins = summary.wins === 1 ? "1 win" : `${summary.wins} wins`;
   return [...lines, `${wins} from ${summary.played}.`];
+}
+
+export type HeadlinePart = { key: TextKey; vars: TextVars };
+
+/** The same headline as buildHeadline, as dictionary keys, so it can be read in either language. */
+export function buildHeadlineParts(
+  summary: SeasonSummary,
+  standing: HomeStanding | null,
+): HeadlinePart[] {
+  const parts: HeadlinePart[] = [];
+  if (standing) {
+    const league = displayCompetition(standing.competition);
+    parts.push(
+      standing.rank === 1
+        ? { key: "headline.top", vars: { league } }
+        : { key: "headline.rank", vars: { rank: standing.rank, league } },
+    );
+  }
+  if (summary.played === 0) return [...parts, { key: "headline.start", vars: {} }];
+  return [
+    ...parts,
+    summary.wins === 1
+      ? { key: "headline.winOne", vars: { played: summary.played } }
+      : { key: "headline.wins", vars: { wins: summary.wins, played: summary.played } },
+  ];
 }

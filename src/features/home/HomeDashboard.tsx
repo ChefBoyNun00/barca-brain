@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { connection } from "next/server";
 import { CURRENT_SEASON } from "@/config/football";
+import type { TextKey } from "@/i18n/dictionary";
+import { T } from "@/i18n/language";
 import { Countdown } from "./Countdown";
 import { HomeHero } from "./HomeHero";
 import { getMatchdayState } from "./matchday";
@@ -10,26 +12,17 @@ import { SeasonSelectionProvider } from "./season-selection";
 import { WovenSeason } from "./WovenSeason";
 import { displayCompetition, formatKickoff, formatUpdatedAgo } from "./format";
 import { getHomeData } from "./get-home-data";
-import {
-  buildHeadline,
-  getLastPlayedIndex,
-  getNextMatchIndex,
-  summariseSeason,
-} from "./season-story";
+import { getLastPlayedIndex, getNextMatchIndex, summariseSeason } from "./season-story";
 import { TaleOfTheTape } from "./TaleOfTheTape";
 
 const EXPLORE = [
-  { href: "/squad", title: "Squad", note: "Every player and their season." },
-  { href: "/table", title: "Table", note: "Where Barça stand in the league." },
-  {
-    href: "/season",
-    title: "Weave the ending",
-    note: "Play out the rest of the season.",
-  },
-  { href: "/news", title: "The press", note: "Spanish news, in English." },
-  { href: "/shirt", title: "Your shirt", note: "Put your name on the back." },
-  { href: "/ask", title: "Ask", note: "Questions about the season." },
-] as const;
+  { href: "/squad", title: "explore.squad", note: "explore.squadNote" },
+  { href: "/table", title: "explore.table", note: "explore.tableNote" },
+  { href: "/season", title: "explore.ending", note: "explore.endingNote" },
+  { href: "/news", title: "explore.press", note: "explore.pressNote" },
+  { href: "/shirt", title: "explore.shirt", note: "explore.shirtNote" },
+  { href: "/ask", title: "explore.ask", note: "explore.askNote" },
+] as const satisfies readonly { href: string; title: TextKey; note: TextKey }[];
 
 /** Runs per request, so the page always reads the latest ingested data. */
 export async function HomeDashboard() {
@@ -46,7 +39,6 @@ export async function HomeDashboard() {
   }
 
   const summary = summariseSeason(matches);
-  const headline = buildHeadline(summary, standing);
   const nextIndex = getNextMatchIndex(matches, now);
   const nextMatch = matches[nextIndex];
   const lastPlayedIndex = getLastPlayedIndex(matches);
@@ -55,7 +47,6 @@ export async function HomeDashboard() {
       <ResultsTicker matches={matches} nextIndex={nextIndex} />
       <HomeHero
         season={CURRENT_SEASON}
-        headline={headline}
         summary={summary}
         total={matches.length}
         standing={standing}
@@ -66,7 +57,7 @@ export async function HomeDashboard() {
       <WovenSeason matches={matches} lastPlayedIndex={lastPlayedIndex} nextIndex={nextIndex} />
       <div className="page-gutter season-more">
         <Link href="/matches" className="chip chip-action">
-          Every match as cards →
+          <T k="home.cards" />
         </Link>
       </div>
 
@@ -74,7 +65,7 @@ export async function HomeDashboard() {
         <section aria-labelledby="next-up" className="poster reveal">
           <div className="page-gutter poster-inner">
             <p id="next-up" className="poster-kicker">
-              Next match
+              <T k="home.nextMatch" />
             </p>
             <div className="poster-teams">
               {nextMatch.opponent?.logoUrl && (
@@ -106,13 +97,17 @@ export async function HomeDashboard() {
 
       <nav aria-labelledby="explore" className="page-gutter section reveal">
         <h2 id="explore" className="section-title">
-          Explore
+          <T k="home.explore" />
         </h2>
         <div className="explore">
           {EXPLORE.map(({ href, title, note }) => (
             <Link key={href} href={href} className="explore-tile">
-              <span className="explore-title">{title}</span>
-              <span className="explore-note">{note}</span>
+              <span className="explore-title">
+                <T k={title} />
+              </span>
+              <span className="explore-note">
+                <T k={note} />
+              </span>
             </Link>
           ))}
         </div>
