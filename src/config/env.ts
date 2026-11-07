@@ -10,6 +10,7 @@ const envVars = {
   DATABASE_URL: requiredText,
   DATABASE_URL_INGEST: requiredText,
   ANTHROPIC_API_KEY: requiredText,
+  ASK_ACCESS_CODE: requiredText,
   DAILY_REQUEST_BUDGET: z.coerce.number().int().positive(),
 };
 
