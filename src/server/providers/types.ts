@@ -1,6 +1,8 @@
+import type { NewsFeed } from "@/config/news";
 import type {
   DomainFixture,
   DomainPlayer,
+  DomainPlayerPhoto,
   DomainScorer,
   DomainStanding,
 } from "@/domain/football";
@@ -13,6 +15,14 @@ export interface FootballProvider {
   getStandings(competitionId: string, season: number): Promise<DomainStanding[]>;
   /** Every listed scorer in the competition, not only one team's. */
   getSeasonScorers(competitionId: string, season: number): Promise<DomainScorer[]>;
+}
+
+/** Finds a freely licensed photo. Null means none could be matched with confidence. */
+export interface PlayerPhotoProvider {
+  findPlayerPhoto(player: {
+    name: string;
+    birthDate: string;
+  }): Promise<DomainPlayerPhoto | null>;
 }
 
 /** One HTTP reply. `body` stays unknown because it is only stored or counted, never read. */
@@ -42,4 +52,16 @@ export class ProviderError extends Error {
     super(message);
     this.name = "ProviderError";
   }
+}
+
+export type FeedArticle = {
+  url: string;
+  outlet: string;
+  title: string;
+  snippet: string | null;
+  publishedAt: Date;
+};
+
+export interface NewsProvider {
+  fetchFeed(feed: NewsFeed): Promise<FeedArticle[]>;
 }

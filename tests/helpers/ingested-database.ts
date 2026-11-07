@@ -58,6 +58,7 @@ export async function createIngestedDatabase() {
           requestsLeftThisMinute: null,
         }),
       }),
+    photos: { findPlayerPhoto: async () => null },
     jobs: INGEST_JOBS,
     target: { teamId: "81", competitionIds: ["PD", "CL"] },
     season: 2026,

@@ -7,7 +7,7 @@ import type { Database, Db } from "@/server/db/client";
 import { INGEST_JOBS } from "@/server/ingest/jobs";
 import { runIngest } from "@/server/ingest/runner";
 import { createFootballDataProvider } from "@/server/providers/football-data/provider";
-import type { ProviderHooks } from "@/server/providers/types";
+import type { PlayerPhotoProvider, ProviderHooks } from "@/server/providers/types";
 
 // Real migrations and jobs on a throwaway Postgres, fed by recorded API replies.
 const MIGRATIONS_DIR = "supabase/migrations";
@@ -59,10 +59,17 @@ const tableCounts = async () => ({
   externalIds: await count("external_ids"),
 });
 
-const ingest = (options: { failingEndpoint?: string; dailyRequestBudget?: number } = {}) =>
+const ingest = (
+  options: {
+    failingEndpoint?: string;
+    dailyRequestBudget?: number;
+    photos?: PlayerPhotoProvider;
+  } = {},
+) =>
   runIngest({
     database,
     createProvider: (hooks) => recordedProvider(hooks, options.failingEndpoint),
+    photos: options.photos ?? { findPlayerPhoto: async () => null },
     jobs: INGEST_JOBS,
     target,
     season: 2026,
@@ -152,6 +159,7 @@ describe("runIngest", () => {
       ["squad", "failed"],
       ["scorers", "success"],
       ["standings", "success"],
+      ["player-photos", "success"],
     ]);
     const { rows } = await pg.query<{ status: string }>(`select status from ingest_runs`);
     expect(rows[0]?.status).toBe("failed");
@@ -169,6 +177,7 @@ describe("runIngest", () => {
     const result = await runIngest({
       database,
       createProvider: (hooks) => recordedProvider(hooks),
+      photos: { findPlayerPhoto: async () => null },
       jobs: [failingJob],
       target,
       season: 2026,
@@ -187,6 +196,7 @@ describe("runIngest", () => {
       "success",
       "failed",
       "failed",
+      "success",
     ]);
   });
 
@@ -195,5 +205,69 @@ describe("runIngest", () => {
     const second = await ingest({ dailyRequestBudget: 10 });
     expect(second.requestsUsed).toBe(4);
     expect(second.status).toBe("failed");
+  });
+
+  describe("player photos", () => {
+    const photo = {
+      url: "https://upload.wikimedia.org/photo.jpg",
+      credit: "A Photographer",
+      license: "CC BY-SA 4.0",
+      pageUrl: "https://commons.wikimedia.org/wiki/File:Photo.jpg",
+    };
+
+    it("stores a photo with its credit", async () => {
+      await ingest({ photos: { findPlayerPhoto: async () => photo } });
+      const { rows } = await pg.query<{ n: number }>(
+        `select count(*)::int as n from players
+         where photo_url = $1 and photo_credit = $2 and photo_license = $3`,
+        [photo.url, photo.credit, photo.license],
+      );
+      expect(rows[0]?.n).toBe(await count("players"));
+    });
+
+    it("does not search again for players already checked", async () => {
+      let lookups = 0;
+      const photos = {
+        findPlayerPhoto: async () => {
+          lookups += 1;
+          return null;
+        },
+      };
+      await ingest({ photos });
+      const firstRun = lookups;
+      expect(firstRun).toBeGreaterThan(0);
+      await ingest({ photos });
+      expect(lookups).toBe(firstRun);
+    });
+
+    it("carries on when one lookup fails", async () => {
+      let calls = 0;
+      const result = await ingest({
+        photos: {
+          findPlayerPhoto: async () => {
+            calls += 1;
+            if (calls === 1) throw new Error("timed out");
+            return photo;
+          },
+        },
+      });
+      expect(result.status).toBe("success");
+      const { rows } = await pg.query<{ n: number }>(
+        `select count(*)::int as n from players where photo_checked_at is null`,
+      );
+      expect(rows[0]?.n).toBe(1);
+    });
+
+    it("reports a failure when every lookup fails", async () => {
+      const result = await ingest({
+        photos: {
+          findPlayerPhoto: async () => {
+            throw new Error("Wikimedia is down");
+          },
+        },
+      });
+      expect(result.status).toBe("failed");
+      expect(result.jobs.at(-1)).toMatchObject({ job: "player-photos", status: "failed" });
+    });
   });
 });

@@ -1,0 +1,32 @@
+name: News
+
+on:
+  schedule:
+    # Every three hours, off the hour because GitHub delays jobs most at the top of each hour.
+    - cron: "23 */3 * * *"
+  workflow_dispatch: # adds a "Run workflow" button for manual runs
+
+# Never let two runs overlap: they could translate the same articles twice.
+concurrency:
+  group: news
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  news:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      # Scripts are skipped so the Supabase CLI binary is not downloaded: this job does not need it.
+      - run: npm ci --ignore-scripts
+      - run: npm run news
+        env:
+          DATABASE_URL_INGEST: ${{ secrets.DATABASE_URL_INGEST }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}

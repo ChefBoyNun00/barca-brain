@@ -8,6 +8,7 @@ import {
 } from "@/server/db/queries/ingest-runs";
 import type {
   FootballProvider,
+  PlayerPhotoProvider,
   ProviderHooks,
   ProviderResponseEvent,
 } from "@/server/providers/types";
@@ -27,6 +28,7 @@ export type IngestResult = {
 export type IngestDeps = {
   database: Database;
   createProvider: (hooks: ProviderHooks) => FootballProvider;
+  photos: PlayerPhotoProvider;
   jobs: readonly IngestJob[];
   target: IngestTarget;
   season: number;
@@ -37,7 +39,7 @@ const errorMessage = (error: unknown) => (error instanceof Error ? error.message
 
 /** Runs every job in order. One failing job rolls back alone and the others still run. */
 export async function runIngest(deps: IngestDeps): Promise<IngestResult> {
-  const { database, jobs, target, season, dailyRequestBudget } = deps;
+  const { database, photos, jobs, target, season, dailyRequestBudget } = deps;
   let requestsUsed = 0;
   let payloads: ProviderResponseEvent[] = [];
 
@@ -64,7 +66,7 @@ export async function runIngest(deps: IngestDeps): Promise<IngestResult> {
     }
 
     try {
-      const rows = await database.transaction((db) => job.run({ db, provider, target, season }));
+      const rows = await database.transaction((db) => job.run({ db, provider, photos, target, season }));
       results.push({ job: job.name, status: "success", rows });
     } catch (error) {
       results.push({ job: job.name, status: "failed", error: errorMessage(error) });

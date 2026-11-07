@@ -6,6 +6,7 @@ import { createDatabase } from "@/server/db/client";
 import { INGEST_JOBS } from "@/server/ingest/jobs";
 import { runIngest } from "@/server/ingest/runner";
 import { getFootballProvider } from "@/server/providers/registry";
+import { createWikimediaPhotoProvider } from "@/server/providers/wikimedia/provider";
 
 async function main(): Promise<void> {
   const { FOOTBALL_PROVIDER, DATABASE_URL_INGEST, DAILY_REQUEST_BUDGET } = getEnvVars([
@@ -21,6 +22,7 @@ async function main(): Promise<void> {
     const result = await runIngest({
       database,
       createProvider: (hooks) => getFootballProvider(FOOTBALL_PROVIDER, hooks),
+      photos: createWikimediaPhotoProvider(),
       jobs: INGEST_JOBS,
       target,
       season: CURRENT_SEASON,

@@ -30,6 +30,13 @@ export type DomainPlayer = {
   shirtNumber: number | null;
 };
 
+export type DomainPlayerPhoto = {
+  url: string;
+  credit: string;
+  license: string;
+  pageUrl: string;
+};
+
 export type DomainFixture = {
   externalId: string;
   competition: DomainCompetition;
