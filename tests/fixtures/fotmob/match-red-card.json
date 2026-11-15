@@ -1,0 +1,2010 @@
+{
+ "general": {
+  "matchId": "5868091",
+  "matchTimeUTCDate": "2026-10-17T16:30:00.000Z",
+  "homeTeam": {
+   "name": "Real Betis",
+   "id": 8603
+  },
+  "awayTeam": {
+   "name": "Barcelona",
+   "id": 8634
+  },
+  "leagueName": "LaLiga"
+ },
+ "content": {
+  "lineup": {
+   "lineupType": "standard",
+   "homeTeam": {
+    "id": 8603,
+    "name": "Real Betis",
+    "formation": "4-2-3-1",
+    "coach": {
+     "name": "Manuel Pellegrini"
+    },
+    "starters": [
+     {
+      "id": 999171,
+      "name": "Álvaro Vallés",
+      "shirtNumber": "1",
+      "performance": {
+       "rating": 6.7
+      },
+      "verticalLayout": {
+       "x": 0.5,
+       "y": 0.1
+      }
+     },
+     {
+      "id": 427438,
+      "name": "Héctor Bellerín",
+      "shirtNumber": "2",
+      "isCaptain": true,
+      "performance": {
+       "rating": 4.9,
+       "substitutionEvents": [
+        {
+         "time": 71,
+         "type": "subOut",
+         "reason": "tactical"
+        }
+       ]
+      },
+      "verticalLayout": {
+       "x": 0.125,
+       "y": 0.292
+      }
+     },
+     {
+      "id": 420568,
+      "name": "Diego Llorente",
+      "shirtNumber": "3",
+      "performance": {
+       "rating": 4.6
+      },
+      "verticalLayout": {
+       "x": 0.375,
+       "y": 0.292
+      }
+     },
+     {
+      "id": 1338016,
+      "name": "Valentín Gómez",
+      "shirtNumber": "16",
+      "performance": {
+       "rating": 6
+      },
+      "verticalLayout": {
+       "x": 0.625,
+       "y": 0.292
+      }
+     },
+     {
+      "id": 750028,
+      "name": "Fran García",
+      "shirtNumber": "11",
+      "performance": {
+       "rating": 4.3
+      },
+      "verticalLayout": {
+       "x": 0.875,
+       "y": 0.292
+      }
+     },
+     {
+      "id": 1436133,
+      "name": "Facundo Bernal",
+      "shirtNumber": "6",
+      "performance": {
+       "rating": 5.1
+      },
+      "verticalLayout": {
+       "x": 0.3,
+       "y": 0.485
+      }
+     },
+     {
+      "id": 531629,
+      "name": "Dani Ceballos",
+      "shirtNumber": "25",
+      "performance": {
+       "rating": 6.6,
+       "substitutionEvents": [
+        {
+         "time": 46,
+         "type": "subOut",
+         "reason": "tactical"
+        }
+       ]
+      },
+      "verticalLayout": {
+       "x": 0.7,
+       "y": 0.485
+      }
+     },
+     {
+      "id": 604126,
+      "name": "Giovani Lo Celso",
+      "shirtNumber": "20",
+      "performance": {
+       "rating": 7.5,
+       "substitutionEvents": [
+        {
+         "time": 64,
+         "type": "subOut",
+         "reason": "tactical"
+        }
+       ]
+      },
+      "verticalLayout": {
+       "x": 0.162,
+       "y": 0.678
+      }
+     },
+     {
+      "id": 683450,
+      "name": "Pablo Fornals",
+      "shirtNumber": "8",
+      "performance": {
+       "rating": 7.4,
+       "substitutionEvents": [
+        {
+         "time": 70,
+         "type": "subOut",
+         "reason": "tactical"
+        }
+       ]
+      },
+      "verticalLayout": {
+       "x": 0.5,
+       "y": 0.678
+      }
+     },
+     {
+      "id": 1209399,
+      "name": "Abdessamad Ezzalzouli",
+      "shirtNumber": "10",
+      "performance": {
+       "rating": 7.4
+      },
+      "verticalLayout": {
+       "x": 0.837,
+       "y": 0.678
+      }
+     },
+     {
+      "id": 852071,
+      "name": "Juan Hernández",
+      "shirtNumber": "9",
+      "performance": {
+       "rating": 6.5,
+       "substitutionEvents": [
+        {
+         "time": 64,
+         "type": "subOut",
+         "reason": "tactical"
+        }
+       ]
+      },
+      "verticalLayout": {
+       "x": 0.5,
+       "y": 0.87
+      }
+     }
+    ],
+    "subs": [
+     {
+      "id": 1315711,
+      "name": "Nelson Deossa",
+      "shirtNumber": "18",
+      "performance": {
+       "rating": 6.3,
+       "substitutionEvents": [
+        {
+         "time": 46,
+         "type": "subIn",
+         "reason": "tactical"
+        }
+       ]
+      }
+     },
+     {
+      "id": 1072200,
+      "name": "Rodrigo Riquelme",
+      "shirtNumber": "17",
+      "performance": {
+       "rating": 6.1,
+       "substitutionEvents": [
+        {
+         "time": 64,
+         "type": "subIn",
+         "reason": "tactical"
+        }
+       ]
+      }
+     },
+     {
+      "id": 942365,
+      "name": "Troy Parrott",
+      "shirtNumber": "19",
+      "performance": {
+       "rating": 5.9,
+       "substitutionEvents": [
+        {
+         "time": 64,
+         "type": "subIn",
+         "reason": "tactical"
+        }
+       ]
+      }
+     },
+     {
+      "id": 895954,
+      "name": "Álvaro Fidalgo",
+      "shirtNumber": "15",
+      "performance": {
+       "rating": 6.6,
+       "substitutionEvents": [
+        {
+         "time": 70,
+         "type": "subIn",
+         "reason": "tactical"
+        }
+       ]
+      }
+     },
+     {
+      "id": 1580522,
+      "name": "Ángel Ortiz",
+      "shirtNumber": "12",
+      "performance": {
+       "rating": 6.4,
+       "substitutionEvents": [
+        {
+         "time": 71,
+         "type": "subIn",
+         "reason": "tactical"
+        }
+       ]
+      }
+     },
+     {
+      "id": 1022354,
+      "name": "Diego Conde",
+      "shirtNumber": "13",
+      "performance": {}
+     },
+     {
+      "id": 195305,
+      "name": "Marc Bartra",
+      "shirtNumber": "5",
+      "performance": {}
+     },
+     {
+      "id": 1188375,
+      "name": "Natan",
+      "shirtNumber": "4",
+      "performance": {}
+     },
+     {
+      "id": 191315,
+      "name": "Isco",
+      "shirtNumber": "22",
+      "performance": {}
+     },
+     {
+      "id": 640220,
+      "name": "Marc Roca",
+      "shirtNumber": "21",
+      "performance": {}
+     },
+     {
+      "id": 967622,
+      "name": "Antony",
+      "shirtNumber": "7",
+      "performance": {}
+     },
+     {
+      "id": 1793845,
+      "name": "José Antonio Morante",
+      "shirtNumber": "27",
+      "performance": {}
+     }
+    ],
+    "unavailable": []
+   },
+   "awayTeam": {
+    "id": 8634,
+    "name": "Barcelona",
+    "formation": "4-2-3-1",
+    "coach": {
+     "name": "Hans-Dieter Flick"
+    },
+    "starters": [
+     {
+      "id": 1167220,
+      "name": "Joan García",
+      "shirtNumber": "1",
+      "performance": {
+       "rating": 7.5
+      },
+      "verticalLayout": {
+       "x": 0.5,
+       "y": 0.1
+      }
+     },
+     {
+      "id": 705450,
+      "name": "Jules Koundé",
+      "shirtNumber": "23",
+      "performance": {
+       "rating": 7.5
+      },
+      "verticalLayout": {
+       "x": 0.125,
+       "y": 0.292
+      }
+     },
+     {
+      "id": 1532137,
+      "name": "Pau Cubarsí",
+      "shirtNumber": "5",
+      "performance": {
+       "rating": 8.7
+      },
+      "verticalLayout": {
+       "x": 0.375,
+       "y": 0.292
+      }
+     },
+     {
+      "id": 1598982,
+      "name": "Gerard Martín",
+      "shirtNumber": "18",
+      "performance": {
+       "rating": 6.5,
+       "substitutionEvents": [
+        {
+         "time": 46,
+         "type": "subOut",
+         "reason": "injury"
+        }
+       ]
+      },
+      "verticalLayout": {
+       "x": 0.625,
+       "y": 0.292
+      }
+     },
+     {
+      "id": 1815149,
+      "name": "Xavi Espart",
+      "shirtNumber": "12",
+      "performance": {
+       "rating": 7.1
+      },
+      "verticalLayout": {
+       "x": 0.875,
+       "y": 0.292
+      }
+     },
+     {
+      "id": 675088,
+      "name": "Rodri",
+      "shirtNumber": "16",
+      "performance": {
+       "rating": 8.6
+      },
+      "verticalLayout": {
+       "x": 0.3,
+       "y": 0.485
+      }
+     },
+     {
+      "id": 1083323,
+      "name": "Pedri",
+      "shirtNumber": "8",
+      "isCaptain": true,
+      "performance": {
+       "rating": 7.8
+      },
+      "verticalLayout": {
+       "x": 0.7,
+       "y": 0.485
+      }
+     },
+     {
+      "id": 1467236,
+      "name": "Lamine Yamal",
+      "shirtNumber": "10",
+      "performance": {
+       "rating": 8.9,
+       "substitutionEvents": [
+        {
+         "time": 70,
+         "type": "subOut",
+         "reason": "tactical"
+        }
+       ]
+      },
+      "verticalLayout": {
+       "x": 0.162,
+       "y": 0.678
+      }
+     },
+     {
+      "id": 1404415,
+      "name": "Fermín López",
+      "shirtNumber": "7",
+      "performance": {
+       "rating": 7.6,
+       "substitutionEvents": [
+        {
+         "time": 62,
+         "type": "subOut",
+         "reason": "tactical"
+        }
+       ]
+      },
+      "verticalLayout": {
+       "x": 0.5,
+       "y": 0.678
+      }
+     },
+     {
+      "id": 959594,
+      "name": "Karim Adeyemi",
+      "shirtNumber": "14",
+      "performance": {
+       "rating": 7,
+       "substitutionEvents": [
+        {
+         "time": 62,
+         "type": "subOut",
+         "reason": "tactical"
+        }
+       ]
+      },
+      "verticalLayout": {
+       "x": 0.837,
+       "y": 0.678
+      }
+     },
+     {
+      "id": 576165,
+      "name": "Gabriel Jesus",
+      "shirtNumber": "9",
+      "performance": {
+       "rating": 7.8,
+       "substitutionEvents": [
+        {
+         "time": 80,
+         "type": "subOut",
+         "reason": "tactical"
+        }
+       ]
+      },
+      "verticalLayout": {
+       "x": 0.5,
+       "y": 0.87
+      }
+     }
+    ],
+    "subs": [
+     {
+      "id": 940573,
+      "name": "Eric García",
+      "shirtNumber": "24",
+      "performance": {
+       "rating": 7.4,
+       "substitutionEvents": [
+        {
+         "time": 46,
+         "type": "subIn",
+         "reason": "injury"
+        }
+       ]
+      }
+     },
+     {
+      "id": 614834,
+      "name": "Dani Olmo",
+      "shirtNumber": "20",
+      "performance": {
+       "rating": 7.7,
+       "substitutionEvents": [
+        {
+         "time": 62,
+         "type": "subIn",
+         "reason": "tactical"
+        }
+       ]
+      }
+     },
+     {
+      "id": 906937,
+      "name": "Anthony Gordon",
+      "shirtNumber": "17",
+      "performance": {
+       "rating": 6.5,
+       "substitutionEvents": [
+        {
+         "time": 62,
+         "type": "subIn",
+         "reason": "tactical"
+        }
+       ]
+      }
+     },
+     {
+      "id": 696679,
+      "name": "Raphinha",
+      "shirtNumber": "11",
+      "performance": {
+       "rating": 6.7,
+       "substitutionEvents": [
+        {
+         "time": 70,
+         "type": "subIn",
+         "reason": "tactical"
+        }
+       ]
+      }
+     },
+     {
+      "id": 1279040,
+      "name": "Gavi",
+      "shirtNumber": "6",
+      "performance": {
+       "rating": 6.7,
+       "substitutionEvents": [
+        {
+         "time": 80,
+         "type": "subIn",
+         "reason": "tactical"
+        }
+       ]
+      }
+     },
+     {
+      "id": 383971,
+      "name": "Dominik Livaković",
+      "shirtNumber": "25",
+      "performance": {}
+     },
+     {
+      "id": 169718,
+      "name": "Wojciech Szczęsny",
+      "shirtNumber": "13",
+      "performance": {}
+     },
+     {
+      "id": 1254166,
+      "name": "Alejandro Balde",
+      "shirtNumber": "3",
+      "performance": {}
+     },
+     {
+      "id": 361757,
+      "name": "João Cancelo",
+      "shirtNumber": "2",
+      "performance": {}
+     },
+     {
+      "id": 1821727,
+      "name": "Brian Fariñas",
+      "shirtNumber": "4",
+      "performance": {}
+     },
+     {
+      "id": 638622,
+      "name": "Frenkie de Jong",
+      "shirtNumber": "21",
+      "performance": {}
+     },
+     {
+      "id": 1573126,
+      "name": "Marc Bernal",
+      "shirtNumber": "22",
+      "performance": {}
+     }
+    ],
+    "unavailable": []
+   }
+  },
+  "matchFacts": {
+   "events": {
+    "events": [
+     {
+      "timeStr": 10,
+      "type": "Goal",
+      "time": 10,
+      "overloadTime": null,
+      "eventId": 14590528,
+      "player": {
+       "id": 1467236,
+       "name": "Lamine Yamal",
+       "profileUrl": "/players/1467236/lamine-yamal"
+      },
+      "homeScore": 0,
+      "awayScore": 0,
+      "profileUrl": "/players/1467236/lamine-yamal",
+      "overloadTimeStr": false,
+      "isHome": false,
+      "ownGoal": null,
+      "goalDescription": null,
+      "goalDescriptionKey": null,
+      "suffix": null,
+      "suffixKey": null,
+      "isPenaltyShootoutEvent": false,
+      "nameStr": "Lamine Yamal",
+      "firstName": "Lamine",
+      "lastName": "Yamal",
+      "fullName": "Lamine Yamal",
+      "playerId": 1467236,
+      "newScore": [
+       0,
+       1
+      ],
+      "penShootoutScore": null,
+      "assistStr": "assist by Jules Koundé",
+      "assistProfileUrl": "/players/705450/jules-kounde",
+      "assistPlayerId": 705450,
+      "assistKey": "assist_by",
+      "assistInput": "Jules Koundé"
+     },
+     {
+      "timeStr": 20,
+      "type": "Card",
+      "time": 20,
+      "overloadTime": null,
+      "eventId": 14590694,
+      "player": {
+       "id": 1404415,
+       "name": "Fermín López",
+       "profileUrl": "/players/1404415/fermin-lopez"
+      },
+      "homeScore": 0,
+      "awayScore": 1,
+      "profileUrl": "/players/1404415/fermin-lopez",
+      "overloadTimeStr": false,
+      "isHome": false,
+      "nameStr": "Fermín López",
+      "firstName": "Fermín",
+      "lastName": "López",
+      "fullName": "Fermín López",
+      "playerId": 1404415,
+      "card": "Yellow",
+      "cardDescription": null,
+      "cardReason": {
+       "localizedKey": "card_desc_foul",
+       "defaultText": "Foul"
+      }
+     },
+     {
+      "timeStr": 22,
+      "type": "Card",
+      "time": 22,
+      "overloadTime": null,
+      "eventId": 14590724,
+      "player": {
+       "id": 427438,
+       "name": "Héctor Bellerín",
+       "profileUrl": "/players/427438/hector-bellerin"
+      },
+      "homeScore": 0,
+      "awayScore": 1,
+      "profileUrl": "/players/427438/hector-bellerin",
+      "overloadTimeStr": false,
+      "isHome": true,
+      "nameStr": "Héctor Bellerín",
+      "firstName": "Héctor",
+      "lastName": "Bellerín",
+      "fullName": "Héctor Bellerín",
+      "playerId": 427438,
+      "card": "Yellow",
+      "cardDescription": null,
+      "cardReason": null
+     },
+     {
+      "timeStr": 27,
+      "type": "Goal",
+      "time": 27,
+      "overloadTime": null,
+      "eventId": 14590775,
+      "player": {
+       "id": 1338016,
+       "name": "Valentín Gómez",
+       "profileUrl": "/players/1338016/valentin-gomez"
+      },
+      "homeScore": 0,
+      "awayScore": 1,
+      "profileUrl": "/players/1338016/valentin-gomez",
+      "overloadTimeStr": false,
+      "isHome": true,
+      "ownGoal": null,
+      "goalDescription": "Header",
+      "goalDescriptionKey": "header",
+      "suffix": null,
+      "suffixKey": null,
+      "isPenaltyShootoutEvent": false,
+      "nameStr": "Valentín Gómez",
+      "firstName": "Valentín",
+      "lastName": "Gómez",
+      "fullName": "Valentín Gómez",
+      "playerId": 1338016,
+      "newScore": [
+       1,
+       1
+      ],
+      "penShootoutScore": null,
+      "assistStr": "assist by Pablo Fornals",
+      "assistProfileUrl": "/players/683450/pablo-fornals",
+      "assistPlayerId": 683450,
+      "assistKey": "assist_by",
+      "assistInput": "Pablo Fornals"
+     },
+     {
+      "timeStr": 41,
+      "type": "Goal",
+      "time": 41,
+      "overloadTime": null,
+      "eventId": 14590944,
+      "player": {
+       "id": 675088,
+       "name": "Rodri",
+       "profileUrl": "/players/675088/rodri"
+      },
+      "homeScore": 1,
+      "awayScore": 1,
+      "profileUrl": "/players/675088/rodri",
+      "overloadTimeStr": false,
+      "isHome": false,
+      "ownGoal": null,
+      "goalDescription": "Header",
+      "goalDescriptionKey": "header",
+      "suffix": null,
+      "suffixKey": null,
+      "isPenaltyShootoutEvent": false,
+      "nameStr": "Rodri",
+      "firstName": "",
+      "lastName": "Rodri",
+      "fullName": "Rodri",
+      "playerId": 675088,
+      "newScore": [
+       1,
+       2
+      ],
+      "penShootoutScore": null,
+      "assistStr": "assist by Fermín López",
+      "assistProfileUrl": "/players/1404415/fermin-lopez",
+      "assistPlayerId": 1404415,
+      "assistKey": "assist_by",
+      "assistInput": "Fermín López"
+     },
+     {
+      "timeStr": 43,
+      "type": "VAR",
+      "time": 43,
+      "overloadTime": null,
+      "eventId": 14590968,
+      "player": {
+       "id": 604126,
+       "name": "Giovani Lo Celso",
+       "profileUrl": "/players/604126/giovani-lo-celso"
+      },
+      "homeScore": 1,
+      "awayScore": 2,
+      "profileUrl": "/players/604126/giovani-lo-celso",
+      "overloadTimeStr": false,
+      "isHome": true,
+      "nameStr": "Giovani Lo Celso",
+      "VAR": {
+       "pendingDecision": false,
+       "decision": {
+        "key": [
+         "var_goal_cancelled",
+         "foul"
+        ],
+        "value": [
+         "Goal ruled out",
+         "foul"
+        ]
+       }
+      }
+     },
+     {
+      "timeStr": 45,
+      "type": "Card",
+      "time": 45,
+      "overloadTime": null,
+      "eventId": 14591028,
+      "player": {
+       "id": 78591,
+       "name": "Manuel Pellegrini",
+       "profileUrl": "/players/78591/manuel-pellegrini"
+      },
+      "homeScore": 1,
+      "awayScore": 2,
+      "profileUrl": "/players/78591/manuel-pellegrini",
+      "overloadTimeStr": false,
+      "isHome": true,
+      "nameStr": "Manuel Pellegrini",
+      "firstName": "Manuel",
+      "lastName": "Pellegrini",
+      "fullName": "Manuel Pellegrini",
+      "playerId": 78591,
+      "card": "Yellow",
+      "cardDescription": {
+       "localizedKey": "coach",
+       "defaultText": "Coach"
+      },
+      "cardReason": {
+       "localizedKey": "card_desc_dissent",
+       "defaultText": "Dissent"
+      }
+     },
+     {
+      "timeStr": 45,
+      "type": "AddedTime",
+      "time": 45,
+      "overloadTime": null,
+      "player": {
+       "id": null,
+       "profileUrl": ""
+      },
+      "homeScore": 1,
+      "awayScore": 2,
+      "minutesAddedStr": "+ 7 minutes added",
+      "minutesAddedKey": "added_injury_time",
+      "minutesAddedInput": 7
+     },
+     {
+      "timeStr": 45,
+      "type": "Half",
+      "time": 45,
+      "overloadTime": null,
+      "player": {
+       "id": null,
+       "profileUrl": ""
+      },
+      "homeScore": 1,
+      "awayScore": 2,
+      "halfStrShort": "HT",
+      "halfStrKey": "halftime_short"
+     },
+     {
+      "timeStr": 46,
+      "type": "Substitution",
+      "time": 46,
+      "overloadTime": 0,
+      "player": {
+       "id": null,
+       "profileUrl": ""
+      },
+      "homeScore": 1,
+      "awayScore": 2,
+      "profileUrl": "",
+      "overloadTimeStr": false,
+      "isHome": true,
+      "injuredPlayerOut": false,
+      "swap": [
+       {
+        "name": "Nelson Deossa",
+        "id": "1315711",
+        "profileUrl": "/players/1315711/nelson-deossa"
+       },
+       {
+        "name": "Dani Ceballos",
+        "id": "531629",
+        "profileUrl": "/players/531629/dani-ceballos"
+       }
+      ]
+     },
+     {
+      "timeStr": 46,
+      "type": "Substitution",
+      "time": 46,
+      "overloadTime": 0,
+      "player": {
+       "id": null,
+       "profileUrl": ""
+      },
+      "homeScore": 1,
+      "awayScore": 2,
+      "profileUrl": "",
+      "overloadTimeStr": false,
+      "isHome": false,
+      "injuredPlayerOut": true,
+      "swap": [
+       {
+        "name": "Eric García",
+        "id": "940573",
+        "profileUrl": "/players/940573/eric-garcia"
+       },
+       {
+        "name": "Gerard Martín",
+        "id": "1598982",
+        "profileUrl": "/players/1598982/gerard-martin"
+       }
+      ]
+     },
+     {
+      "timeStr": 51,
+      "type": "Goal",
+      "time": 51,
+      "overloadTime": null,
+      "eventId": 14591584,
+      "player": {
+       "id": 576165,
+       "name": "Gabriel Jesus",
+       "profileUrl": "/players/576165/gabriel-jesus"
+      },
+      "homeScore": 1,
+      "awayScore": 2,
+      "profileUrl": "/players/576165/gabriel-jesus",
+      "overloadTimeStr": false,
+      "isHome": false,
+      "ownGoal": null,
+      "goalDescription": null,
+      "goalDescriptionKey": null,
+      "suffix": null,
+      "suffixKey": null,
+      "isPenaltyShootoutEvent": false,
+      "nameStr": "Gabriel Jesus",
+      "firstName": "Gabriel",
+      "lastName": "Jesus",
+      "fullName": "Gabriel Jesus",
+      "playerId": 576165,
+      "newScore": [
+       1,
+       3
+      ],
+      "penShootoutScore": null,
+      "assistStr": "assist by Lamine Yamal",
+      "assistProfileUrl": "/players/1467236/lamine-yamal",
+      "assistPlayerId": 1467236,
+      "assistKey": "assist_by",
+      "assistInput": "Lamine Yamal"
+     },
+     {
+      "timeStr": 53,
+      "type": "Card",
+      "time": 53,
+      "overloadTime": null,
+      "eventId": 14596895,
+      "player": {
+       "id": 1436133,
+       "name": "Facundo Bernal",
+       "profileUrl": "/players/1436133/facundo-bernal"
+      },
+      "homeScore": 1,
+      "awayScore": 3,
+      "profileUrl": "/players/1436133/facundo-bernal",
+      "overloadTimeStr": false,
+      "isHome": true,
+      "nameStr": "Facundo Bernal",
+      "firstName": "Facundo",
+      "lastName": "Bernal",
+      "fullName": "Facundo Bernal",
+      "playerId": 1436133,
+      "card": "Yellow",
+      "cardDescription": null,
+      "cardReason": {
+       "localizedKey": "card_desc_dissent",
+       "defaultText": "Dissent"
+      }
+     },
+     {
+      "timeStr": 53,
+      "type": "Goal",
+      "time": 53,
+      "overloadTime": null,
+      "eventId": 14591619,
+      "player": {
+       "id": 1209399,
+       "name": "Abdessamad Ezzalzouli",
+       "profileUrl": "/players/1209399/abdessamad-ezzalzouli"
+      },
+      "homeScore": 1,
+      "awayScore": 3,
+      "profileUrl": "/players/1209399/abdessamad-ezzalzouli",
+      "overloadTimeStr": false,
+      "isHome": true,
+      "ownGoal": null,
+      "goalDescription": null,
+      "goalDescriptionKey": null,
+      "suffix": null,
+      "suffixKey": null,
+      "isPenaltyShootoutEvent": false,
+      "nameStr": "Abdessamad Ezzalzouli",
+      "firstName": "Abdessamad",
+      "lastName": "Ezzalzouli",
+      "fullName": "Abdessamad Ezzalzouli",
+      "playerId": 1209399,
+      "newScore": [
+       2,
+       3
+      ],
+      "penShootoutScore": null,
+      "assistStr": "assist by Giovani Lo Celso",
+      "assistProfileUrl": "/players/604126/giovani-lo-celso",
+      "assistPlayerId": 604126,
+      "assistKey": "assist_by",
+      "assistInput": "Giovani Lo Celso"
+     },
+     {
+      "eventId": 0,
+      "type": "Comment",
+      "card": null,
+      "cardDescription": null,
+      "cardReason": null,
+      "missedPenaltyOutcome": null,
+      "time": 53,
+      "addedTime": null,
+      "overloadTime": null,
+      "ownGoal": null,
+      "goalDescription": null,
+      "goalDescriptionKey": null,
+      "isHome": false,
+      "isPenaltyShootoutEvent": false,
+      "player": {
+       "id": 0,
+       "name": " ",
+       "profileUrl": ""
+      },
+      "homeScore": 2,
+      "awayScore": 3,
+      "swap": [
+       {},
+       {}
+      ],
+      "penalty": false,
+      "VAR": null
+     },
+     {
+      "timeStr": 54,
+      "type": "Card",
+      "time": 54,
+      "overloadTime": null,
+      "eventId": 14591641,
+      "player": {
+       "id": 1436133,
+       "name": "Facundo Bernal",
+       "profileUrl": "/players/1436133/facundo-bernal"
+      },
+      "homeScore": 2,
+      "awayScore": 3,
+      "profileUrl": "/players/1436133/facundo-bernal",
+      "overloadTimeStr": false,
+      "isHome": true,
+      "nameStr": "Facundo Bernal",
+      "firstName": "Facundo",
+      "lastName": "Bernal",
+      "fullName": "Facundo Bernal",
+      "playerId": 1436133,
+      "card": "Red",
+      "cardDescription": null,
+      "cardReason": {
+       "localizedKey": "card_desc_violent_conduct",
+       "defaultText": "Violent conduct"
+      }
+     },
+     {
+      "timeStr": 55,
+      "type": "Card",
+      "time": 55,
+      "overloadTime": null,
+      "eventId": 14591653,
+      "player": {
+       "id": 1467236,
+       "name": "Lamine Yamal",
+       "profileUrl": "/players/1467236/lamine-yamal"
+      },
+      "homeScore": 2,
+      "awayScore": 3,
+      "profileUrl": "/players/1467236/lamine-yamal",
+      "overloadTimeStr": false,
+      "isHome": false,
+      "nameStr": "Lamine Yamal",
+      "firstName": "Lamine",
+      "lastName": "Yamal",
+      "fullName": "Lamine Yamal",
+      "playerId": 1467236,
+      "card": "Yellow",
+      "cardDescription": null,
+      "cardReason": null
+     },
+     {
+      "timeStr": 61,
+      "type": "Card",
+      "time": 61,
+      "overloadTime": null,
+      "eventId": 14591723,
+      "player": {
+       "id": 420568,
+       "name": "Diego Llorente",
+       "profileUrl": "/players/420568/diego-llorente"
+      },
+      "homeScore": 2,
+      "awayScore": 3,
+      "profileUrl": "/players/420568/diego-llorente",
+      "overloadTimeStr": false,
+      "isHome": true,
+      "nameStr": "Diego Llorente",
+      "firstName": "Diego",
+      "lastName": "Llorente",
+      "fullName": "Diego Llorente",
+      "playerId": 420568,
+      "card": "Yellow",
+      "cardDescription": null,
+      "cardReason": {
+       "localizedKey": "card_desc_foul",
+       "defaultText": "Foul"
+      }
+     },
+     {
+      "timeStr": 62,
+      "type": "Substitution",
+      "time": 62,
+      "overloadTime": 0,
+      "player": {
+       "id": null,
+       "profileUrl": ""
+      },
+      "homeScore": 2,
+      "awayScore": 3,
+      "profileUrl": "",
+      "overloadTimeStr": false,
+      "isHome": false,
+      "injuredPlayerOut": false,
+      "swap": [
+       {
+        "name": "Dani Olmo",
+        "id": "614834",
+        "profileUrl": "/players/614834/dani-olmo"
+       },
+       {
+        "name": "Fermín López",
+        "id": "1404415",
+        "profileUrl": "/players/1404415/fermin-lopez"
+       }
+      ]
+     },
+     {
+      "timeStr": 62,
+      "type": "Substitution",
+      "time": 62,
+      "overloadTime": 0,
+      "player": {
+       "id": null,
+       "profileUrl": ""
+      },
+      "homeScore": 2,
+      "awayScore": 3,
+      "profileUrl": "",
+      "overloadTimeStr": false,
+      "isHome": false,
+      "injuredPlayerOut": false,
+      "swap": [
+       {
+        "name": "Anthony Gordon",
+        "id": "906937",
+        "profileUrl": "/players/906937/anthony-gordon"
+       },
+       {
+        "name": "Karim Adeyemi",
+        "id": "959594",
+        "profileUrl": "/players/959594/karim-adeyemi"
+       }
+      ]
+     },
+     {
+      "timeStr": 62,
+      "type": "Goal",
+      "time": 62,
+      "overloadTime": null,
+      "eventId": 14591754,
+      "player": {
+       "id": 940573,
+       "name": "Eric García",
+       "profileUrl": "/players/940573/eric-garcia"
+      },
+      "homeScore": 2,
+      "awayScore": 3,
+      "profileUrl": "/players/940573/eric-garcia",
+      "overloadTimeStr": false,
+      "isHome": false,
+      "ownGoal": null,
+      "goalDescription": null,
+      "goalDescriptionKey": null,
+      "suffix": null,
+      "suffixKey": null,
+      "isPenaltyShootoutEvent": false,
+      "nameStr": "Eric García",
+      "firstName": "Eric",
+      "lastName": "García",
+      "fullName": "Eric García",
+      "playerId": 940573,
+      "newScore": [
+       2,
+       4
+      ],
+      "penShootoutScore": null,
+      "assistStr": "assist by Pau Cubarsí",
+      "assistProfileUrl": "/players/1532137/pau-cubarsi",
+      "assistPlayerId": 1532137,
+      "assistKey": "assist_by",
+      "assistInput": "Pau Cubarsí"
+     },
+     {
+      "timeStr": 64,
+      "type": "Substitution",
+      "time": 64,
+      "overloadTime": 0,
+      "player": {
+       "id": null,
+       "profileUrl": ""
+      },
+      "homeScore": 2,
+      "awayScore": 4,
+      "profileUrl": "",
+      "overloadTimeStr": false,
+      "isHome": true,
+      "injuredPlayerOut": false,
+      "swap": [
+       {
+        "name": "Troy Parrott",
+        "id": "942365",
+        "profileUrl": "/players/942365/troy-parrott"
+       },
+       {
+        "name": "Juan Hernández",
+        "id": "852071",
+        "profileUrl": "/players/852071/juan-hernandez"
+       }
+      ]
+     },
+     {
+      "timeStr": 64,
+      "type": "Substitution",
+      "time": 64,
+      "overloadTime": 0,
+      "player": {
+       "id": null,
+       "profileUrl": ""
+      },
+      "homeScore": 2,
+      "awayScore": 4,
+      "profileUrl": "",
+      "overloadTimeStr": false,
+      "isHome": true,
+      "injuredPlayerOut": false,
+      "swap": [
+       {
+        "name": "Rodrigo Riquelme",
+        "id": "1072200",
+        "profileUrl": "/players/1072200/rodrigo-riquelme"
+       },
+       {
+        "name": "Giovani Lo Celso",
+        "id": "604126",
+        "profileUrl": "/players/604126/giovani-lo-celso"
+       }
+      ]
+     },
+     {
+      "timeStr": 70,
+      "type": "Substitution",
+      "time": 70,
+      "overloadTime": 0,
+      "player": {
+       "id": null,
+       "profileUrl": ""
+      },
+      "homeScore": 2,
+      "awayScore": 4,
+      "profileUrl": "",
+      "overloadTimeStr": false,
+      "isHome": false,
+      "injuredPlayerOut": false,
+      "swap": [
+       {
+        "name": "Raphinha",
+        "id": "696679",
+        "profileUrl": "/players/696679/raphinha"
+       },
+       {
+        "name": "Lamine Yamal",
+        "id": "1467236",
+        "profileUrl": "/players/1467236/lamine-yamal"
+       }
+      ]
+     },
+     {
+      "timeStr": 70,
+      "type": "Substitution",
+      "time": 70,
+      "overloadTime": 0,
+      "player": {
+       "id": null,
+       "profileUrl": ""
+      },
+      "homeScore": 2,
+      "awayScore": 4,
+      "profileUrl": "",
+      "overloadTimeStr": false,
+      "isHome": true,
+      "injuredPlayerOut": false,
+      "swap": [
+       {
+        "name": "Álvaro Fidalgo",
+        "id": "895954",
+        "profileUrl": "/players/895954/alvaro-fidalgo"
+       },
+       {
+        "name": "Pablo Fornals",
+        "id": "683450",
+        "profileUrl": "/players/683450/pablo-fornals"
+       }
+      ]
+     },
+     {
+      "timeStr": 71,
+      "type": "Substitution",
+      "time": 71,
+      "overloadTime": 0,
+      "player": {
+       "id": null,
+       "profileUrl": ""
+      },
+      "homeScore": 2,
+      "awayScore": 4,
+      "profileUrl": "",
+      "overloadTimeStr": false,
+      "isHome": true,
+      "injuredPlayerOut": false,
+      "swap": [
+       {
+        "name": "Ángel Ortiz",
+        "id": "1580522",
+        "profileUrl": "/players/1580522/angel-ortiz"
+       },
+       {
+        "name": "Héctor Bellerín",
+        "id": "427438",
+        "profileUrl": "/players/427438/hector-bellerin"
+       }
+      ]
+     },
+     {
+      "timeStr": 80,
+      "type": "Substitution",
+      "time": 80,
+      "overloadTime": 0,
+      "player": {
+       "id": null,
+       "profileUrl": ""
+      },
+      "homeScore": 2,
+      "awayScore": 4,
+      "profileUrl": "",
+      "overloadTimeStr": false,
+      "isHome": false,
+      "injuredPlayerOut": false,
+      "swap": [
+       {
+        "name": "Gavi",
+        "id": "1279040",
+        "profileUrl": "/players/1279040/gavi"
+       },
+       {
+        "name": "Gabriel Jesus",
+        "id": "576165",
+        "profileUrl": "/players/576165/gabriel-jesus"
+       }
+      ]
+     },
+     {
+      "timeStr": 81,
+      "type": "Goal",
+      "time": 81,
+      "overloadTime": null,
+      "eventId": 14591975,
+      "player": {
+       "id": 614834,
+       "name": "Dani Olmo",
+       "profileUrl": "/players/614834/dani-olmo"
+      },
+      "homeScore": 2,
+      "awayScore": 4,
+      "profileUrl": "/players/614834/dani-olmo",
+      "overloadTimeStr": false,
+      "isHome": false,
+      "ownGoal": null,
+      "goalDescription": null,
+      "goalDescriptionKey": null,
+      "suffix": null,
+      "suffixKey": null,
+      "isPenaltyShootoutEvent": false,
+      "nameStr": "Dani Olmo",
+      "firstName": "Dani",
+      "lastName": "Olmo",
+      "fullName": "Dani Olmo",
+      "playerId": 614834,
+      "newScore": [
+       2,
+       5
+      ],
+      "penShootoutScore": null,
+      "assistStr": "assist by Pau Cubarsí",
+      "assistProfileUrl": "/players/1532137/pau-cubarsi",
+      "assistPlayerId": 1532137,
+      "assistKey": "assist_by",
+      "assistInput": "Pau Cubarsí"
+     },
+     {
+      "timeStr": 90,
+      "type": "AddedTime",
+      "time": 90,
+      "overloadTime": null,
+      "player": {
+       "id": null,
+       "profileUrl": ""
+      },
+      "homeScore": 2,
+      "awayScore": 5,
+      "minutesAddedStr": "+ 3 minutes added",
+      "minutesAddedKey": "added_injury_time",
+      "minutesAddedInput": 3
+     },
+     {
+      "timeStr": 90,
+      "type": "Half",
+      "time": 90,
+      "overloadTime": null,
+      "player": {
+       "id": null,
+       "profileUrl": ""
+      },
+      "homeScore": 2,
+      "awayScore": 5,
+      "halfStrShort": "FT",
+      "halfStrKey": "fulltime_short"
+     }
+    ]
+   },
+   "infoBox": {
+    "Stadium": {
+     "name": "Estadio La Cartuja de Sevilla",
+     "city": "Sevilla",
+     "country": "Spain",
+     "lat": 37.417208903,
+     "long": -6.004661322,
+     "capacity": 72000,
+     "surface": "grass"
+    },
+    "Referee": {
+     "imgUrl": "https://images.fotmob.com/image_resources/logo/teamlogo/esp.png",
+     "text": "Ricardo de Burgos Bengoetxea",
+     "countryCode": "ESP",
+     "country": "Spain",
+     "id": 1001071954,
+     "leagueId": 87,
+     "leagueName": "LaLiga",
+     "stats": [
+      {
+       "type": "matches",
+       "value": 38,
+       "valueType": "total"
+      },
+      {
+       "type": "yellowCards",
+       "value": 3.87,
+       "valueType": "perMatch",
+       "average": 4.45,
+       "total": 147,
+       "averageType": "below",
+       "fillPercentage": 15.72,
+       "averagePercentage": 50
+      },
+      {
+       "type": "redCards",
+       "value": 5,
+       "valueType": "total"
+      },
+      {
+       "type": "unknown",
+       "value": 1,
+       "valueType": "total"
+      },
+      {
+       "type": "penalties",
+       "value": 14,
+       "valueType": "total"
+      },
+      {
+       "type": "fouls",
+       "value": 22.77,
+       "valueType": "perMatch",
+       "average": 25.01,
+       "total": 797,
+       "averageType": "below",
+       "fillPercentage": 16.89,
+       "averagePercentage": 50
+      }
+     ]
+    }
+   },
+   "playerOfTheMatch": {
+    "id": 1467236,
+    "name": {
+     "firstName": "Lamine",
+     "lastName": "Yamal",
+     "fullName": "Lamine Yamal"
+    },
+    "teamName": "Barcelona",
+    "teamId": 8634,
+    "rating": {
+     "num": "8.9",
+     "isTop": {
+      "isTopRating": true,
+      "isMatchFinished": true
+     }
+    },
+    "minutesPlayed": 70,
+    "shotmap": [
+     {
+      "id": 2983087539,
+      "eventType": "Goal",
+      "teamId": 8634,
+      "playerId": 1467236,
+      "playerName": "Lamine Yamal",
+      "x": 86.5676470584,
+      "y": 18.394140129500002,
+      "min": 10,
+      "minAdded": null,
+      "isBlocked": false,
+      "isOnTarget": true,
+      "blockedX": null,
+      "blockedY": null,
+      "goalCrossedY": 36.51625,
+      "goalCrossedZ": 1.8685263066000002,
+      "expectedGoals": 0.030560314655303955,
+      "expectedGoalsOnTarget": 0.26868507266044617,
+      "shotType": "LeftFoot",
+      "situation": "RegularPlay",
+      "period": "FirstHalf",
+      "isOwnGoal": false,
+      "onGoalShot": {
+       "x": 0.33432539682539697,
+       "y": 0.49431912873015876,
+       "zoomRatio": 1
+      },
+      "isSavedOffLine": false,
+      "isFromInsideBox": false,
+      "keeperId": 999171,
+      "teamColor": "#971e48"
+     },
+     {
+      "id": 2983123289,
+      "eventType": "AttemptSaved",
+      "teamId": 8634,
+      "playerId": 1467236,
+      "playerName": "Lamine Yamal",
+      "x": 96.50877192889999,
+      "y": 22.247643316,
+      "min": 39,
+      "minAdded": null,
+      "isBlocked": false,
+      "isOnTarget": true,
+      "blockedX": 103.577586207,
+      "blockedY": 31.941249999999997,
+      "goalCrossedY": 33.39,
+      "goalCrossedZ": 0.3659999982,
+      "expectedGoals": 0.06559843569993973,
+      "expectedGoalsOnTarget": 0.19411712884902954,
+      "shotType": "LeftFoot",
+      "situation": "RegularPlay",
+      "period": "FirstHalf",
+      "isOwnGoal": false,
+      "onGoalShot": {
+       "x": 1.1613756613756612,
+       "y": 0.09682539634920634,
+       "zoomRatio": 1
+      },
+      "isSavedOffLine": false,
+      "isFromInsideBox": true,
+      "keeperId": 999171,
+      "teamColor": "#971e48"
+     },
+     {
+      "id": 2983178017,
+      "eventType": "AttemptSaved",
+      "teamId": 8634,
+      "playerId": 1467236,
+      "playerName": "Lamine Yamal",
+      "x": 83.723786408,
+      "y": 46.2428025441,
+      "min": 62,
+      "minAdded": null,
+      "isBlocked": true,
+      "isOnTarget": true,
+      "blockedX": 90.9,
+      "blockedY": 42.639687499999994,
+      "goalCrossedY": 34.61,
+      "goalCrossedZ": 1.2199999940000001,
+      "expectedGoals": 0.057912833988666534,
+      "expectedGoalsOnTarget": 0,
+      "shotType": "LeftFoot",
+      "situation": "FreeKick",
+      "period": "SecondHalf",
+      "isOwnGoal": false,
+      "onGoalShot": {
+       "x": 0.8386243386243388,
+       "y": 0.32275132116402117,
+       "zoomRatio": 1
+      },
+      "isSavedOffLine": false,
+      "isFromInsideBox": false,
+      "keeperId": null,
+      "teamColor": "#971e48"
+     },
+     {
+      "id": 2983180861,
+      "eventType": "Miss",
+      "teamId": 8634,
+      "playerId": 1467236,
+      "playerName": "Lamine Yamal",
+      "x": 86.6749999996,
+      "y": 23.718980896300003,
+      "min": 66,
+      "minAdded": null,
+      "isBlocked": false,
+      "isOnTarget": false,
+      "blockedX": null,
+      "blockedY": null,
+      "goalCrossedY": 27.362380952,
+      "goalCrossedZ": 0.1797894728,
+      "expectedGoals": 0.06835176050662994,
+      "expectedGoalsOnTarget": 0,
+      "shotType": "LeftFoot",
+      "situation": "RegularPlay",
+      "period": "SecondHalf",
+      "isOwnGoal": false,
+      "onGoalShot": {
+       "x": 2,
+       "y": 0.027086440408804834,
+       "zoomRatio": 0.5694813113956819
+      },
+      "isSavedOffLine": false,
+      "isFromInsideBox": false,
+      "keeperId": null,
+      "teamColor": "#971e48"
+     }
+    ],
+    "pageUrl": "/players/1467236/lamine-yamal",
+    "isHomeTeam": false,
+    "stats": [
+     {
+      "title": "Top stats",
+      "key": "top_stats",
+      "stats": {
+       "FotMob rating": {
+        "key": "rating_title",
+        "stat": {
+         "value": 8.89,
+         "type": "double"
+        }
+       },
+       "Minutes played": {
+        "key": "minutes_played",
+        "stat": {
+         "value": 70,
+         "type": "integer"
+        }
+       },
+       "Goals": {
+        "key": "goals",
+        "stat": {
+         "value": 1,
+         "type": "integer"
+        }
+       },
+       "Assists": {
+        "key": "assists",
+        "stat": {
+         "value": 1,
+         "type": "integer"
+        }
+       },
+       "Expected goals (xG)": {
+        "key": "expected_goals",
+        "stat": {
+         "value": 0.22,
+         "type": "double"
+        }
+       },
+       "Expected goals on target (xGOT)": {
+        "key": "expected_goals_on_target_variant",
+        "stat": {
+         "value": 0.46,
+         "type": "double"
+        }
+       },
+       "Expected assists (xA)": {
+        "key": "expected_assists",
+        "stat": {
+         "value": 0.47,
+         "type": "double"
+        }
+       },
+       "xG + xA": {
+        "key": "xg_and_xa",
+        "stat": {
+         "value": 0.69,
+         "type": "double"
+        }
+       },
+       "Total shots": {
+        "key": "total_shots",
+        "stat": {
+         "value": 4,
+         "type": "integer"
+        },
+        "hideInPopupCard": true
+       },
+       "Accurate passes": {
+        "key": "accurate_passes",
+        "stat": {
+         "value": 21,
+         "total": 32,
+         "type": "fractionWithPercentage"
+        }
+       },
+       "Chances created": {
+        "key": "chances_created",
+        "stat": {
+         "value": 2,
+         "type": "integer"
+        }
+       },
+       "Big chances created": {
+        "key": "big_chance_created_team_title",
+        "stat": {
+         "value": 2,
+         "type": "integer"
+        }
+       },
+       "Shots on target": {
+        "key": "ShotsOnTarget",
+        "stat": {
+         "value": 2,
+         "type": "integer"
+        }
+       },
+       "Shots off target": {
+        "key": "ShotsOffTarget",
+        "stat": {
+         "value": 1,
+         "type": "integer"
+        }
+       },
+       "Blocked shots": {
+        "key": "blocked_shots",
+        "stat": {
+         "value": 1,
+         "type": "integer"
+        }
+       },
+       "Shot accuracy": {
+        "key": "shot_accuracy",
+        "stat": {
+         "value": 2,
+         "total": 3,
+         "type": "fractionWithPercentage"
+        }
+       },
+       "Shotmap": {
+        "key": null,
+        "stat": {
+         "value": 1,
+         "type": "boolean"
+        }
+       },
+       "Defensive actions": {
+        "key": "defensive_actions",
+        "stat": {
+         "value": 2,
+         "type": "integer"
+        }
+       }
+      }
+     },
+     {
+      "title": "Attack",
+      "key": "attack",
+      "stats": {
+       "Touches": {
+        "key": "touches",
+        "stat": {
+         "value": 53,
+         "type": "integer"
+        }
+       },
+       "Touches in opposition box": {
+        "key": "touches_opp_box",
+        "stat": {
+         "value": 3,
+         "type": "integer"
+        }
+       },
+       "Successful dribbles": {
+        "key": "dribbles_succeeded",
+        "stat": {
+         "value": 6,
+         "total": 8,
+         "type": "fractionWithPercentage"
+        }
+       },
+       "Passes into final third": {
+        "key": "passes_into_final_third",
+        "stat": {
+         "value": 3,
+         "type": "integer"
+        }
+       },
+       "Line breaking passes": {
+        "key": "line_breaking_passes",
+        "stat": {
+         "value": 5,
+         "type": "integer"
+        }
+       },
+       "Accurate long balls": {
+        "key": "long_balls_accurate",
+        "stat": {
+         "value": 0,
+         "total": 1,
+         "type": "fractionWithPercentage"
+        }
+       },
+       "Dispossessed": {
+        "key": "dispossessed",
+        "stat": {
+         "value": 0,
+         "type": "integer"
+        }
+       },
+       "xG Non-penalty": {
+        "key": "expected_goals_non_penalty",
+        "stat": {
+         "value": 0.22,
+         "type": "double"
+        }
+       }
+      }
+     },
+     {
+      "title": "Defense",
+      "key": "defense",
+      "stats": {
+       "Defensive actions": {
+        "key": "defensive_actions",
+        "stat": {
+         "value": 2,
+         "type": "integer"
+        }
+       },
+       "Tackles": {
+        "key": "matchstats.headers.tackles",
+        "stat": {
+         "value": 1,
+         "type": "integer"
+        }
+       },
+       "Blocks": {
+        "key": "shot_blocks",
+        "stat": {
+         "value": 0,
+         "type": "integer"
+        }
+       },
+       "Clearances": {
+        "key": "clearances",
+        "stat": {
+         "value": 0,
+         "type": "integer"
+        }
+       },
+       "Interceptions": {
+        "key": "interceptions",
+        "stat": {
+         "value": 1,
+         "type": "integer"
+        }
+       },
+       "Recoveries": {
+        "key": "recoveries",
+        "stat": {
+         "value": 1,
+         "type": "integer"
+        }
+       },
+       "Dribbled past": {
+        "key": "dribbled_past",
+        "stat": {
+         "value": 0,
+         "type": "integer"
+        }
+       }
+      }
+     },
+     {
+      "title": "Duels",
+      "key": "duels",
+      "stats": {
+       "Ground duels won": {
+        "key": "ground_duels_won",
+        "stat": {
+         "value": 8,
+         "total": 10,
+         "type": "fractionWithPercentage"
+        }
+       },
+       "Aerial duels won": {
+        "key": "aerials_won",
+        "stat": {
+         "value": 0,
+         "total": 0,
+         "type": "fractionWithPercentage"
+        }
+       },
+       "Was fouled": {
+        "key": "was_fouled",
+        "stat": {
+         "value": 1,
+         "type": "integer"
+        }
+       },
+       "Fouls committed": {
+        "key": "fouls",
+        "stat": {
+         "value": 0,
+         "type": "integer"
+        }
+       },
+       "Duels won": {
+        "key": "duel_won",
+        "stat": {
+         "value": 8,
+         "type": "integer"
+        },
+        "hideInPopupCard": true
+       },
+       "Duels lost": {
+        "key": "duel_lost",
+        "stat": {
+         "value": 2,
+         "type": "integer"
+        },
+        "hideInPopupCard": true
+       }
+      }
+     }
+    ],
+    "role": "Attacker",
+    "teamData": {
+     "home": {
+      "id": 8603,
+      "color": "#009048"
+     },
+     "away": {
+      "id": 8634,
+      "color": "#971e48"
+     }
+    }
+   }
+  }
+ }
+}

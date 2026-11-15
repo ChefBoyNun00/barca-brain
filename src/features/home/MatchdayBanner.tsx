@@ -91,11 +91,16 @@ export function MatchdayBanner({ state, now }: { state: MatchdayState; now: Date
           {kind === "fulltime" && outcome && `${describeOutcome(outcome, language)} · ${venue}`}
         </p>
 
-        {isClasico && (
-          <Link href="/news" className="chip chip-action matchday-link">
-            {t("matchday.papers")} {t("arrow.forward")}
+        <div className="matchday-links">
+          <Link href={`/matches/${match.id}`} className="chip chip-action matchday-link">
+            {t("match.room")}
           </Link>
-        )}
+          {isClasico && (
+            <Link href="/news" className="chip chip-action matchday-link">
+              {t("matchday.papers")} {t("arrow.forward")}
+            </Link>
+          )}
+        </div>
       </div>
 
       {kind === "fulltime" && outcome && (

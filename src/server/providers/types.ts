@@ -6,6 +6,7 @@ import type {
   DomainScorer,
   DomainStanding,
 } from "@/domain/football";
+import type { FetchedMatchRoom } from "@/domain/match-room";
 
 /** The contract between ingest and any football API. Only domain types cross it. */
 export interface FootballProvider {
@@ -52,6 +53,13 @@ export class ProviderError extends Error {
     super(message);
     this.name = "ProviderError";
   }
+}
+
+/** Lineups, absences and events for Barça's latest and next match. */
+export interface MatchRoomProvider {
+  name: string;
+  /** `warnings` names sections that could not be read; those come back as null. */
+  getBarcaMatchRooms(): Promise<{ rooms: FetchedMatchRoom[]; warnings: string[] }>;
 }
 
 export type FeedArticle = {

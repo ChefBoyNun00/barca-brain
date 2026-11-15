@@ -88,7 +88,7 @@ export function MatchCard({ match, index, showShare = true }: MatchCardProps) {
       </p>
       {showShare && (
         <Link className="match-card-share" href={`/matches/${match.id}`}>
-          {t("match.share")}
+          {t("match.room")}
         </Link>
       )}
     </article>

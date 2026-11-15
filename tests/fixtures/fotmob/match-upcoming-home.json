@@ -1,0 +1,138 @@
+{
+ "general": {
+  "matchId": "5868133",
+  "matchTimeUTCDate": "2026-11-22T13:00:00.000Z",
+  "homeTeam": {
+   "name": "Barcelona",
+   "id": 8634
+  },
+  "awayTeam": {
+   "name": "Villarreal",
+   "id": 10205
+  },
+  "leagueName": "LaLiga"
+ },
+ "content": {
+  "lineup": {
+   "lineupType": "unavailable",
+   "homeTeam": {
+    "id": 8634,
+    "name": "Barcelona",
+    "formation": "",
+    "starters": [],
+    "unavailable": [
+     {
+      "name": "Frenkie de Jong",
+      "unavailability": {
+       "injuryId": 45,
+       "type": "injury",
+       "expectedReturn": "About 1-2 weeks"
+      }
+     },
+     {
+      "name": "Rodri",
+      "unavailability": {
+       "injuryId": 42,
+       "type": "injury",
+       "expectedReturn": "Late November 2026"
+      }
+     },
+     {
+      "name": "Xavi Espart",
+      "unavailability": {
+       "injuryId": 30,
+       "type": "injury",
+       "expectedReturn": "Early January 2027"
+      }
+     },
+     {
+      "name": "Dani Olmo",
+      "unavailability": {
+       "injuryId": 69,
+       "type": "injury",
+       "expectedReturn": "Late November 2026"
+      }
+     },
+     {
+      "name": "Jules Koundé",
+      "unavailability": {
+       "injuryId": 38,
+       "type": "injury",
+       "expectedReturn": "Late November 2026"
+      }
+     },
+     {
+      "name": "Roony Bardghji",
+      "unavailability": {
+       "injuryId": 76,
+       "type": "injury",
+       "expectedReturn": "Late February 2027"
+      }
+     }
+    ]
+   },
+   "awayTeam": {
+    "id": 10205,
+    "name": "Villarreal",
+    "formation": "",
+    "starters": [],
+    "unavailable": [
+     {
+      "name": "Juan Foyth",
+      "unavailability": {
+       "injuryId": 87,
+       "type": "injury",
+       "expectedReturn": "About 1-2 weeks"
+      }
+     },
+     {
+      "name": "Alassane Diatta",
+      "unavailability": {
+       "injuryId": 87,
+       "type": "injury",
+       "expectedReturn": "Doubtful"
+      }
+     },
+     {
+      "name": "Gerard Moreno",
+      "unavailability": {
+       "injuryId": 87,
+       "type": "injury",
+       "expectedReturn": "About 1-2 weeks"
+      }
+     },
+     {
+      "name": "Ilias Akhomach",
+      "unavailability": {
+       "injuryId": 87,
+       "type": "injury",
+       "expectedReturn": "Late November 2026"
+      }
+     }
+    ]
+   }
+  },
+  "matchFacts": {
+   "events": {
+    "events": []
+   },
+   "infoBox": {
+    "Stadium": {
+     "name": "Spotify Camp Nou",
+     "city": "Barcelona",
+     "country": "Spain",
+     "lat": 41.380890137,
+     "long": 2.122812867,
+     "capacity": 99787,
+     "surface": "grass"
+    },
+    "Referee": {
+     "text": "",
+     "countryCode": "",
+     "country": ""
+    }
+   },
+   "playerOfTheMatch": {}
+  }
+ }
+}

@@ -1,0 +1,66 @@
+{
+ "details": {
+  "id": 8634,
+  "name": "Barcelona"
+ },
+ "fixtures": {
+  "allFixtures": {
+   "lastMatch": {
+    "id": 5868121,
+    "home": {
+     "id": 9906,
+     "name": "Atlético Madrid",
+     "score": 1
+    },
+    "away": {
+     "id": 8634,
+     "name": "Barcelona",
+     "score": 2
+    },
+    "tournament": {
+     "name": "LaLiga",
+     "stage": "",
+     "leagueId": 87
+    },
+    "status": {
+     "utcTime": "2026-11-08T20:00:00.000Z",
+     "finished": true,
+     "started": true,
+     "cancelled": false,
+     "awarded": false,
+     "scoreStr": "1 - 2",
+     "reason": {
+      "short": "FT",
+      "shortKey": "fulltime_short",
+      "long": "Full-Time",
+      "longKey": "finished"
+     }
+    }
+   },
+   "nextMatch": {
+    "id": 5868133,
+    "home": {
+     "id": 8634,
+     "name": "Barcelona",
+     "score": 0
+    },
+    "away": {
+     "id": 10205,
+     "name": "Villarreal",
+     "score": 0
+    },
+    "tournament": {
+     "name": "LaLiga",
+     "stage": "",
+     "leagueId": 87
+    },
+    "status": {
+     "utcTime": "2026-11-22T13:00:00.000Z",
+     "started": false,
+     "cancelled": false,
+     "finished": false
+    }
+   }
+  }
+ }
+}

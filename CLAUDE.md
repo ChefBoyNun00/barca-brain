@@ -11,6 +11,7 @@ with "Ask Barça": Claude answers questions using typed tools over our DB.
 - `npm run dev` — local app
 - `npm run ingest` — run ingest jobs (needs `DATABASE_URL_INGEST`, `FOOTBALL_DATA_KEY`)
 - `npm run news` — read and translate the Spanish press (needs `DATABASE_URL_INGEST`; translation needs `ANTHROPIC_API_KEY`)
+- `npm run matchday` — refresh the Matchday Room from FotMob's unofficial API (needs `DATABASE_URL_INGEST`, `FOOTBALL_PROVIDER`); runs every 15 min on GitHub
 - `npm test` — vitest
 - `npm run eval` — Ask Barça accuracy eval
 - `npx supabase migration new <name>` — new migration (never edit applied ones)

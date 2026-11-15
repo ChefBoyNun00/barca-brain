@@ -5,6 +5,9 @@ import { connection } from "next/server";
 import { PageLoader } from "@/components/PageLoader";
 import { SiteNav } from "@/components/SiteNav";
 import { describeMatch } from "@/features/home/season-story";
+import { getMatchRoomData } from "@/features/match-room/get-match-room-data";
+import { MatchRoomView } from "@/features/match-room/MatchRoomView";
+import { MatchCard } from "@/features/matches/MatchCard";
 import { MatchShare } from "@/features/matches/MatchShare";
 import { getSeasonData } from "@/features/season/get-season-data";
 import { T } from "@/i18n/language";
@@ -29,9 +32,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 async function Detail({ params }: Props) {
   const { id } = await params;
-  const match = await findMatch(id);
-  if (!match) notFound();
-  return <MatchShare match={match} />;
+  await connection();
+  const data = await getMatchRoomData(id);
+  if (!data) notFound();
+  return (
+    <>
+      <div className="share-match">
+        <MatchCard match={data.match} index={0} showShare={false} />
+      </div>
+      <MatchRoomView match={data.match} room={data.room} now={new Date()} />
+      <MatchShare match={data.match} />
+    </>
+  );
 }
 
 export default function MatchPage({ params }: Props) {
@@ -39,11 +51,8 @@ export default function MatchPage({ params }: Props) {
     <>
       <SiteNav />
       <main className="page-gutter flex-1 pt-10 pb-16">
-        <p className="kicker">
-          <T k="share.matchKicker" />
-        </p>
-        <h1 className="display-title mt-3">
-          <T k="share.matchTitle" />
+        <h1 className="display-title">
+          <T k="room.kicker" />
         </h1>
         <Suspense fallback={<PageLoader />}>
           <Detail params={params} />

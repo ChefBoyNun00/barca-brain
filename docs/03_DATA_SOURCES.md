@@ -92,3 +92,13 @@ Live = paid tier, or polling every 2–3 minutes with degraded UX.
   so we can re-normalise without re-fetching when our schema changes.
 - Respect rate limits in the client: count requests per run, abort with a clear error before
   exceeding a configured `DAILY_REQUEST_BUDGET`.
+
+## Matchday Room: FotMob (unofficial, free)
+Added 2026-11-15, chosen by Daniel over API-Football's paid plan.
+- `GET https://www.fotmob.com/api/data/teams?id=8634&ccode3=ISR` → Barça's `nextMatch` and `lastMatch`.
+- `GET https://www.fotmob.com/api/data/matchDetails?matchId=…&ccode3=ISR` → lineups (about an hour
+  before kickoff), absences with expected return, goals, cards, ratings, player of the match.
+- No key. Refuses an empty user agent; we send `barca-brain (fan project)`.
+- Unofficial: it can change or close without notice, and FotMob's terms likely do not allow it.
+  If it breaks, the job fails alone and each room keeps its last good data.
+- No TV listings: Israeli channels are set by hand in `src/config/match-room.ts`.
