@@ -1,4 +1,5 @@
-import type { TextKey, TextVars } from "@/i18n/dictionary";
+import { translate, type Language, type TextKey, type TextVars } from "@/i18n/dictionary";
+import { formatScore } from "@/i18n/numbers";
 import type { HomeStanding, SeasonMatch } from "@/domain/home";
 import { displayCompetition, formatMatchDate } from "./format";
 
@@ -37,19 +38,29 @@ export function getMatchOutcome(match: SeasonMatch): MatchOutcome | null {
   return match.goalsFor > match.goalsAgainst ? "W" : "L";
 }
 
-const OUTCOME_WORDS: Record<MatchOutcome, string> = { W: "Win", D: "Draw", L: "Defeat" };
+export function describeOutcome(outcome: MatchOutcome, language: Language = "en"): string {
+  return translate(language, `outcome.${outcome}`);
+}
 
-export function describeOutcome(outcome: MatchOutcome): string {
-  return OUTCOME_WORDS[outcome];
+/** The single letter on badges and form pips: W/D/L in English, נ/ת/ה in Hebrew. */
+export function outcomeLetter(outcome: MatchOutcome, language: Language = "en"): string {
+  return translate(language, `outcome.short.${outcome}`);
 }
 
 /** One plain sentence per match, for screen readers and the list view. */
-export function describeMatch(match: SeasonMatch): string {
-  const opponent = match.opponent?.name ?? "Opponent to be decided";
-  const venue = match.isHome ? "at home" : "away";
+export function describeMatch(match: SeasonMatch, language: Language = "en"): string {
+  const opponent = match.opponent?.name ?? translate(language, "common.opponentTbd");
+  const venue = translate(language, match.isHome ? "venue.home" : "venue.away");
+  const date = formatMatchDate(match.kickoffAt, language);
   const outcome = getMatchOutcome(match);
-  if (!outcome) return `${opponent}, ${venue}, ${formatMatchDate(match.kickoffAt)}, not played yet`;
-  return `${OUTCOME_WORDS[outcome]}, ${match.goalsFor}–${match.goalsAgainst} ${venue} to ${opponent}, ${formatMatchDate(match.kickoffAt)}`;
+  if (!outcome) return translate(language, "describe.unplayed", { opponent, venue, date });
+  return translate(language, "describe.played", {
+    outcome: describeOutcome(outcome, language),
+    score: formatScore(language, match.goalsFor, match.goalsAgainst),
+    venue,
+    opponent,
+    date,
+  });
 }
 
 /** The provider lists form newest first. Returned oldest first, to read left to right. */
@@ -128,7 +139,8 @@ export function buildHeadline(summary: SeasonSummary, standing: HomeStanding | n
   return [...lines, `${wins} from ${summary.played}.`];
 }
 
-export type HeadlinePart = { key: TextKey; vars: TextVars };
+/** competition is the provider's name, so the page can write the league in the reader's language. */
+export type HeadlinePart = { key: TextKey; vars: TextVars; competition?: string };
 
 /** The same headline as buildHeadline, as dictionary keys, so it can be read in either language. */
 export function buildHeadlineParts(
@@ -140,8 +152,12 @@ export function buildHeadlineParts(
     const league = displayCompetition(standing.competition);
     parts.push(
       standing.rank === 1
-        ? { key: "headline.top", vars: { league } }
-        : { key: "headline.rank", vars: { rank: standing.rank, league } },
+        ? { key: "headline.top", vars: { league }, competition: standing.competition }
+        : {
+            key: "headline.rank",
+            vars: { rank: standing.rank, league },
+            competition: standing.competition,
+          },
     );
   }
   if (summary.played === 0) return [...parts, { key: "headline.start", vars: {} }];

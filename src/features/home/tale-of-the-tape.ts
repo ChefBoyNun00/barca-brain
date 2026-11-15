@@ -1,5 +1,6 @@
 import type { LeagueRow, SeasonMatch } from "@/domain/home";
-import { getMatchOutcome, ordinal } from "./season-story";
+import { ordinal, translate, type Language } from "@/i18n/dictionary";
+import { getMatchOutcome } from "./season-story";
 
 export type TapeRow = {
   label: string;
@@ -28,7 +29,11 @@ function countRow(
 }
 
 /** Null when the opponent is not in the league table, such as a European side. */
-export function buildTape(table: LeagueRow[], opponentId: string | undefined): Tape | null {
+export function buildTape(
+  table: LeagueRow[],
+  opponentId: string | undefined,
+  language: Language = "en",
+): Tape | null {
   const barca = table.find((row) => row.isBarca);
   const rival = table.find((row) => row.teamId === opponentId);
   if (!barca || !rival || rival.isBarca) return null;
@@ -38,14 +43,14 @@ export function buildTape(table: LeagueRow[], opponentId: string | undefined): T
     rival,
     rows: [
       {
-        label: "Position",
-        barca: ordinal(barca.rank),
-        rival: ordinal(rival.rank),
+        label: translate(language, "tape.position"),
+        barca: ordinal(language, barca.rank),
+        rival: ordinal(language, rival.rank),
         barcaShare: share(rival.rank, barca.rank),
       },
-      ...countRow("Points", barca.points, rival.points),
-      ...countRow("Goals scored", barca.goalsFor, rival.goalsFor),
-      ...countRow("Goals conceded", barca.goalsAgainst, rival.goalsAgainst, true),
+      ...countRow(translate(language, "tape.points"), barca.points, rival.points),
+      ...countRow(translate(language, "tape.scored"), barca.goalsFor, rival.goalsFor),
+      ...countRow(translate(language, "tape.conceded"), barca.goalsAgainst, rival.goalsAgainst, true),
     ],
   };
 }

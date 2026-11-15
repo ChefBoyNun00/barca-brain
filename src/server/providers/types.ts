@@ -64,6 +64,8 @@ export type FeedArticle = {
   videoId?: string | null;
   /** Fan threads only: who posted it. */
   author?: string | null;
+  /** Podcasts only: the episode's audio file. */
+  audioUrl?: string | null;
 };
 
 export interface NewsProvider {

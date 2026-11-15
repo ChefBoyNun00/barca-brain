@@ -13,6 +13,15 @@ const parser = new XMLParser({
   isArray: (name) => name === "item",
 });
 
+/** Podcasts keep attributes, because the audio file's address is one. */
+const podcastParser = new XMLParser({
+  ignoreAttributes: false,
+  attributeNamePrefix: "@_",
+  parseTagValue: false,
+  htmlEntities: true,
+  isArray: (name) => name === "item",
+});
+
 const atomParser = new XMLParser({
   ignoreAttributes: false,
   attributeNamePrefix: "@_",
@@ -50,7 +59,8 @@ export function createRssProvider(deps: Deps = {}): NewsProvider {
         if (!parsed.success) throw unrecognised();
         return mapAtomEntries(parsed.data.feed.entry, feed);
       }
-      const parsed = RssFeedSchema.safeParse(parser.parse(text));
+      const rssParser = feed.kind === "podcast" ? podcastParser : parser;
+      const parsed = RssFeedSchema.safeParse(rssParser.parse(text));
       if (!parsed.success) throw unrecognised();
       return mapFeedItems(parsed.data.rss.channel.item, feed);
     },

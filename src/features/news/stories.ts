@@ -1,5 +1,6 @@
 import { NEWS_CATCH_ALL_TOPICS, type PressSide, type ScoopJournalist } from "@/config/news";
 import type { NewsArticle, NewsCategory, NewsCertainty, StoryWriteup } from "@/domain/news";
+import { translate, type Language } from "@/i18n/dictionary";
 
 /** One real-world story, however many outlets covered it. */
 export type Story = {
@@ -80,12 +81,13 @@ export const findPlayerStories = (stories: Story[], playerName: string, limit: n
 
 const MINUTE_MS = 60_000;
 
-export function formatStoryAge(date: Date, now: Date): string {
+export function formatStoryAge(date: Date, now: Date, language: Language = "en"): string {
   const minutes = Math.max(0, Math.round((now.getTime() - date.getTime()) / MINUTE_MS));
-  if (minutes < 60) return `${Math.max(minutes, 1)}m ago`;
+  if (minutes < 60) return translate(language, "age.minutes", { n: Math.max(minutes, 1) });
   const hours = Math.round(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  return `${Math.round(hours / 24)}d ago`;
+  if (hours < 24) return translate(language, "age.hours", { n: hours });
+  const days = Math.round(hours / 24);
+  return days === 1 ? translate(language, "age.day") : translate(language, "age.days", { n: days });
 }
 
 export type StoryTopic = NewsCategory;
@@ -148,3 +150,73 @@ const HOUR_MS = 3_600_000;
 
 export const isBreaking = (story: Story, now: Date, hours: number) =>
   now.getTime() - story.latestAt.getTime() < hours * HOUR_MS;
+
+/** The newest coverage written in this language, if any outlet covered the story in it. */
+export const coverageIn = (story: Story, language: NewsArticle["language"]) =>
+  story.coverage.find((article) => article.language === language) ?? null;
+
+/**
+ * How hot a story is: the outlets running it, halved for every half-life since the latest one.
+ * A story ten outlets ran this morning beats one twelve outlets ran two days ago.
+ */
+export function heatOf(story: Story, now: Date, halfLifeHours: number): number {
+  const hours = Math.max(0, now.getTime() - story.latestAt.getTime()) / HOUR_MS;
+  return story.outlets.length * 0.5 ** (hours / halfLifeHours);
+}
+
+/** Hottest first. Ties go to the newer story. */
+export function rankByHeat<S extends Story>(stories: S[], now: Date, halfLifeHours: number): S[] {
+  return [...stories].sort(
+    (a, b) =>
+      heatOf(b, now, halfLifeHours) - heatOf(a, now, halfLifeHours) ||
+      b.latestAt.getTime() - a.latestAt.getTime(),
+  );
+}
+
+/** One city's take on a story: its newest headline from that city's press. */
+export type CityTake = { outlet: string; headline: string; language: NewsArticle["language"] };
+
+const takeFrom = (story: Story, side: PressSide): CityTake | null => {
+  const article = story.coverage.find((item) => item.pressSide === side);
+  if (!article) return null;
+  return {
+    outlet: article.outlet,
+    headline: article.titleEn ?? article.titleOriginal,
+    language: article.titleEn ? "en" : article.language,
+  };
+};
+
+/** The same story as Barcelona's press and Madrid's press tell it, hottest first. */
+export function spinsOf<S extends Story>(ranked: S[], limit: number) {
+  return ranked.flatMap((story) => {
+    const barcelona = takeFrom(story, "barcelona");
+    const madrid = takeFrom(story, "madrid");
+    return barcelona && madrid ? [{ story, barcelona, madrid }] : [];
+  }).slice(0, limit);
+}
+
+/**
+ * The world story an Israeli story matches: the same topic label, or, since two batches can
+ * label one story differently, the same kind of story about the same player.
+ */
+export function findAbroad<S extends Story>(story: Story, world: S[]): S | null {
+  const sameTopic = world.find((other) => other.id === story.id);
+  if (sameTopic) return sameTopic;
+  if (story.players.length === 0) return null;
+  return (
+    world.find(
+      (other) =>
+        topicOf(other) === topicOf(story) &&
+        other.players.some((player) => story.players.includes(player)),
+    ) ?? null
+  );
+}
+
+/** Big stories abroad that no Israeli outlet has picked up yet, hottest first. */
+export function notYetIn<S extends Story>(rankedWorld: S[], local: Story[], limit: number): S[] {
+  return rankedWorld
+    .filter(hasStoryPage)
+    .filter((story) => story.outlets.length > 1)
+    .filter((story) => !local.some((mine) => findAbroad(mine, [story])))
+    .slice(0, limit);
+}

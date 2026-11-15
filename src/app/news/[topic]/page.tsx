@@ -28,7 +28,7 @@ export default function NewsStory({ params }: Props) {
     <>
       <SiteNav />
       <main className="page-gutter flex-1 pt-8 pb-16">
-        <Suspense fallback={<PageLoader label="Loading the story" />}>
+        <Suspense fallback={<PageLoader label="loading.story" />}>
           <Story params={params} />
         </Suspense>
       </main>

@@ -4,7 +4,6 @@ import { useState } from "react";
 import { ChoiceChips } from "@/components/ChoiceChips";
 import type { TextKey } from "@/i18n/dictionary";
 import { useT } from "@/i18n/language";
-import { POSITION_LABELS } from "@/config/display";
 import type { PlayerPosition, SquadPlayer } from "@/domain/home";
 import { Jersey } from "./Jersey";
 import { getJersey } from "./jersey-data";
@@ -30,19 +29,22 @@ const SORT_CHOICES: { id: SquadSort; label: TextKey }[] = [
 ];
 
 function Hanger({ player, onOpen }: { player: SquadPlayer; onOpen: () => void }) {
+  const t = useT();
   const jersey = getJersey(player);
-  const position = player.position ? POSITION_LABELS[player.position] : "Squad player";
+  const position = t(player.position ? `position.${player.position}` : "position.none");
   const masia = isLaMasia(player);
+  const numberPart = jersey.number === null ? "" : t("squad.numberPart", { n: jersey.number });
+  const masiaPart = masia ? `, ${t("squad.masiaGrad")}` : "";
   return (
     <button
       type="button"
       className="hanger"
       onClick={onOpen}
-      aria-label={`${player.name}${jersey.number === null ? "" : `, number ${jersey.number}`}. ${position}${masia ? ", La Masia graduate" : ""}. Open stats.`}
+      aria-label={`${player.name}${numberPart}. ${position}${masiaPart}. ${t("squad.openStats")}`}
     >
       <span aria-hidden="true" className="hanger-hook" />
       {masia && (
-        <span aria-hidden="true" className="hanger-masia" title="La Masia graduate">
+        <span aria-hidden="true" className="hanger-masia" title={t("squad.masiaGrad")}>
           M
         </span>
       )}
@@ -81,20 +83,20 @@ export function Wardrobe({ squad, onOpen }: WardrobeProps) {
       <p className="section-note">{t("squad.note")}</p>
       <div className="squad-controls">
         <ChoiceChips
-          label="Filter by position"
+          label={t("squad.filterLabel")}
           choices={POSITION_CHOICES.map(({ id, label }) => ({ id, label: t(label) }))}
           value={position}
           onChange={setPosition}
         />
         <ChoiceChips
-          label="Sort players"
+          label={t("squad.sortLabel")}
           choices={SORT_CHOICES.map(({ id, label }) => ({ id, label: t(label) }))}
           value={sort}
           onChange={setSort}
         />
       </div>
       {shown.length === 0 ? (
-        <p className="section-note">No players in this group.</p>
+        <p className="section-note">{t("squad.noneInGroup")}</p>
       ) : (
         <ul className="wardrobe">
           {shown.map((player) => (

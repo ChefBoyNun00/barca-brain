@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useT } from "@/i18n/language";
 import { Jersey } from "../squad/Jersey";
 import { SHIRT_DEFAULT, SHIRT_NAME_MAX, cleanShirtInput } from "./shirt-input";
 import { ShareBar } from "./ShareBar";
@@ -9,6 +10,7 @@ type ShirtMakerProps = { initialName: string; initialNumber: number | null };
 
 /** Type a name and number, see the shirt, and take the picture away. */
 export function ShirtMaker({ initialName, initialNumber }: ShirtMakerProps) {
+  const t = useT();
   const [name, setName] = useState(initialName === SHIRT_DEFAULT.name ? "" : initialName);
   const [number, setNumber] = useState(initialNumber === null ? "" : String(initialNumber));
 
@@ -29,19 +31,20 @@ export function ShirtMaker({ initialName, initialNumber }: ShirtMakerProps) {
 
       <form className="shirt-form" onSubmit={(event) => event.preventDefault()}>
         <label>
-          <span>Name on the back</span>
+          <span>{t("shirt.name")}</span>
           <input
             type="text"
             value={name}
             maxLength={SHIRT_NAME_MAX}
-            placeholder="Your name"
+            placeholder={t("shirt.namePlaceholder")}
+            dir="auto"
             autoComplete="off"
             onChange={(event) => setName(event.target.value)}
             onBlur={remember}
           />
         </label>
         <label>
-          <span>Number</span>
+          <span>{t("shirt.number")}</span>
           <input
             type="number"
             inputMode="numeric"
@@ -54,13 +57,15 @@ export function ShirtMaker({ initialName, initialNumber }: ShirtMakerProps) {
           />
         </label>
         <p className="shirt-note">
-          Printed as <strong>{clean.name}</strong>
-          {clean.number === null ? " with no number." : `, number ${clean.number}.`}
+          {t("shirt.printed")} <bdi><strong>{clean.name}</strong></bdi>
+          {clean.number === null
+            ? ` ${t("shirt.noNumber")}`
+            : `, ${t("shirt.withNumber", { n: clean.number })}`}
         </p>
         <ShareBar
           path={`/shirt?${query}`}
           cardPath={`/card/shirt?${query}`}
-          title="My Barça shirt"
+          title={t("shirt.shareTitle")}
         />
       </form>
     </div>

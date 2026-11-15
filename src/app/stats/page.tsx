@@ -14,7 +14,7 @@ export default function StatsRoute() {
     <>
       <SiteNav />
       <main className="flex-1 pb-16">
-        <Suspense fallback={<PageLoader label="Loading the numbers" />}>
+        <Suspense fallback={<PageLoader label="loading.numbers" />}>
           <StatsPage />
         </Suspense>
       </main>

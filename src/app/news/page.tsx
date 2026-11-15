@@ -8,10 +8,10 @@ import { NewsPage } from "@/features/news/NewsPage";
 export const metadata: Metadata = {
   title: "Barça news · Barça Brain",
   description:
-    "Every Barça story from the Spanish and English press, Fabrizio Romano and David Ornstein, the club and the fans, written up in full.",
+    "Only the Barça stories that matter, ranked by heat, in two editions: the world's press and Israel's own.",
 };
 
-export default function News() {
+export default function News({ searchParams }: PageProps<"/news">) {
   return (
     <>
       <SiteNav />
@@ -23,11 +23,10 @@ export default function News() {
           <T k="news.title" />
         </h1>
         <p className="mt-4 max-w-2xl">
-          The Spanish and English press, the transfer insiders, the club and the fans, in one place.
-          Every story is written up in full, with how solid it is and who reported it.
+          <T k="news.intro" />
         </p>
-        <Suspense fallback={<PageLoader label="Loading the news" />}>
-          <NewsPage />
+        <Suspense fallback={<PageLoader label="loading.news" />}>
+          <NewsPage searchParams={searchParams} />
         </Suspense>
       </main>
     </>

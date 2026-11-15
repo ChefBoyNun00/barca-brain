@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useT } from "@/i18n/language";
 import { getCountdownParts } from "./format";
 
 /** How far ahead the countdown thread starts to fill. */
@@ -12,6 +13,7 @@ type CountdownProps = { kickoffAt: Date; serverNow: Date };
 
 /** Starts from the server's time so the first paint matches, then ticks in the browser. */
 export function Countdown({ kickoffAt, serverNow }: CountdownProps) {
+  const t = useT();
   const [now, setNow] = useState(serverNow);
 
   useEffect(() => {
@@ -21,10 +23,10 @@ export function Countdown({ kickoffAt, serverNow }: CountdownProps) {
 
   const { days, hours, minutes, seconds } = getCountdownParts(kickoffAt, now);
   const units = [
-    { label: "days", value: pad(days) },
-    { label: "hrs", value: pad(hours) },
-    { label: "min", value: pad(minutes) },
-    { label: "sec", value: pad(seconds) },
+    { id: "days", label: t("countdown.days"), value: pad(days) },
+    { id: "hours", label: t("countdown.hours"), value: pad(hours) },
+    { id: "minutes", label: t("countdown.minutes"), value: pad(minutes) },
+    { id: "seconds", label: t("countdown.seconds"), value: pad(seconds) },
   ];
 
   // The thread fills over the last 7 days and glows in the final hour.
@@ -35,10 +37,10 @@ export function Countdown({ kickoffAt, serverNow }: CountdownProps) {
   return (
     <div aria-hidden="true" className="countdown-wrap">
       <div className="countdown">
-        {units.map(({ label, value }) => (
-          <div key={label}>
+        {units.map(({ id, label, value }) => (
+          <div key={id}>
             {/* keyed on the value so the seconds digit ticks each time it changes */}
-            <span key={value} className="countdown-value" data-tick={label === "sec"}>
+            <span key={value} className="countdown-value" data-tick={id === "seconds"}>
               {value}
             </span>
             <span className="countdown-label">{label}</span>

@@ -3,10 +3,21 @@ import { z } from "zod";
 // Fields are loose on purpose: one odd item is skipped later, it must not sink the feed.
 export const RssItemSchema = z.object({
   title: z.union([z.string(), z.number()]).transform(String),
-  link: z.string(),
+  link: z.string().optional(),
   pubDate: z.string(),
   description: z.string().optional(),
   source: z.union([z.string(), z.object({ "#text": z.string() })]).optional(),
+  /**
+   * Podcasts: the audio file. News feeds use it for a picture, and without attributes it arrives
+   * as an empty string, so anything that is not an address is read as no enclosure.
+   */
+  enclosure: z
+    .unknown()
+    .optional()
+    .transform((value) => {
+      const parsed = z.object({ "@_url": z.string() }).safeParse(value);
+      return parsed.success ? parsed.data["@_url"] : null;
+    }),
 });
 
 export const RssFeedSchema = z.object({

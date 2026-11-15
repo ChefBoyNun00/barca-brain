@@ -16,6 +16,8 @@
   --barca-blue: #004d98;
   --barca-gold: #edbb00;
   --barca-navy: #0a1230;
+  /* The Israeli flag's blue, for the Israeli edition. */
+  --israel-blue: #0038b8;
 
   /* Photo pass: night surfaces, the blaugrana gradient and the wash that keeps text readable on photos. */
   --night: #060b1f;
@@ -27,6 +29,80 @@
   --shadow-md: 0 4px 6px -1px rgba(0, 77, 152, 0.08), 0 2px 4px -2px rgba(0, 77, 152, 0.06);
   --ease-out: cubic-bezier(0, 0, 0.2, 1);
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ---------- Design tokens ----------
+     One scale for every corner, shadow and duration, so a card on the news page and a card on
+     the squad page are the same card. Components use these; raw values are the exception. */
+
+  /* Semantic colours: what a colour is for, not what it looks like. */
+  --surface: #ffffff;
+  --surface-sunken: var(--off-white);
+  --ink: var(--text-heading);
+  --ink-muted: var(--text-secondary);
+  --line: var(--border);
+  --on-dark: #ffffff;
+  --on-dark-muted: rgba(255, 255, 255, 0.78);
+  /* Gold is never text on white (1.9:1). On white, gold detail uses this darker gold (4.6:1). */
+  --gold-ink: #8a6500;
+  --blue-deep: #00387a;
+
+  /* Corners: small details, controls, cards, big panels, pills. */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-pill: 9999px;
+
+  /* Elevation: resting card, raised on hover, floating panels. All tinted navy, never grey. */
+  --shadow-sm: 0 1px 2px rgba(10, 18, 48, 0.06), 0 1px 3px rgba(0, 77, 152, 0.06);
+  --shadow-lg: 0 18px 36px -14px rgba(10, 18, 48, 0.28), 0 4px 10px -4px rgba(0, 77, 152, 0.12);
+  --shadow-gold: 0 0 0 3px rgba(237, 187, 0, 0.35);
+
+  /* Motion: taps feel instant, panels glide, nothing drags. */
+  --dur-fast: 150ms;
+  --dur-base: 220ms;
+  --dur-slow: 360ms;
+
+  /* Touch: the smallest a tap target can be (WCAG 2.5.5, Apple and Google guidance). */
+  --tap: 44px;
+
+  /* Focus: blue on light surfaces; dark surfaces switch it to gold below. */
+  --focus-ring: var(--barca-blue);
+
+  /* The blaugrana stripe used as a rule under headings and along dark bars. */
+  --stripe-rule: linear-gradient(90deg, var(--barca-blue) 0 50%, var(--barca-garnet) 50% 100%);
+}
+
+/* Every interactive thing gets a visible keyboard focus ring, not just the ones someone listed.
+   :where() keeps this at zero specificity, so a component can still style its own. */
+@layer base {
+  :where(a, button, input, select, textarea, summary, [tabindex], [role="button"]):focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  /* On navy, blue disappears; gold reads at 9:1. */
+  :where(.nav, .tabbar, .poster, .hero, .home-hero, .site-foot, .matchday, .intro, [data-surface="dark"]) {
+    --focus-ring: var(--barca-gold);
+  }
+
+  :where(button, [role="button"], summary, label[for], select) {
+    cursor: pointer;
+  }
+
+  :where(h1, h2, h3) {
+    text-wrap: balance;
+  }
+
+  :where(p, li, figcaption) {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    color: #ffffff;
+    background: var(--barca-garnet);
+  }
 }
 
 @theme inline {
@@ -35,6 +111,8 @@
   --color-secondary: var(--text-secondary);
   --font-sans: var(--font-inter);
 }
+
+
 
 body {
   background: var(--off-white);
@@ -282,7 +360,7 @@ body {
     cursor: pointer;
     background: #ffffff;
     border: 2px solid var(--border);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     transition:
       transform 200ms var(--ease-smooth),
       border-color 200ms var(--ease-smooth);
@@ -305,9 +383,8 @@ body {
   .poster-ask:focus-visible,
   .pick:focus-visible,
   .hanger:focus-visible,
-  .meeting:focus-visible,
-  .nav a:focus-visible {
-    outline: 2px solid var(--primary);
+  .meeting:focus-visible {
+    outline: 3px solid var(--focus-ring);
     outline-offset: 2px;
   }
 
@@ -340,6 +417,8 @@ body {
     align-items: center;
     gap: 1rem;
     margin-top: 0.5rem;
+    /* The name below measures itself against this row's width (cqi). */
+    container-type: inline-size;
   }
 
   .poster-teams img {
@@ -348,13 +427,21 @@ body {
     object-fit: contain;
     padding: 6px;
     background: #ffffff;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
+  /* A long one-word name such as VILLARREAL must still fit on one line beside its crest.
+     --name-chars is the longest word's length (set in NextMatchPoster), and --cap-width is
+     roughly how wide one capital letter is, as a share of the font size. */
   .poster-opponent {
+    --cap-width: 0.56;
     min-width: 0;
     font-family: var(--font-display);
-    font-size: clamp(4rem, 17vw, 12rem);
+    font-size: min(
+      clamp(4rem, 17vw, 12rem),
+      (100cqi - clamp(56px, 12vw, 96px) - 1rem) / (var(--name-chars, 8) * var(--cap-width))
+    );
+    overflow-wrap: break-word;
     font-weight: 900;
     line-height: 0.9;
     text-transform: uppercase;
@@ -527,18 +614,25 @@ body {
     padding: 1.5rem;
     background: #ffffff;
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
   }
 
   .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: var(--tap);
     padding: 0.75rem 1.5rem;
-    font-size: 0.9rem;
-    font-weight: 600;
+    font-size: 0.9375rem;
+    font-weight: 700;
     color: #ffffff;
     cursor: pointer;
-    background: linear-gradient(135deg, var(--barca-blue), var(--primary-light));
-    border-radius: 12px;
+    /* Blue into deep blue keeps white text above 7:1 the whole way across. */
+    background: linear-gradient(135deg, var(--barca-blue), var(--blue-deep));
+    border-radius: var(--radius-md);
+    box-shadow: inset 0 -3px 0 var(--barca-garnet);
     transition:
       transform 200ms var(--ease-smooth),
       box-shadow 200ms var(--ease-smooth);
@@ -550,7 +644,7 @@ body {
   }
 
   .skeleton {
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     background: linear-gradient(
       90deg,
       var(--primary-wash),
@@ -590,10 +684,13 @@ body {
       column-gap: 2rem;
     }
 
-    .countdown {
+    .countdown-wrap {
       grid-column: 2;
       grid-row: 1 / 4;
       align-self: center;
+    }
+
+    .countdown-wrap .countdown {
       margin-top: 0;
     }
 
@@ -608,7 +705,7 @@ body {
 
     .tally-number {
       grid-column: 3;
-      text-align: right;
+      text-align: end;
     }
   }
 }
@@ -723,7 +820,7 @@ body {
   }
 
   .chip {
-    min-height: 2.25rem;
+    min-height: var(--tap);
     padding: 0.375rem 0.875rem;
     font-size: 0.875rem;
     font-weight: 600;
@@ -731,7 +828,7 @@ body {
     cursor: pointer;
     background: #ffffff;
     border: 1px solid var(--border);
-    border-radius: 9999px;
+    border-radius: var(--radius-pill);
     transition:
       transform 150ms var(--ease-smooth),
       background 150ms var(--ease-smooth),
@@ -796,7 +893,7 @@ body {
     padding: 4px;
     object-fit: contain;
     background: #ffffff;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
   }
 
   .tape-title {
@@ -867,11 +964,11 @@ body {
     width: 1.25rem;
     height: 1.25rem;
     place-items: center;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 700;
     color: var(--text-heading);
     background: var(--primary-soft);
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
   }
 
   .form-pip[data-outcome="W"] {
@@ -909,6 +1006,40 @@ body {
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.6);
   }
 
+  /* Long names end in "…" rather than running into the middle column. */
+  .tape-team span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Phones: the title gets its own line above the two names, and the last-five row packs
+     its badges closer (the thread between badges is as wide as the gap) so both sides fit. */
+  @media (max-width: 639px) {
+    .tape-head {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .tape-title {
+      grid-column: 1 / -1;
+      grid-row: 1;
+    }
+
+    .tape-row-form {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 0.5rem;
+    }
+
+    .tape-row-form .form-pips {
+      gap: 3px;
+    }
+
+    .tape-row-form .form-pip[data-prev]::before {
+      width: 3px;
+    }
+  }
+
   /* Weave the ending */
   .ending {
     display: grid;
@@ -936,7 +1067,7 @@ body {
     min-width: 0;
     text-align: center;
     cursor: pointer;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     transition: transform 150ms var(--ease-smooth);
   }
 
@@ -961,7 +1092,7 @@ body {
     height: 7.5rem;
     padding: 0.5rem 0.25rem;
     overflow: hidden;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
   }
 
   .pick[data-pick="none"] .pick-stripe {
@@ -991,7 +1122,7 @@ body {
     font-weight: 700;
     color: var(--text-heading);
     background: #ffffff;
-    border-radius: 9999px;
+    border-radius: var(--radius-pill);
   }
 
   .pick[data-pick="none"] .pick-word {
@@ -1009,7 +1140,7 @@ body {
   }
 
   .pick-meta {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
   }
 
   .ending-peek {
@@ -1029,7 +1160,7 @@ body {
     text-transform: uppercase;
     color: #ffffff;
     background: var(--text-heading);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     box-shadow: var(--shadow-md);
   }
 
@@ -1045,7 +1176,7 @@ body {
     padding: 1.5rem;
     background: #ffffff;
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
   }
 
@@ -1119,7 +1250,7 @@ body {
     margin-top: 1.25rem;
     background: #ffffff;
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
   }
 
@@ -1157,7 +1288,7 @@ body {
   .league .league-team {
     font-weight: 600;
     color: var(--text-heading);
-    text-align: left;
+    text-align: start;
   }
 
   .league-team span {
@@ -1206,7 +1337,7 @@ body {
     font-weight: 700;
     white-space: nowrap;
     cursor: pointer;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     transition: transform 150ms var(--ease-smooth);
   }
 
@@ -1273,7 +1404,7 @@ body {
     margin: auto;
     padding: 0;
     overflow-y: auto;
-    border-radius: 24px;
+    border-radius: var(--radius-xl);
     box-shadow: 0 20px 40px -12px rgba(0, 77, 152, 0.35);
   }
 
@@ -1345,7 +1476,7 @@ body {
   .player-splits th,
   .player-splits td {
     padding: 0.375rem 0.25rem;
-    text-align: right;
+    text-align: end;
     border-top: 1px solid var(--border);
   }
 
@@ -1356,7 +1487,7 @@ body {
   }
 
   .player-splits th:first-child {
-    text-align: left;
+    text-align: start;
   }
 
   .player-splits tbody th {
@@ -1457,7 +1588,7 @@ body {
     font-weight: 600;
     color: var(--text-heading);
     background: #ffffff;
-    border-radius: 9999px;
+    border-radius: var(--radius-pill);
     transition: transform 150ms var(--ease-smooth);
   }
 
@@ -1476,7 +1607,7 @@ body {
     padding: 1.5rem;
     color: #ffffff;
     background: linear-gradient(115deg, var(--barca-garnet), var(--primary) 55%, var(--barca-blue));
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   .briefing-kicker {
@@ -1497,7 +1628,7 @@ body {
     display: grid;
     gap: 0.5rem;
     margin-top: 0.875rem;
-    padding-left: 1.125rem;
+    padding-inline-start: 1.125rem;
     list-style: disc;
   }
 
@@ -1520,7 +1651,7 @@ body {
     font-weight: 700;
     color: var(--text-heading);
     background: var(--primary-soft);
-    border-radius: 9999px;
+    border-radius: var(--radius-pill);
   }
 
   .story-certainty[data-certainty="official"] {
@@ -1541,7 +1672,7 @@ body {
   }
 
   .story-age {
-    margin-left: auto;
+    margin-inline-start: auto;
   }
 
   .story-pending {
@@ -1594,7 +1725,7 @@ body {
     padding: 1rem 1.25rem;
     color: var(--text-heading);
     background: var(--primary-wash);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
   }
 
   .chat-suggestions {
@@ -1612,20 +1743,21 @@ body {
   .chat-question {
     width: fit-content;
     max-width: 85%;
-    margin-left: auto;
+    margin-inline-start: auto;
     padding: 0.5rem 0.875rem;
     color: #ffffff;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
     background: var(--primary);
-    border-radius: 14px 14px 4px 14px;
+    border-radius: var(--radius-lg);
+    border-end-end-radius: 4px;
   }
 
   .chat-answer {
     margin-top: 0.75rem;
-    padding-left: 0.875rem;
+    padding-inline-start: 0.875rem;
     color: var(--text-heading);
-    border-left: 4px solid;
+    border-inline-start: 4px solid;
     border-image: linear-gradient(180deg, var(--barca-garnet), var(--barca-blue)) 1;
   }
 
@@ -1642,7 +1774,7 @@ body {
 
   .answer-text ul,
   .answer-text ol {
-    padding-left: 1.25rem;
+    padding-inline-start: 1.25rem;
     list-style: revert;
   }
 
@@ -1660,8 +1792,9 @@ body {
 
   .answer-text th,
   .answer-text td {
-    padding: 0.25rem 0.75rem 0.25rem 0;
-    text-align: left;
+    padding-block: 0.25rem;
+    padding-inline: 0 0.75rem;
+    text-align: start;
     border-bottom: 1px solid var(--border);
   }
 
@@ -1717,7 +1850,7 @@ body {
     color: var(--text-heading);
     background: #ffffff;
     border: 2px solid var(--border);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     transition: border-color 150ms var(--ease-smooth);
   }
 
@@ -1738,7 +1871,7 @@ body {
     background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(20px);
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
   }
 
@@ -1765,7 +1898,7 @@ body {
     display: block;
     padding: 1.25rem;
     border: 1px solid var(--border);
-    border-radius: 1rem;
+    border-radius: var(--radius-lg);
     background: #ffffff;
     transition:
       transform 150ms var(--ease-smooth),
@@ -2057,7 +2190,7 @@ body {
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.18);
     border-top: 3px solid var(--barca-gold);
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
     backdrop-filter: blur(8px);
     animation: fadeInUp 0.55s var(--ease-out) both;
     transition: transform 200ms var(--ease-smooth);
@@ -2132,7 +2265,7 @@ body {
     place-items: center;
     width: 1.25rem;
     height: 1.25rem;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 800;
     color: var(--barca-navy);
     background: #ffffff;
@@ -2302,7 +2435,7 @@ body {
       align-items: center;
       gap: 0.125rem;
       padding: 0.5rem 0 0.4rem;
-      font-size: 0.65rem;
+      font-size: 0.6875rem;
       font-weight: 600;
       color: rgba(255, 255, 255, 0.65);
       transition: color 150ms var(--ease-smooth);
@@ -2349,15 +2482,16 @@ body {
     padding: 4px;
     background: #ffffff;
     border: 1px solid var(--border);
-    border-radius: 9999px;
+    border-radius: var(--radius-pill);
   }
 
   .segmented-thumb {
     position: absolute;
-    inset: 4px auto 4px 4px;
+    inset-block: 4px;
+    inset-inline-start: 4px;
     width: calc((100% - 8px) / var(--count));
     background: linear-gradient(135deg, var(--barca-blue), var(--barca-garnet));
-    border-radius: 9999px;
+    border-radius: var(--radius-pill);
     transform: translateX(calc(var(--index) * 100%));
     transition: transform 350ms cubic-bezier(0.34, 1.4, 0.64, 1);
   }
@@ -2369,7 +2503,7 @@ body {
     font-weight: 700;
     color: var(--text-heading);
     cursor: pointer;
-    border-radius: 9999px;
+    border-radius: var(--radius-pill);
     transition: color 250ms var(--ease-smooth);
   }
 
@@ -2432,7 +2566,7 @@ body {
     scroll-margin-top: 6rem;
     background: #ffffff;
     border: 1px solid var(--border);
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
     animation: cardPop 0.5s var(--ease-out) both;
     animation-delay: calc(var(--i, 0) * 45ms);
@@ -2444,7 +2578,8 @@ body {
   .match-card::before {
     content: "";
     position: absolute;
-    inset: 0 auto 0 0;
+    inset-block: 0;
+    inset-inline-start: 0;
     width: 6px;
     background: var(--tone);
   }
@@ -2712,7 +2847,7 @@ body {
 
   .wall-table ol {
     margin-top: 0.75rem;
-    text-align: left;
+    text-align: start;
   }
 
   .wall-table li {
@@ -2730,7 +2865,7 @@ body {
   }
 
   .wall-record {
-    margin-left: auto;
+    margin-inline-start: auto;
     font-size: 0.9rem;
     font-weight: 600;
     color: var(--text-heading);
@@ -2803,7 +2938,8 @@ body {
   .briefing::after {
     content: "";
     position: absolute;
-    inset: 0 0 0 auto;
+    inset-block: 0;
+    inset-inline-end: 0;
     width: 40%;
     pointer-events: none;
     background: repeating-linear-gradient(
@@ -2814,21 +2950,22 @@ body {
   }
 
   .briefing-bullets {
-    padding-left: 0;
+    padding-inline-start: 0;
     list-style: none;
     counter-reset: bullet;
   }
 
   .briefing-bullets li {
     position: relative;
-    padding-left: 2.25rem;
+    padding-inline-start: 2.25rem;
     counter-increment: bullet;
   }
 
   .briefing-bullets li::before {
     content: counter(bullet);
     position: absolute;
-    inset: 0.0625rem auto auto 0;
+    inset-block-start: 0.0625rem;
+    inset-inline-start: 0;
     display: grid;
     place-items: center;
     width: 1.5rem;
@@ -2905,7 +3042,7 @@ body {
 
   .story-art-crest {
     position: absolute;
-    right: -1.5rem;
+    inset-inline-end: -1.5rem;
     bottom: -1.5rem;
     width: 8rem;
     height: 8rem;
@@ -2936,15 +3073,16 @@ body {
 
   .story-art-badge {
     position: absolute;
-    inset: 0.625rem auto auto 0.625rem;
+    inset-block-start: 0.625rem;
+    inset-inline-start: 0.625rem;
     padding: 0.125rem 0.625rem;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 800;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--barca-navy);
     background: var(--barca-gold);
-    border-radius: 9999px;
+    border-radius: var(--radius-pill);
   }
 
   .nw-card:hover .story-art-jersey {
@@ -2962,7 +3100,7 @@ body {
     overflow: hidden;
     background: #ffffff;
     border: 1px solid var(--border);
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
     animation: cardPop 0.5s var(--ease-out) both;
     transition:
@@ -3202,7 +3340,8 @@ body {
   /* La Masia graduates wear a small gold badge on the hanger */
   .hanger-masia {
     position: absolute;
-    inset: 1.75rem 0.5rem auto auto;
+    inset-block-start: 1.75rem;
+    inset-inline-end: 0.5rem;
     z-index: 2;
     display: grid;
     place-items: center;
@@ -3228,7 +3367,7 @@ body {
     text-transform: uppercase;
     color: var(--barca-navy);
     background: var(--barca-gold);
-    border-radius: 9999px;
+    border-radius: var(--radius-pill);
   }
 }
 
@@ -3264,7 +3403,7 @@ body {
     max-width: 40rem;
     margin-top: 0.75rem;
     border: 1px solid var(--border);
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
   }
 
@@ -3275,6 +3414,7 @@ body {
 
   .shirt-maker {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: 2rem;
     margin-top: 2rem;
   }
@@ -3285,11 +3425,11 @@ body {
     justify-content: center;
     padding: 2rem 1rem;
     background: var(--barca-navy);
-    border-radius: 20px;
+    border-radius: var(--radius-xl);
   }
 
   .shirt-preview .jersey {
-    width: min(42vw, 15rem);
+    width: min(calc(50% - 0.5rem), 15rem);
     max-width: none;
   }
 
@@ -3320,7 +3460,7 @@ body {
     color: var(--text-heading);
     background: #ffffff;
     border: 2px solid var(--border);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
   }
 
   .shirt-form input:focus-visible {
@@ -3347,17 +3487,17 @@ body {
     display: inline-flex;
     padding: 2px;
     border: 1px solid rgba(255, 255, 255, 0.28);
-    border-radius: 9999px;
+    border-radius: var(--radius-pill);
   }
 
   .lang-toggle button {
     padding: 0.125rem 0.625rem;
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     font-weight: 800;
     letter-spacing: 0.06em;
     color: rgba(255, 255, 255, 0.75);
     cursor: pointer;
-    border-radius: 9999px;
+    border-radius: var(--radius-pill);
     transition:
       color 150ms var(--ease-smooth),
       background 150ms var(--ease-smooth);
@@ -3539,7 +3679,7 @@ body {
     text-align: center;
     background: var(--barca-navy);
     border: 3px solid var(--barca-gold);
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     box-shadow: 10px 10px 0 var(--barca-garnet);
   }
 
@@ -3638,19 +3778,21 @@ body {
   /* Ask Blaugrana: a button at the corner of every page, and a chat that slides in from the side */
   .ask-launch {
     position: fixed;
-    inset: auto 1rem 1rem auto;
+    inset-block-end: 1rem;
+    inset-inline-end: 1rem;
     z-index: 65;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.5rem 1rem 0.5rem 0.625rem;
+    padding-block: 0.5rem;
+    padding-inline: 0.625rem 1rem;
     font-size: 0.85rem;
     font-weight: 800;
     color: var(--barca-navy);
     cursor: pointer;
     background: var(--barca-gold);
     border: 2px solid var(--barca-navy);
-    border-radius: 9999px;
+    border-radius: var(--radius-pill);
     box-shadow:
       0 10px 24px -8px rgba(10, 18, 48, 0.55),
       4px 4px 0 var(--barca-garnet);
@@ -3671,12 +3813,13 @@ body {
     max-width: none;
     height: 100dvh;
     max-height: none;
-    margin: 0 0 0 auto;
+    margin-block: 0;
+    margin-inline: auto 0;
     padding: 0;
     overflow: hidden;
     background: var(--off-white);
     border: none;
-    border-left: 4px solid var(--barca-gold);
+    border-inline-start: 4px solid var(--barca-gold);
   }
 
   .ask-drawer[open] {
@@ -3728,7 +3871,8 @@ body {
 
   @media (max-width: 639px) {
     .ask-launch {
-      inset: auto 0.75rem 5.25rem auto;
+      inset-block-end: 5.25rem;
+      inset-inline-end: 0.75rem;
     }
   }
 
@@ -3757,6 +3901,16 @@ body {
     margin-top: 1.5rem;
   }
 
+  .num-grid-eight {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (min-width: 768px) {
+    .num-grid-eight {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
   .num-grid-three {
     grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
   }
@@ -3775,7 +3929,7 @@ body {
       repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.035) 0 18px, transparent 18px 36px),
       linear-gradient(160deg, #13235a 0%, var(--barca-navy) 70%);
     border-bottom: 5px solid var(--barca-gold);
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     box-shadow: 0 10px 24px -14px rgba(10, 18, 48, 0.7);
     transition:
       transform 200ms var(--ease-smooth),
@@ -3824,7 +3978,7 @@ body {
     margin-top: 1rem;
     color: #ffffff;
     background: var(--grad-blaugrana);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     outline: 2px dashed rgba(255, 255, 255, 0.35);
     outline-offset: -8px;
     box-shadow: 0 14px 30px -16px rgba(90, 31, 110, 0.8);
@@ -3857,8 +4011,8 @@ body {
     font-weight: 900;
     text-transform: uppercase;
     color: var(--text-heading);
-    border-left: 6px solid var(--barca-gold);
-    padding-left: 0.75rem;
+    border-inline-start: 6px solid var(--barca-gold);
+    padding-inline-start: 0.75rem;
   }
 
   .stats-columns {
@@ -3877,13 +4031,17 @@ body {
     color: var(--text-heading);
   }
 
+  .split-record {
+    display: inline-flex;
+  }
+
   /* Wins, draws and defeats in one bar that sweeps in from the left, each part showing its count. */
   .split-bar {
     display: flex;
     height: 1.75rem;
     margin-top: 0.375rem;
     overflow: hidden;
-    border-radius: 9999px;
+    border-radius: var(--radius-pill);
     background: var(--border);
     transform-origin: left;
     animation: barFill 0.9s var(--ease-out) 0.2s backwards;
@@ -3921,7 +4079,7 @@ body {
     height: 5rem;
     margin-top: 1rem;
     overflow: hidden;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     transform-origin: left;
     animation: barFill 0.9s var(--ease-out) 0.2s backwards;
   }
@@ -3976,8 +4134,8 @@ body {
     font-weight: 900;
     text-transform: uppercase;
     color: var(--text-heading);
-    border-left: 6px solid var(--barca-garnet);
-    padding-left: 0.75rem;
+    border-inline-start: 6px solid var(--barca-garnet);
+    padding-inline-start: 0.75rem;
   }
 
   .leaders ol {
@@ -3997,7 +4155,7 @@ body {
     align-items: center;
     gap: 0.625rem;
     padding: 0.5rem 0.625rem;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     transition:
       background 150ms var(--ease-smooth),
       transform 150ms var(--ease-smooth);
@@ -4055,14 +4213,14 @@ body {
     height: 0.75rem;
     overflow: hidden;
     background: var(--border);
-    border-radius: 9999px;
+    border-radius: var(--radius-pill);
   }
 
   .leaders-bar span {
     display: block;
     height: 100%;
     background: linear-gradient(90deg, var(--barca-blue), var(--barca-garnet));
-    border-radius: 9999px;
+    border-radius: var(--radius-pill);
     transform-origin: left;
     animation: barFill 0.8s var(--ease-out) backwards;
     animation-delay: calc(var(--i, 0) * 70ms + 300ms);
@@ -4073,7 +4231,7 @@ body {
     font-size: 1.5rem;
     font-weight: 900;
     color: var(--text-heading);
-    text-align: right;
+    text-align: end;
   }
 
   @media (min-width: 768px) {
@@ -4090,13 +4248,14 @@ body {
     display: grid;
     gap: 2.5rem;
     margin-top: 2.5rem;
-    padding-left: 1.5rem;
+    padding-inline-start: 1.5rem;
   }
 
   .timeline::before {
     content: "";
     position: absolute;
-    inset: 0 auto 0 0.4rem;
+    inset-block: 0;
+    inset-inline-start: 0.4rem;
     width: 4px;
     background: repeating-linear-gradient(
       180deg,
@@ -4113,7 +4272,8 @@ body {
   .moment::before {
     content: "";
     position: absolute;
-    inset: 0.9rem auto auto -1.5rem;
+    inset-block-start: 0.9rem;
+    inset-inline-start: -1.5rem;
     width: 1.1rem;
     height: 1.1rem;
     background: var(--barca-gold);
@@ -4140,8 +4300,10 @@ body {
     margin-top: 0.25rem;
     background: #ffffff;
     border: 1px solid var(--border);
-    border-left: 6px solid var(--barca-gold);
-    border-radius: 6px 16px 16px 6px;
+    border-inline-start: 6px solid var(--barca-gold);
+    border-radius: var(--radius-lg);
+    border-start-start-radius: 6px;
+    border-end-start-radius: 6px;
     box-shadow: var(--shadow-md);
   }
 
@@ -4181,7 +4343,7 @@ body {
     font-size: 0.9rem;
     color: var(--text-heading);
     background: var(--primary-wash);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
   }
 
   .moment-tags {
@@ -4194,17 +4356,17 @@ body {
 
   .moment-tags span {
     padding: 0.0625rem 0.625rem;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 800;
     letter-spacing: 0.05em;
     text-transform: uppercase;
     color: var(--barca-navy);
     background: var(--barca-gold);
-    border-radius: 9999px;
+    border-radius: var(--radius-pill);
   }
 
   .moment-ask {
-    margin-left: auto;
+    margin-inline-start: auto;
     font-size: 0.8rem;
     font-weight: 700;
     color: var(--primary);
@@ -4216,12 +4378,13 @@ body {
 
   @media (min-width: 900px) {
     .timeline {
-      padding-left: 0;
+      padding-inline-start: 0;
     }
 
     .timeline::before {
-      inset: 0 auto 0 50%;
-      margin-left: -2px;
+      inset-block: 0;
+      inset-inline-start: 50%;
+      margin-inline-start: -2px;
     }
 
     .moment {
@@ -4232,17 +4395,19 @@ body {
     }
 
     .moment::before {
-      inset: 50% auto auto 50%;
-      margin: -0.55rem 0 0 -0.55rem;
+      inset-block-start: 50%;
+      inset-inline-start: 50%;
+      margin-block-start: -0.55rem;
+      margin-inline-start: -0.55rem;
     }
 
     .moment-year {
-      text-align: right;
+      text-align: end;
     }
 
     .moment[data-side="right"] .moment-year {
       order: 2;
-      text-align: left;
+      text-align: start;
     }
 
     .moment[data-side="right"] .moment-card {
@@ -4292,7 +4457,7 @@ body {
       gap: 0.125rem;
       width: 100%;
       padding: 0.5rem 0 0.4rem;
-      font-size: 0.65rem;
+      font-size: 0.6875rem;
       font-weight: 600;
       color: rgba(255, 255, 255, 0.65);
       cursor: pointer;
@@ -4310,7 +4475,8 @@ body {
 
     .tabbar-more {
       position: absolute;
-      inset: auto 0.5rem 100% auto;
+      inset-block-end: 100%;
+      inset-inline-end: 0.5rem;
       display: grid;
       gap: 0.125rem;
       min-width: 11rem;
@@ -4318,7 +4484,7 @@ body {
       margin-bottom: 0.5rem;
       background: var(--barca-navy);
       border: 2px solid var(--barca-gold);
-      border-radius: 12px;
+      border-radius: var(--radius-md);
       box-shadow: 0 16px 32px -10px rgba(0, 0, 0, 0.6);
       animation: cardPop 0.25s var(--ease-out) both;
     }
@@ -4333,7 +4499,7 @@ body {
       gap: 0.75rem;
       padding: 0.625rem 0.75rem;
       font-size: 0.9rem;
-      border-radius: 8px;
+      border-radius: var(--radius-sm);
     }
   }
 }
@@ -4394,7 +4560,7 @@ body {
     height: 6px;
     overflow: hidden;
     background: rgba(255, 255, 255, 0.16);
-    border-radius: 9999px;
+    border-radius: var(--radius-pill);
   }
 
   .intro-bar span {
@@ -4541,179 +4707,28 @@ body {
   /* ---------- The news: a front page, not a grid of squares ---------- */
 
   .nw-section-title {
-    padding-left: 0.75rem;
+    padding-inline-start: 0.75rem;
     font-family: var(--font-display);
     font-size: clamp(1.9rem, 5vw, 2.75rem);
     font-weight: 900;
     line-height: 1;
     text-transform: uppercase;
     color: var(--text-heading);
-    border-left: 6px solid var(--barca-garnet);
+    border-inline-start: 6px solid var(--barca-garnet);
   }
 
-  .insiders,
-  .videos,
-  .nw-feed,
-  .fans,
-  .board,
   .sp-related {
     margin-top: 3rem;
   }
 
   /* Breaking: a stadium ticker of the newest headlines */
-  .breaking {
-    display: flex;
-    align-items: stretch;
-    margin-top: 1.5rem;
-    overflow: hidden;
-    color: #ffffff;
-    background: var(--barca-navy);
-    border-radius: 14px;
-    animation: fadeInUp 0.5s var(--ease-out) both;
-  }
-
-  .breaking-label {
-    display: flex;
-    flex: none;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.625rem 1rem;
-    font-size: 0.75rem;
-    font-weight: 900;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    background: var(--barca-garnet);
-  }
-
-  .breaking-label[data-live="false"] {
-    background: var(--barca-blue);
-  }
-
-  .breaking-dot {
-    width: 0.5rem;
-    height: 0.5rem;
-    background: #ffffff;
-    border-radius: 50%;
-    animation: livePulse 1.2s ease-in-out infinite;
-  }
-
-  .breaking-window {
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
-    mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
-  }
-
-  .breaking-track {
-    display: flex;
-    width: max-content;
-    padding-block: 0.625rem;
-    animation: marquee 70s linear infinite;
-  }
-
-  .breaking:hover .breaking-track,
-  .breaking:focus-within .breaking-track {
-    animation-play-state: paused;
-  }
-
-  .breaking-track li {
-    padding-inline: 1.25rem;
-  }
-
-  .breaking-item {
-    font-size: 0.9rem;
-    font-weight: 600;
-    white-space: nowrap;
-  }
-
-  .breaking-item::before {
-    content: "";
-    display: inline-block;
-    width: 0.4rem;
-    height: 0.4rem;
-    margin-right: 0.75rem;
-    vertical-align: middle;
-    background: var(--barca-gold);
-    border-radius: 50%;
-  }
-
-  .breaking-item:hover {
-    color: var(--barca-gold);
-  }
+  
 
   /* The front page: the lead story, and the next biggest beside it */
   .front {
     display: grid;
     gap: 1.25rem;
     margin-top: 1.25rem;
-  }
-
-  .front-side {
-    padding: 1.25rem 1.25rem 0.5rem;
-    background: #ffffff;
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    box-shadow: var(--shadow-md);
-    animation: cardPop 0.5s var(--ease-out) 0.1s both;
-  }
-
-  .front-side-title {
-    padding-bottom: 0.5rem;
-    font-family: var(--font-display);
-    font-size: 1.6rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    color: var(--text-heading);
-    border-bottom: 4px solid var(--barca-gold);
-  }
-
-  .front-list {
-    counter-reset: top;
-  }
-
-  .front-list li {
-    counter-increment: top;
-  }
-
-  .front-list li + li {
-    border-top: 1px solid var(--border);
-  }
-
-  .front-item {
-    display: grid;
-    grid-template-columns: 2.25rem minmax(0, 1fr);
-    column-gap: 0.5rem;
-    padding-block: 0.875rem;
-  }
-
-  .front-item::before {
-    content: counter(top);
-    grid-row: span 2;
-    font-family: var(--font-display);
-    font-size: 2.25rem;
-    font-weight: 900;
-    line-height: 0.9;
-    color: transparent;
-    -webkit-text-stroke: 1.5px var(--barca-garnet);
-  }
-
-  .front-item-title {
-    font-weight: 700;
-    line-height: 1.3;
-    color: var(--text-heading);
-  }
-
-  .front-item:hover .front-item-title {
-    text-decoration: underline;
-    text-decoration-color: var(--barca-gold);
-    text-decoration-thickness: 2px;
-    text-underline-offset: 3px;
-  }
-
-  .front-item-meta {
-    margin-top: 0.25rem;
-    font-size: 0.75rem;
-    font-weight: 600;
   }
 
   @media (min-width: 900px) {
@@ -4734,7 +4749,7 @@ body {
   .nw-card-link:focus-visible {
     outline: 3px solid var(--barca-gold);
     outline-offset: -3px;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .nw-card-foot {
@@ -4807,7 +4822,8 @@ body {
   .nw-card[data-size="text"]::after {
     content: "";
     position: absolute;
-    inset: 0 0 auto auto;
+    inset-block-start: 0;
+    inset-inline-end: 0;
     width: 5rem;
     height: 5rem;
     pointer-events: none;
@@ -4866,11 +4882,6 @@ body {
     }
   }
 
-  .nw-more {
-    display: block;
-    margin: 1.25rem auto 0;
-  }
-
   /* How close a deal is: four segments, filled one after another */
   .meter {
     --on: var(--text-secondary);
@@ -4923,7 +4934,7 @@ body {
   }
 
   .meter-label {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 900;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -4931,110 +4942,7 @@ body {
   }
 
   /* The Here we go board */
-  .board {
-    position: relative;
-    padding: 1.75rem 1.25rem 1.25rem;
-    overflow: hidden;
-    color: #ffffff;
-    background: var(--barca-navy);
-    border-radius: 22px;
-  }
-
-  .board::before {
-    content: "";
-    position: absolute;
-    inset: 0 0 auto auto;
-    width: 55%;
-    height: 100%;
-    pointer-events: none;
-    background: repeating-linear-gradient(
-      100deg,
-      rgba(165, 0, 68, 0.22) 0 34px,
-      rgba(0, 77, 152, 0.22) 34px 68px
-    );
-    mask-image: linear-gradient(90deg, transparent, #000 80%);
-  }
-
-  .board-head {
-    position: relative;
-  }
-
-  .board-title {
-    font-family: var(--font-display);
-    font-size: clamp(2.25rem, 7vw, 3.75rem);
-    font-weight: 900;
-    line-height: 0.92;
-    text-transform: uppercase;
-    color: var(--barca-gold);
-  }
-
-  .board-note {
-    margin-top: 0.375rem;
-    color: rgba(255, 255, 255, 0.7);
-  }
-
-  .board-list {
-    position: relative;
-    display: flex;
-    gap: 0.875rem;
-    margin-top: 1.25rem;
-    padding-bottom: 0.5rem;
-    overflow-x: auto;
-    scroll-snap-type: x proximity;
-    scrollbar-width: thin;
-  }
-
-  .board-list li {
-    flex: 0 0 min(17rem, 78vw);
-    scroll-snap-align: start;
-    animation: cardPop 0.5s var(--ease-out) both;
-    animation-delay: calc(var(--i, 0) * 60ms);
-  }
-
-  .board-card {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    height: 100%;
-    padding: 1rem;
-    color: #ffffff;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 16px;
-    transition:
-      transform 200ms var(--ease-smooth),
-      background 200ms var(--ease-smooth);
-  }
-
-  .board-card:hover {
-    background: rgba(255, 255, 255, 0.12);
-    transform: translateY(-3px);
-  }
-
-  .board-card .meter {
-    --off: rgba(255, 255, 255, 0.18);
-  }
-
-  .board-card .meter[data-step="1"] {
-    --on: #c3cad8;
-  }
-
-  .board-card-title {
-    font-size: 1.05rem;
-    font-weight: 800;
-    line-height: 1.25;
-  }
-
-  .board-card-meta {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
-    margin-top: auto;
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.7);
-  }
+  
 
   /* Scoop badges: initials in a disc, gold for Romano, blue for Ornstein */
   .scoop {
@@ -5051,7 +4959,7 @@ body {
     place-items: center;
     width: 1.6rem;
     height: 1.6rem;
-    font-size: 0.62rem;
+    font-size: 0.6875rem;
     font-weight: 900;
     color: var(--barca-navy);
     background: var(--barca-gold);
@@ -5077,210 +4985,13 @@ body {
   }
 
   /* From the insiders */
-  .insiders-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
-    gap: 1rem;
-    margin-top: 1.25rem;
-  }
-
-  .insider {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 0.625rem;
-    padding: 1.25rem;
-    overflow: hidden;
-    color: inherit;
-    background: #ffffff;
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    box-shadow: var(--shadow-md);
-    transition:
-      transform 200ms var(--ease-smooth),
-      box-shadow 200ms var(--ease-smooth);
-  }
-
-  .insider::before {
-    content: "“";
-    position: absolute;
-    inset: -1.5rem 0.75rem auto auto;
-    font-family: var(--font-display);
-    font-size: 8rem;
-    font-weight: 900;
-    line-height: 1;
-    color: var(--primary-wash);
-    pointer-events: none;
-  }
-
-  .insider:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 18px 36px -14px rgba(0, 77, 152, 0.4);
-  }
-
-  .insider-title {
-    position: relative;
-    font-family: var(--font-display);
-    font-size: 1.45rem;
-    font-weight: 800;
-    line-height: 1.05;
-    text-transform: uppercase;
-    color: var(--text-heading);
-  }
-
-  .insider-summary {
-    display: -webkit-box;
-    overflow: hidden;
-    font-size: 0.9rem;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-  }
-
-  .insider-age {
-    margin-top: auto;
-    font-size: 0.75rem;
-    font-weight: 600;
-  }
+  
 
   /* Barça TV */
-  .video-row {
-    display: flex;
-    gap: 1rem;
-    margin: 1.25rem -1rem 0;
-    padding: 0 1rem 0.75rem;
-    overflow-x: auto;
-    scroll-padding-inline: 1rem;
-    scroll-snap-type: x proximity;
-    scrollbar-width: thin;
-  }
-
-  .video {
-    flex: 0 0 min(22rem, 80vw);
-    scroll-snap-align: start;
-  }
-
-  .video-frame {
-    position: relative;
-    aspect-ratio: 16 / 9;
-    overflow: hidden;
-    background: var(--barca-navy);
-    border-radius: 16px;
-    box-shadow: var(--shadow-md);
-  }
-
-  .video-frame iframe {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    border: 0;
-  }
-
-  .video-poster {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    padding: 0;
-    cursor: pointer;
-    border: 0;
-  }
-
-  .video-poster img {
-    object-fit: cover;
-    transition: transform 400ms var(--ease-smooth);
-  }
-
-  .video-poster:hover img {
-    transform: scale(1.05);
-  }
-
-  .video-poster:focus-visible {
-    outline: 3px solid var(--barca-gold);
-    outline-offset: -3px;
-  }
-
-  .video-play {
-    position: absolute;
-    inset: 50% auto auto 50%;
-    display: grid;
-    place-items: center;
-    width: 3.5rem;
-    height: 3.5rem;
-    margin: -1.75rem 0 0 -1.75rem;
-    background: var(--barca-garnet);
-    border-radius: 50%;
-    box-shadow: 0 8px 24px rgba(10, 18, 48, 0.45);
-    transition: transform 200ms var(--ease-smooth);
-  }
-
-  .video-poster:hover .video-play {
-    transform: scale(1.12);
-  }
-
-  .video-play svg {
-    width: 1.5rem;
-    margin-left: 3px;
-    fill: #ffffff;
-  }
-
-  .video-title {
-    display: -webkit-box;
-    margin-top: 0.625rem;
-    overflow: hidden;
-    font-size: 0.92rem;
-    font-weight: 700;
-    color: var(--text-heading);
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-  }
-
-  .video-age {
-    font-size: 0.75rem;
-  }
+  
 
   /* The fans are saying: speech bubbles */
-  .fan-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
-    gap: 0.625rem;
-    margin-top: 1.25rem;
-  }
-
-  .fan-list li {
-    animation: fadeInUp 0.5s var(--ease-out) both;
-    animation-delay: calc(var(--i, 0) * 50ms);
-  }
-
-  .fan {
-    display: flex;
-    flex-direction: column;
-    gap: 0.375rem;
-    height: 100%;
-    padding: 0.875rem 1rem;
-    color: inherit;
-    background: #ffffff;
-    border: 1px solid var(--border);
-    border-radius: 16px 16px 16px 4px;
-    transition:
-      border-color 150ms var(--ease-smooth),
-      transform 150ms var(--ease-smooth);
-  }
-
-  .fan:hover {
-    border-color: var(--primary);
-    transform: translateY(-2px);
-  }
-
-  .fan-title {
-    font-weight: 600;
-    line-height: 1.35;
-    color: var(--text-heading);
-  }
-
-  .fan-meta {
-    margin-top: auto;
-    font-size: 0.75rem;
-  }
+  
 
   /* ---------- One story, in full ---------- */
   .sp-back {
@@ -5305,13 +5016,13 @@ body {
 
   .sp-topic {
     padding: 0.25rem 0.75rem;
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     font-weight: 900;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: #ffffff;
     background: var(--barca-blue);
-    border-radius: 9999px;
+    border-radius: var(--radius-pill);
   }
 
   .sp-topic[data-topic="transfers"] {
@@ -5356,7 +5067,7 @@ body {
   .sp-art {
     margin-top: 1.5rem;
     overflow: hidden;
-    border-radius: 22px;
+    border-radius: var(--radius-xl);
   }
 
   .sp-art .story-art {
@@ -5380,8 +5091,9 @@ body {
   }
 
   .sp-body p:first-child::first-letter {
-    float: left;
-    margin: 0.3rem 0.6rem 0 0;
+    float: inline-start;
+    margin-block: 0.3rem 0;
+    margin-inline: 0 0.6rem;
     font-family: var(--font-display);
     font-size: 4.25rem;
     font-weight: 900;
@@ -5393,8 +5105,10 @@ body {
     margin-block: 2rem;
     padding: 1.25rem 1.5rem;
     background: var(--primary-wash);
-    border-left: 6px solid var(--barca-garnet);
-    border-radius: 0 16px 16px 0;
+    border-inline-start: 6px solid var(--barca-garnet);
+    border-radius: var(--radius-lg);
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
   }
 
   .sp-quote blockquote {
@@ -5416,7 +5130,7 @@ body {
     padding: 1.25rem 1.5rem;
     color: var(--barca-navy);
     background: var(--barca-gold);
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .sp-next h2,
@@ -5444,7 +5158,7 @@ body {
     font-weight: 600;
     color: var(--primary);
     background: var(--primary-wash);
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
   }
 
   .sp-coverage {
@@ -5457,11 +5171,11 @@ body {
     padding: 1rem 1.25rem;
     background: #ffffff;
     border: 1px solid var(--border);
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
   }
 
   .sp-coverage-outlet {
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     font-weight: 900;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -5485,7 +5199,7 @@ body {
     padding: 1.25rem;
     background: #fbf6ea;
     border: 2px dashed rgba(165, 0, 68, 0.35);
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
     box-shadow:
       0 0 0 5px #fbf6ea,
       var(--shadow-md);
@@ -5501,7 +5215,7 @@ body {
 
   .sp-facts li {
     position: relative;
-    padding-left: 1.1rem;
+    padding-inline-start: 1.1rem;
     font-size: 0.92rem;
     font-weight: 600;
     color: var(--text-heading);
@@ -5514,7 +5228,8 @@ body {
   .sp-facts li::before {
     content: "";
     position: absolute;
-    inset: 0.45rem auto auto 0;
+    inset-block-start: 0.45rem;
+    inset-inline-start: 0;
     width: 0.45rem;
     height: 0.45rem;
     background: var(--barca-gold);
@@ -5533,7 +5248,7 @@ body {
     font-weight: 800;
     color: #ffffff;
     background: linear-gradient(115deg, var(--barca-garnet), var(--barca-blue));
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
     transition: transform 150ms var(--ease-smooth);
   }
 
@@ -5545,7 +5260,7 @@ body {
     padding: 1.125rem 1.25rem;
     background: #ffffff;
     border: 1px solid var(--border);
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
   }
 
   .sp-sources ul {
@@ -5587,15 +5302,6 @@ body {
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .breaking-track {
-      animation: none;
-    }
-
-    .breaking-window {
-      overflow-x: auto;
-    }
-  }
 }
 
 /* ------------------------------------------------------------------
@@ -5688,7 +5394,7 @@ body {
   /* The big story box is very wide and the photos are tall, so the photo takes the right half
      and fades in from the topic colour, which keeps the whole head in frame. */
   .story-art[data-size="hero"] .story-art-photo {
-    left: auto;
+    inset-inline-start: auto;
     width: 55%;
     mask-image: linear-gradient(90deg, transparent 0%, #000 40%);
   }
@@ -5739,6 +5445,23 @@ html[lang="he"] {
   --font-display: var(--font-hebrew);
 }
 
+html[data-lang-pending] body {
+  opacity: 0;
+  animation: languageReveal 0s 2.5s forwards;
+}
+
+@keyframes languageReveal {
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html[lang="he"] body {
+    transition: opacity 0.18s ease-out;
+  }
+}
+
 html[lang="he"] body {
   /* Hebrew letters are not spaced out like capitals; letter-spacing breaks them apart. */
   letter-spacing: normal;
@@ -5748,25 +5471,891 @@ html[lang="he"] [class] {
   letter-spacing: normal;
 }
 
+html[lang="he"] .poster-opponent {
+  /* Heebo's capitals are wider than Big Shoulders' (measured: about 0.68 against 0.54). */
+  --cap-width: 0.7;
+}
+
 [dir="rtl"] .wall,
+[dir="rtl"] .wall-crests,
+[dir="rtl"] .wall-readout,
 [dir="rtl"] .form-pips,
-[dir="rtl"] .ticker,
-[dir="rtl"] .split-bar,
-[dir="rtl"] .halves,
-[dir="rtl"] .leaders-bar,
-[dir="rtl"] .countdown-thread {
+[dir="rtl"] .ticker {
   direction: ltr;
 }
 
-/* Section headings carry their coloured edge on the reading side. */
-[dir="rtl"] .stats-heading,
-[dir="rtl"] .leaders-title {
-  border-left: 0;
-  border-right: 6px solid var(--barca-gold);
-  padding-left: 0;
-  padding-right: 0.75rem;
+/* Bars that are not a timeline read from the right in Hebrew: wins, the first half and the
+   top scorer's bar start on the right and grow leftwards. */
+[dir="rtl"] .split-bar,
+[dir="rtl"] .halves,
+[dir="rtl"] .leaders-bar span,
+[dir="rtl"] .countdown-thread::before {
+  transform-origin: right;
 }
 
-[dir="rtl"] .leaders-title {
-  border-right-color: var(--barca-garnet);
+[dir="rtl"] .split-bar > span + span {
+  box-shadow: inset -2px 0 0 rgba(255, 255, 255, 0.6);
+}
+
+[dir="rtl"] .leaders-bar span {
+  background: linear-gradient(270deg, var(--barca-blue), var(--barca-garnet));
+}
+
+[dir="rtl"] .leaders li[data-first="true"] .leaders-bar span {
+  background: linear-gradient(270deg, var(--barca-gold), #ffd84d);
+}
+
+[dir="rtl"] .countdown-thread::before {
+  background: linear-gradient(270deg, var(--barca-blue), var(--barca-garnet), var(--barca-gold));
+}
+
+[dir="rtl"] .countdown-thread::after {
+  animation-direction: reverse;
+}
+
+/* Right to left, things that slide or point sideways go the other way. Everything that only
+   sits on one side uses start/end properties above, so it mirrors without a rule here. */
+/* The step buttons sit with the wall, older on the left, but the match itself reads in Hebrew. */
+[dir="rtl"] .wall-readout .match-detail {
+  direction: rtl;
+}
+
+[dir="rtl"] .segmented-thumb {
+  transform: translateX(calc(var(--index) * -100%));
+}
+
+[dir="rtl"] .leaders a:hover {
+  transform: translateX(-3px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [dir="rtl"] .ask-drawer[open] {
+    animation-name: drawerInFromLeft;
+  }
+}
+
+@keyframes drawerInFromLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+/* The headline sits on the right, so the dark wash behind it does too. */
+[dir="rtl"] .hero::after {
+  background:
+    linear-gradient(270deg, rgba(6, 11, 31, 0.92) 0%, rgba(6, 11, 31, 0.7) 40%, rgba(6, 11, 31, 0.3) 100%),
+    linear-gradient(180deg, rgba(6, 11, 31, 0.1) 0%, rgba(6, 11, 31, 0.8) 100%);
+}
+
+[dir="rtl"] .story-art[data-size="hero"] .story-art-photo {
+  mask-image: linear-gradient(270deg, transparent 0%, #000 40%);
+}
+
+/* The news in two editions: the world's press and Israel's own, ranked by heat. */
+@layer components {
+  .edition-switch {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-top: 1.75rem;
+  }
+
+  .edition-tab {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 0.75rem;
+    align-items: center;
+    padding: 0.875rem 1rem;
+    color: var(--text-heading);
+    background: #ffffff;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-lg);
+    transition: transform 0.2s var(--ease-smooth), border-color 0.2s var(--ease-smooth);
+  }
+
+  .edition-tab:hover {
+    border-color: var(--primary-light);
+    transform: translateY(-2px);
+  }
+
+  .edition-tab:focus-visible {
+    outline: 3px solid var(--barca-gold);
+    outline-offset: 2px;
+  }
+
+  .edition-flag {
+    grid-row: span 2;
+    font-size: clamp(1.75rem, 6vw, 2.5rem);
+    line-height: 1;
+  }
+
+  .edition-label {
+    font-family: var(--font-display);
+    font-size: clamp(1.15rem, 4vw, 1.6rem);
+    font-weight: 900;
+    line-height: 1.05;
+    text-transform: uppercase;
+  }
+
+  .edition-note {
+    overflow: hidden;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .edition-tab[data-edition="world"][aria-current="page"] {
+    color: #ffffff;
+    background: var(--grad-blaugrana);
+    border-color: transparent;
+  }
+
+  .edition-tab[data-edition="world"][aria-current="page"] .edition-note {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  /* Israel's tab, when chosen, wears the flag's two blue stripes. */
+  .edition-tab[data-edition="israel"][aria-current="page"] {
+    background:
+      linear-gradient(var(--israel-blue), var(--israel-blue)) top / 100% 7px no-repeat,
+      linear-gradient(var(--israel-blue), var(--israel-blue)) bottom / 100% 7px no-repeat,
+      #ffffff;
+    border-color: var(--israel-blue);
+  }
+
+  .edition-tab[data-edition="israel"][aria-current="page"] .edition-label {
+    color: var(--israel-blue);
+  }
+
+  .edition {
+    animation: fadeInUp 0.45s var(--ease-out) both;
+  }
+
+  .edition[data-edition="israel"] .nw-section-title {
+    border-color: var(--israel-blue);
+  }
+
+  .front-lead {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+  }
+
+  .front-hottest {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    font-size: 0.8rem;
+    font-weight: 900;
+    color: var(--barca-garnet);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .abroad-tag {
+    display: inline-flex;
+    gap: 0.25rem;
+    align-items: center;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--primary);
+    text-transform: none;
+    letter-spacing: 0;
+    background: var(--primary-soft);
+    border-radius: var(--radius-pill);
+  }
+
+  .abroad-tag[data-only="true"] {
+    color: #ffffff;
+    background: var(--israel-blue);
+  }
+
+  /* The heat chart: numbered like the charts, with a bar for how hot each story is */
+  .heat {
+    padding: 1.25rem 1.25rem 0.5rem;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    animation: cardPop 0.5s var(--ease-out) 0.1s both;
+  }
+
+  .heat-head {
+    padding-bottom: 0.625rem;
+    border-bottom: 4px solid var(--barca-gold);
+  }
+
+  .heat-title {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 900;
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--text-heading);
+  }
+
+  .heat-note {
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+
+  .heat-list li + li {
+    border-top: 1px solid var(--border);
+  }
+
+  .heat-item {
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    column-gap: 0.625rem;
+    padding-block: 0.875rem;
+  }
+
+  .heat-item:focus-visible {
+    outline: 3px solid var(--barca-gold);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  .heat-rank {
+    font-family: var(--font-display);
+    font-size: 2.25rem;
+    font-weight: 900;
+    line-height: 0.9;
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--barca-garnet);
+  }
+
+  .heat-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-width: 0;
+  }
+
+  .heat-headline {
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--text-heading);
+  }
+
+  .heat-item:hover .heat-headline {
+    text-decoration: underline;
+    text-decoration-color: var(--barca-gold);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+  }
+
+  .heat-bar {
+    position: relative;
+    height: 6px;
+    overflow: hidden;
+    background: var(--primary-wash);
+    border-radius: var(--radius-pill);
+  }
+
+  .heat-bar::after {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: calc(max(var(--heat), 0.06) * 100%);
+    background: linear-gradient(90deg, var(--barca-gold), var(--barca-garnet));
+    border-radius: inherit;
+    transform-origin: left;
+    animation: heatFill 0.8s var(--ease-out) 0.2s both;
+  }
+
+  [dir="rtl"] .heat-bar::after {
+    background: linear-gradient(270deg, var(--barca-gold), var(--barca-garnet));
+    transform-origin: right;
+  }
+
+  .heat-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.625rem;
+    align-items: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  /* The spin: one story, as each city's press tells it */
+  .spin,
+  .gap {
+    margin-top: 3rem;
+  }
+
+  .spin-list {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.25rem;
+  }
+
+  .spin-card {
+    padding: 1.25rem;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+  }
+
+  .spin-story {
+    font-size: 1.05rem;
+    font-weight: 800;
+    line-height: 1.3;
+    color: var(--text-heading);
+  }
+
+  .spin-story:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--barca-gold);
+    text-underline-offset: 3px;
+  }
+
+  .spin-sides {
+    display: grid;
+    gap: 0.75rem;
+    align-items: center;
+    margin-top: 1rem;
+  }
+
+  .spin-take {
+    height: 100%;
+    padding: 0.875rem 1rem;
+    border-radius: var(--radius-lg);
+  }
+
+  .spin-take[data-side="barcelona"] {
+    background: linear-gradient(135deg, rgba(165, 0, 68, 0.08), rgba(0, 77, 152, 0.08));
+    border-inline-start: 5px solid var(--barca-garnet);
+  }
+
+  .spin-take[data-side="madrid"] {
+    background: #f4f2f8;
+    border-inline-start: 5px solid #8a7fa8;
+  }
+
+  .spin-city {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.5rem;
+    align-items: baseline;
+    font-size: 0.75rem;
+    font-weight: 900;
+    color: var(--text-heading);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .spin-outlet {
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .spin-headline {
+    margin-top: 0.4rem;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--text-heading);
+  }
+
+  .spin-headline::before {
+    content: "“";
+  }
+
+  .spin-headline::after {
+    content: "”";
+  }
+
+  .spin-vs {
+    justify-self: center;
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    font-weight: 900;
+    color: var(--barca-navy);
+    text-transform: uppercase;
+    background: var(--barca-gold);
+    border-radius: 50%;
+  }
+
+  @media (min-width: 720px) {
+    .spin-sides {
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    }
+  }
+
+  /* What the world is running that Israel has not */
+  .gap-list {
+    display: grid;
+    gap: 0.625rem;
+    margin-top: 1.25rem;
+  }
+
+  .gap-item {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    column-gap: 1rem;
+    align-items: center;
+    padding: 0.875rem 1rem;
+    background: #ffffff;
+    border: 1px dashed var(--israel-blue);
+    border-radius: var(--radius-lg);
+  }
+
+  .gap-item:hover {
+    background: var(--primary-wash);
+  }
+
+  .gap-count {
+    grid-row: span 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.6875rem;
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--text-secondary);
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .gap-number {
+    font-family: var(--font-display);
+    font-size: 1.9rem;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--israel-blue);
+  }
+
+  .gap-headline {
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--text-heading);
+  }
+
+  .gap-age {
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+
+  .podcasts {
+    margin-top: 3rem;
+  }
+
+  .podcast-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+    gap: 0.875rem;
+    margin-top: 1.25rem;
+  }
+
+  .podcast {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    padding: 1rem;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-inline-start: 6px solid var(--barca-garnet);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+  }
+
+  .podcast-show {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--barca-garnet);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .podcast-title {
+    display: -webkit-box;
+    overflow: hidden;
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--text-heading);
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  .podcast-title:hover {
+    text-decoration: underline;
+  }
+
+  .podcast-age {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+  }
+
+  .podcast audio {
+    width: 100%;
+    margin-top: auto;
+  }
+}
+
+@keyframes heatFill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heat-bar::after,
+  .edition {
+    animation: none;
+  }
+}
+
+/* ==========================================================================
+   Design pass (2026-11-09): shared icons, the Explore doors, the site footer,
+   and touch-size fixes. Uses only the tokens at the top of this file.
+   ========================================================================== */
+@layer components {
+  /* One icon size everywhere: it follows the text it sits beside. */
+  .icon {
+    flex: none;
+    width: 1.25em;
+    height: 1.25em;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .flag {
+    flex: none;
+    width: 1.5em;
+    height: auto;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px rgba(10, 18, 48, 0.12);
+  }
+
+  /* An arrow points the way you read: right in English, left in Hebrew. */
+  [dir="rtl"] .explore-go,
+  [dir="rtl"] .icon-flip {
+    transform: scaleX(-1);
+  }
+
+  .edition-flag {
+    display: grid;
+    place-items: center;
+  }
+
+  .edition-flag .icon {
+    width: 1em;
+    height: 1em;
+    stroke-width: 1.5;
+  }
+
+  .edition-flag .flag {
+    width: 1.1em;
+  }
+
+  .front-hottest .icon {
+    width: 1.15rem;
+    height: 1.15rem;
+    color: var(--barca-garnet);
+    fill: rgba(237, 187, 0, 0.35);
+  }
+
+  .abroad-tag .icon,
+  .abroad-tag .flag {
+    width: 1rem;
+    height: auto;
+  }
+
+  .ask-drawer-close {
+    display: grid;
+    place-items: center;
+    width: var(--tap);
+    height: var(--tap);
+    transition: background var(--dur-fast) var(--ease-smooth);
+  }
+
+  .ask-drawer-close:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .ask-drawer-close .icon {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  /* ---------- The Explore doors ----------
+     Four across on a wide screen and two on a phone, so eight doors never leave an orphan row.
+     Each has its icon on a navy tile with a gold mark, the colours of the away crest. */
+  .explore {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (min-width: 900px) {
+    .explore {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1rem;
+    }
+  }
+
+  .explore-tile {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto 1fr;
+    align-content: start;
+    column-gap: 0.5rem;
+    min-height: 9.5rem;
+    padding: 1.5rem 1rem 1rem;
+    box-shadow: var(--shadow-sm);
+    transition:
+      transform var(--dur-base) var(--ease-smooth),
+      box-shadow var(--dur-base) var(--ease-smooth),
+      background var(--dur-base) var(--ease-smooth);
+  }
+
+  .explore-tile:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .explore-icon {
+    grid-column: 1 / -1;
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-bottom: 0.875rem;
+    color: var(--barca-gold);
+    background: var(--barca-navy);
+    border-radius: var(--radius-md);
+    box-shadow: inset 0 -3px 0 var(--barca-garnet);
+    transition: transform var(--dur-base) var(--ease-smooth);
+  }
+
+  .explore-icon .icon {
+    width: 1.375rem;
+    height: 1.375rem;
+  }
+
+  .explore-tile:hover .explore-icon {
+    transform: rotate(-6deg) scale(1.06);
+  }
+
+  .explore-title {
+    grid-column: 1 / -1;
+    font-size: clamp(1.15rem, 4.2vw, 1.5rem);
+    line-height: 1.05;
+    overflow-wrap: anywhere;
+  }
+
+  .explore-note {
+    grid-column: 1;
+    align-self: end;
+    margin-top: 0.375rem;
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    color: var(--ink-muted);
+  }
+
+  .explore-go {
+    grid-column: 2;
+    align-self: end;
+    width: 1.125rem;
+    height: 1.125rem;
+    color: var(--barca-garnet);
+    transition: translate var(--dur-base) var(--ease-smooth);
+  }
+
+  .explore-tile:hover .explore-go {
+    color: var(--barca-gold);
+    translate: 3px 0;
+  }
+
+  [dir="rtl"] .explore-tile:hover .explore-go {
+    translate: -3px 0;
+  }
+
+  .explore-tile:hover .explore-icon {
+    color: var(--barca-navy);
+    background: var(--barca-gold);
+    box-shadow: none;
+  }
+
+  .home-fresh {
+    margin-top: 3rem;
+    font-size: 0.875rem;
+    text-align: center;
+    color: var(--ink-muted);
+  }
+
+  /* ---------- The site footer ----------
+     It continues the mosaic above it into the night navy of the nav, so every page ends the
+     same way it begins. */
+  .mosaic-band {
+    margin-bottom: -1px;
+  }
+
+  .site-foot {
+    margin-top: 0;
+    /* The bottom leaves room for the floating Ask Blaugrana button, so it never covers a link. */
+    padding: 3rem 1rem calc(5.5rem + env(safe-area-inset-bottom));
+    color: var(--on-dark-muted);
+    background: var(--barca-navy);
+  }
+
+  .site-foot-inner {
+    display: grid;
+    gap: 2.25rem;
+    max-width: 1200px;
+    margin-inline: auto;
+  }
+
+  @media (min-width: 760px) {
+    .site-foot-inner {
+      grid-template-columns: 1.4fr 1fr 1fr;
+      gap: 3rem;
+    }
+  }
+
+  .site-foot-brand {
+    display: grid;
+    align-content: start;
+    gap: 0.5rem;
+    max-width: 22rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  .site-foot-motto {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--barca-gold);
+  }
+
+  .site-foot-col h2 {
+    position: relative;
+    padding-bottom: 0.625rem;
+    margin-bottom: 0.875rem;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--on-dark);
+  }
+
+  /* The shirt, in a short stripe under each heading. */
+  .site-foot-col h2::after {
+    content: "";
+    position: absolute;
+    inset-inline-start: 0;
+    bottom: 0;
+    width: 2.5rem;
+    height: 3px;
+    background: var(--stripe-rule);
+    border-radius: var(--radius-pill);
+  }
+
+  .site-foot-pages {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 1rem;
+  }
+
+  .site-foot-pages a,
+  .site-foot-club a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    min-height: var(--tap);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--on-dark-muted);
+    transition: color var(--dur-fast) var(--ease-smooth);
+  }
+
+  .site-foot-pages a:hover,
+  .site-foot-club a:hover {
+    color: var(--barca-gold);
+  }
+
+  .site-foot-club .icon {
+    color: var(--barca-gold);
+  }
+
+  .site-foot-fine {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+    padding-top: 1.5rem;
+    margin: 2.5rem auto 0;
+    font-size: 0.8125rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .site-foot-fine-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.25rem;
+  }
+
+  .site-foot-fine-links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: var(--tap);
+    font-weight: 700;
+    color: var(--on-dark);
+    text-decoration: underline;
+    text-decoration-color: rgba(237, 187, 0, 0.6);
+    text-underline-offset: 3px;
+  }
+
+  .site-foot-fine-links a:hover {
+    color: var(--barca-gold);
+  }
+
+  /* On phones the tab bar covers the bottom of the page; keep the footer's last line clear of it. */
+  @media (max-width: 639px) {
+    .site-foot {
+      padding-bottom: calc(6.5rem + env(safe-area-inset-bottom));
+    }
+  }
+
+  /* ---------- Touch targets ----------
+     The language switch and filter chips were 32–36px tall; fingers need 44. */
+  .lang-toggle button {
+    min-width: var(--tap);
+    min-height: 2.25rem;
+  }
+
+  @media (pointer: coarse) {
+    .lang-toggle button,
+    .segmented button {
+      min-height: var(--tap);
+    }
+  }
 }

@@ -1,6 +1,6 @@
 // The translated press, independent of the database and any feed.
 
-import type { PressSide, ScoopJournalist } from "@/config/news";
+import type { NewsLanguage, PressSide, ScoopJournalist } from "@/config/news";
 
 export const NEWS_CATEGORIES = ["transfers", "injuries", "match", "club", "other"] as const;
 export type NewsCategory = (typeof NEWS_CATEGORIES)[number];
@@ -24,20 +24,23 @@ export type NewsArticle = {
   certainty: NewsCertainty | null;
   topic: string | null;
   playerNames: string[];
-  language: "es" | "en";
+  language: NewsLanguage;
   /** Set when the story comes from a named journalist, such as Fabrizio Romano. */
   scoopBy: ScoopJournalist | null;
 };
 
-/** A club video or a fan thread: shown as it is, never translated or grouped. */
+/** A club video, a fan thread or a podcast episode: shown as it is, never translated or grouped. */
 export type NewsMedia = {
   id: string;
   url: string;
   outlet: string;
+  pressSide: PressSide;
   title: string;
   publishedAt: Date;
   videoId: string | null;
   author: string | null;
+  /** Podcasts only: the episode's audio file, played on the page. */
+  audioUrl: string | null;
 };
 
 export type BriefingBullet = { text: string; topic: string | null };

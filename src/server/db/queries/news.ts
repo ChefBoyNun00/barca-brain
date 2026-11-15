@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { SCOOP_JOURNALISTS, type FeedKind } from "@/config/news";
+import { PRESS_SIDES, SCOOP_JOURNALISTS, type FeedKind, type PressSide } from "@/config/news";
 import {
   NEWS_CATEGORIES,
   NEWS_CERTAINTIES,
@@ -14,7 +14,7 @@ const ArticleRowSchema = z.object({
   id: z.string(),
   url: z.string(),
   outlet: z.string(),
-  press_side: z.enum(["barcelona", "madrid", "national", "english", "official"]),
+  press_side: z.enum(PRESS_SIDES),
   title_original: z.string(),
   snippet_original: z.string().nullable(),
   published_at: z.coerce.date(),
@@ -24,7 +24,7 @@ const ArticleRowSchema = z.object({
   certainty: z.enum(NEWS_CERTAINTIES).nullable(),
   topic: z.string().nullable(),
   player_names: z.array(z.string()),
-  language: z.enum(["es", "en"]),
+  language: z.enum(["es", "en", "he"]),
   scoop_by: z.enum(SCOOP_JOURNALISTS.map((journalist) => journalist.id)).nullable(),
 });
 
@@ -53,14 +53,22 @@ const toArticles = (rows: unknown): NewsArticle[] =>
       scoopBy: row.scoop_by,
     }));
 
-/** Newest first. Articles judged off-topic are left out, untranslated ones are kept. */
-export async function getRecentArticles(db: Db, limit: number): Promise<NewsArticle[]> {
+/**
+ * Newest first, from some press sides or all. Articles judged off-topic are left out,
+ * untranslated ones are kept. Filtering here, not after, so one country is never crowded out.
+ */
+export async function getRecentArticles(
+  db: Db,
+  limit: number,
+  sides: readonly PressSide[] | null = null,
+): Promise<NewsArticle[]> {
   const { rows } = await db.query(
     `select ${ARTICLE_COLUMNS} from news_articles
      where kind = 'article' and is_relevant is not false
+       and ($2::text[] is null or press_side = any($2))
      order by published_at desc
      limit $1`,
-    [limit],
+    [limit, sides],
   );
   return toArticles(rows);
 }
@@ -89,24 +97,28 @@ const MediaRowSchema = z.object({
   id: z.string(),
   url: z.string(),
   outlet: z.string(),
+  press_side: z.enum(PRESS_SIDES),
   title_original: z.string(),
   published_at: z.coerce.date(),
   video_id: z.string().nullable(),
   author: z.string().nullable(),
+  audio_url: z.string().nullable(),
 });
 
-/** Club videos or fan threads, newest first. */
+/** Club videos, fan threads or podcast episodes, newest first, from some press sides or all. */
 export async function getRecentMedia(
   db: Db,
   kind: Exclude<FeedKind, "article">,
   limit: number,
+  sides: readonly PressSide[] | null = null,
 ): Promise<NewsMedia[]> {
   const { rows } = await db.query(
-    `select id, url, outlet, title_original, published_at, video_id, author from news_articles
-     where kind = $1
+    `select id, url, outlet, press_side, title_original, published_at, video_id, author, audio_url
+     from news_articles
+     where kind = $1 and ($3::text[] is null or press_side = any($3))
      order by published_at desc
      limit $2`,
-    [kind, limit],
+    [kind, limit, sides],
   );
   return z
     .array(MediaRowSchema)
@@ -115,10 +127,12 @@ export async function getRecentMedia(
       id: row.id,
       url: row.url,
       outlet: row.outlet,
+      pressSide: row.press_side,
       title: row.title_original,
       publishedAt: row.published_at,
       videoId: row.video_id,
       author: row.author,
+      audioUrl: row.audio_url,
     }));
 }
 

@@ -4,6 +4,7 @@ import type { SquadPlayer } from "@/domain/home";
 import { getAppDatabase } from "@/server/db/app-database";
 import { getSquad } from "@/server/db/queries/squad";
 import { getCurrentTeamScope } from "@/server/db/team-scope";
+import { T } from "@/i18n/language";
 
 /** Free licences require this credit, so it lists whatever the page actually shows. */
 export async function CreditsList() {
@@ -15,7 +16,9 @@ export async function CreditsList() {
     <>
       <ul className="credits">
         <li>
-          <span className="credits-player">Camp Nou (home page)</span>
+          <span className="credits-player">
+            <T k="credits.stadium" />
+          </span>
           <a href={STADIUM_PHOTO.pageUrl} target="_blank" rel="noreferrer">
             {STADIUM_PHOTO.credit}, {STADIUM_PHOTO.license}
           </a>
@@ -23,11 +26,12 @@ export async function CreditsList() {
       </ul>
       {/* CC BY-SA asks us to say when a photo has been changed. */}
       <p className="section-note">
-        Player photos are colour-tinted in blue and garnet, and the stadium photo is darkened, so
-        text stays readable on top. The originals are at the links.
+        <T k="credits.tinted" />
       </p>
       {credited.length === 0 ? (
-        <p className="section-note">No player photos are in use yet.</p>
+        <p className="section-note">
+          <T k="credits.noPhotos" />
+        </p>
       ) : (
         <PlayerCredits players={credited} />
       )}
@@ -40,7 +44,9 @@ function PlayerCredits({ players }: { players: SquadPlayer[] }) {
     <ul className="credits">
       {players.map(({ id, name, photo }) => (
         <li key={id}>
-          <span className="credits-player">{name}</span>
+          <span className="credits-player">
+            <bdi>{name}</bdi>
+          </span>
           <a href={photo?.pageUrl} target="_blank" rel="noreferrer">
             {photo?.credit ?? "Wikimedia Commons"}, {photo?.license}
           </a>

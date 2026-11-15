@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { Icon } from "@/components/Icon";
 import { usePathname } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { BARCA_CREST_URL } from "@/config/display";
@@ -53,7 +54,7 @@ function Drawer() {
             aria-label={t("ask.close")}
             onClick={() => dialog.current?.close()}
           >
-            ✕
+            <Icon name="close" />
           </button>
         </div>
         <div className="ask-drawer-body">

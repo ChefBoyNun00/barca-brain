@@ -5,9 +5,9 @@ import { connection } from "next/server";
 import { PageLoader } from "@/components/PageLoader";
 import { SiteNav } from "@/components/SiteNav";
 import { describeMatch } from "@/features/home/season-story";
-import { MatchCard } from "@/features/matches/MatchCard";
+import { MatchShare } from "@/features/matches/MatchShare";
 import { getSeasonData } from "@/features/season/get-season-data";
-import { ShareBar } from "@/features/share/ShareBar";
+import { T } from "@/i18n/language";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -31,21 +31,7 @@ async function Detail({ params }: Props) {
   const { id } = await params;
   const match = await findMatch(id);
   if (!match) notFound();
-  return (
-    <>
-      <div className="share-match">
-        <MatchCard match={match} index={0} showShare={false} />
-      </div>
-      <p className="section-note">This is the picture people see when you share it.</p>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img className="share-preview" src={`/card/match/${id}`} alt={describeMatch(match)} />
-      <ShareBar
-        path={`/matches/${id}`}
-        cardPath={`/card/match/${id}`}
-        title={describeMatch(match)}
-      />
-    </>
-  );
+  return <MatchShare match={match} />;
 }
 
 export default function MatchPage({ params }: Props) {
@@ -53,9 +39,13 @@ export default function MatchPage({ params }: Props) {
     <>
       <SiteNav />
       <main className="page-gutter flex-1 pt-10 pb-16">
-        <p className="kicker">Share a match</p>
-        <h1 className="display-title mt-3">The match</h1>
-        <Suspense fallback={<PageLoader label="Loading" />}>
+        <p className="kicker">
+          <T k="share.matchKicker" />
+        </p>
+        <h1 className="display-title mt-3">
+          <T k="share.matchTitle" />
+        </h1>
+        <Suspense fallback={<PageLoader />}>
           <Detail params={params} />
         </Suspense>
       </main>

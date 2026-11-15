@@ -14,7 +14,7 @@ export default function MatchesRoute() {
     <>
       <SiteNav />
       <main className="flex-1 pb-16">
-        <Suspense fallback={<PageLoader label="Loading matches" />}>
+        <Suspense fallback={<PageLoader label="loading.matches" />}>
           <MatchesPage />
         </Suspense>
       </main>

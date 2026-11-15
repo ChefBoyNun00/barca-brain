@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { FeedKind, PressSide, ScoopJournalist } from "@/config/news";
+import type { FeedKind, NewsLanguage, PressSide, ScoopJournalist } from "@/config/news";
 import { NEWS_CATCH_ALL_TOPICS, SCOOP_JOURNALISTS } from "@/config/news";
 import type { BriefingBullet } from "@/domain/news";
 import type { StorySource, Translation, WrittenStory } from "@/server/news/types";
@@ -10,7 +10,7 @@ export type ArticleToStore = FeedArticle & {
   dedupeKey: string;
   pressSide: PressSide;
   kind: FeedKind;
-  language: "es" | "en";
+  language: NewsLanguage;
   scoopBy: ScoopJournalist | null;
 };
 
@@ -19,8 +19,8 @@ export async function insertArticle(db: Db, article: ArticleToStore): Promise<bo
   const { rows } = await db.query(
     `insert into news_articles
        (url, dedupe_key, outlet, press_side, title_original, snippet_original, published_at,
-        kind, language, scoop_by, video_id, author)
-     values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+        kind, language, scoop_by, video_id, author, audio_url)
+     values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
      on conflict do nothing
      returning id`,
     [
@@ -36,6 +36,7 @@ export async function insertArticle(db: Db, article: ArticleToStore): Promise<bo
       article.scoopBy,
       article.videoId ?? null,
       article.author ?? null,
+      article.audioUrl ?? null,
     ],
   );
   return rows.length > 0;

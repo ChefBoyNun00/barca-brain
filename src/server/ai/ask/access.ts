@@ -1,6 +1,7 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import { ASK_MAX_MESSAGE_CHARS, ASK_MAX_MESSAGES, ASK_REQUESTS_PER_HOUR } from "@/config/ai";
+import { LANGUAGES } from "@/i18n/dictionary";
 
 const HOUR_MS = 3_600_000;
 
@@ -15,6 +16,8 @@ export const AskRequestSchema = z.object({
     .min(1)
     .max(ASK_MAX_MESSAGES)
     .refine((messages) => messages.at(-1)?.role === "user" && messages[0]?.role === "user"),
+  /** The language the fan reads the site in, so the answer comes back in it. */
+  language: z.enum(LANGUAGES).default("en"),
 });
 
 const digest = (text: string) => createHash("sha256").update(text).digest();

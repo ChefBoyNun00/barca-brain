@@ -1,36 +1,53 @@
 import {
   COMPETITION_DISPLAY_NAMES,
-  DISPLAY_LOCALE,
+  COMPETITION_DISPLAY_NAMES_HE,
+  DISPLAY_LOCALES,
   DISPLAY_TIME_ZONE,
 } from "@/config/display";
+import { isTextKey, translate, type Language } from "@/i18n/dictionary";
 
 const HOUR_MS = 3_600_000;
 const DAY_MS = 24 * HOUR_MS;
-
-const plural = (count: number, unit: string) => `${count} ${unit}${count === 1 ? "" : "s"}`;
 
 export function formatSeason(season: number): string {
   return `${season}–${String(season + 1).slice(-2)}`;
 }
 
-export function displayCompetition(name: string): string {
+/** The competition as fans call it, in the visitor's language. Server code and AI tools pass no language and get English. */
+export function displayCompetition(name: string, language: Language = "en"): string {
+  if (language === "he") return COMPETITION_DISPLAY_NAMES_HE[name] ?? COMPETITION_DISPLAY_NAMES[name] ?? name;
   return COMPETITION_DISPLAY_NAMES[name] ?? name;
 }
 
-export function formatKickoff(date: Date): string {
-  return new Intl.DateTimeFormat(DISPLAY_LOCALE, {
+/**
+ * The round as the provider names it ("Matchday 12", "Quarter finals"), in the visitor's language.
+ * English keeps the stored text exactly; a round the dictionary doesn't know shows as stored.
+ */
+export function displayRound(round: string | null, language: Language = "en"): string | null {
+  if (round === null || language === "en") return round;
+  const matchday = /^Matchday (\d+)$/.exec(round);
+  if (matchday) return translate(language, "round.matchday", { n: Number(matchday[1]) });
+  const key = `round.${round}`;
+  return isTextKey(key) ? translate(language, key) : round;
+}
+
+export function formatKickoff(date: Date, language: Language = "en"): string {
+  return new Intl.DateTimeFormat(DISPLAY_LOCALES[language], {
     timeZone: DISPLAY_TIME_ZONE,
     weekday: "short",
     day: "numeric",
     month: "short",
     hour: "2-digit",
     minute: "2-digit",
-    timeZoneName: "short",
-  }).format(date);
+    // English says "GMT+2"; Hebrew readers expect "שעון ישראל" (Israel time) instead.
+    timeZoneName: language === "en" ? "short" : undefined,
+  })
+    .format(date)
+    .concat(language === "en" ? "" : ` ${translate(language, "time.zone")}`);
 }
 
-export function formatMatchDate(date: Date): string {
-  return new Intl.DateTimeFormat(DISPLAY_LOCALE, {
+export function formatMatchDate(date: Date, language: Language = "en"): string {
+  return new Intl.DateTimeFormat(DISPLAY_LOCALES[language], {
     timeZone: DISPLAY_TIME_ZONE,
     day: "numeric",
     month: "short",
@@ -49,11 +66,19 @@ export function getCountdownParts(kickoffAt: Date, now: Date): CountdownParts {
   };
 }
 
-export function formatUpdatedAgo(updatedAt: Date, now: Date): string {
+export function formatUpdatedAgo(updatedAt: Date, now: Date, language: Language = "en"): string {
   const elapsed = Math.max(0, now.getTime() - updatedAt.getTime());
-  if (elapsed < HOUR_MS) return "Updated within the last hour";
-  if (elapsed < DAY_MS) return `Updated ${plural(Math.floor(elapsed / HOUR_MS), "hour")} ago`;
-  return `Updated ${plural(Math.floor(elapsed / DAY_MS), "day")} ago`;
+  if (elapsed < HOUR_MS) return translate(language, "updated.recent");
+  if (elapsed < DAY_MS) {
+    const hours = Math.floor(elapsed / HOUR_MS);
+    return hours === 1
+      ? translate(language, "updated.hour")
+      : translate(language, "updated.hours", { n: hours });
+  }
+  const days = Math.floor(elapsed / DAY_MS);
+  return days === 1
+    ? translate(language, "updated.day")
+    : translate(language, "updated.days", { n: days });
 }
 
 /** A blank stat stays visibly blank, because the provider never said it was zero. */

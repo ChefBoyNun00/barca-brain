@@ -1,4 +1,8 @@
+"use client";
+
 import Image from "next/image";
+import { useLanguage, useT } from "@/i18n/language";
+import { formatScore } from "@/i18n/numbers";
 import type { LeagueRow, SeasonMatch } from "@/domain/home";
 import { FormPips } from "./FormPips";
 import { formatMatchDate } from "./format";
@@ -17,7 +21,9 @@ type TaleOfTheTapeProps = { table: LeagueRow[]; matches: SeasonMatch[]; opponent
 
 /** How the two sides compare in the league. Skipped for opponents outside it. */
 export function TaleOfTheTape({ table, matches, opponentId }: TaleOfTheTapeProps) {
-  const tape = buildTape(table, opponentId);
+  const t = useT();
+  const language = useLanguage();
+  const tape = buildTape(table, opponentId, language);
   if (!tape) return null;
   const lastMeeting = findLastMeeting(matches, opponentId);
 
@@ -25,7 +31,7 @@ export function TaleOfTheTape({ table, matches, opponentId }: TaleOfTheTapeProps
     <div className="tape">
       <div className="tape-head">
         <TapeTeam team={tape.barca} />
-        <p className="tape-title">Tale of the tape</p>
+        <p className="tape-title">{t("tape.title")}</p>
         <TapeTeam team={tape.rival} />
       </div>
       <dl>
@@ -35,7 +41,7 @@ export function TaleOfTheTape({ table, matches, opponentId }: TaleOfTheTapeProps
             <div className="tape-middle">
               <dt>{label}</dt>
               <dd className="sr-only">
-                Barça {barca}, {tape.rival.name} {rival}
+                {t("tape.values", { barca, rival: tape.rival.name, rivalValue: rival })}
               </dd>
               <div aria-hidden="true" className="tape-bar">
                 <span style={{ flexGrow: barcaShare }} />
@@ -45,18 +51,22 @@ export function TaleOfTheTape({ table, matches, opponentId }: TaleOfTheTapeProps
             <span className="tape-value">{rival}</span>
           </div>
         ))}
-        <div className="tape-row">
+        <div className="tape-row tape-row-form">
           <FormPips form={tape.barca.form} />
           <div className="tape-middle">
-            <dt>Last five</dt>
+            <dt>{t("tape.lastFive")}</dt>
           </div>
           <FormPips form={tape.rival.form} />
         </div>
       </dl>
       {lastMeeting && (
         <p className="tape-note">
-          Last time, {formatMatchDate(lastMeeting.kickoffAt)}: Barça {lastMeeting.goalsFor}–
-          {lastMeeting.goalsAgainst} {tape.rival.name}, {lastMeeting.isHome ? "at home" : "away"}.
+          {t("tape.last", {
+            date: formatMatchDate(lastMeeting.kickoffAt, language),
+            score: formatScore(language, lastMeeting.goalsFor, lastMeeting.goalsAgainst),
+            rival: tape.rival.name,
+            venue: t(lastMeeting.isHome ? "venue.home" : "venue.away"),
+          })}
         </p>
       )}
     </div>

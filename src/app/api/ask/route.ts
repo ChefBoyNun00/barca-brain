@@ -6,14 +6,23 @@ import { createClaudeClient, hasClaudeKey } from "@/server/ai/client";
 
 export const maxDuration = 60;
 
-type WireEvent = AskEvent | { type: "error"; message: string } | { type: "done" };
+/** The reason travels with the message, so the browser can show it in the visitor's language. */
+type FailureReason = "key" | "busy" | "failed";
+type WireEvent =
+  | AskEvent
+  | { type: "error"; message: string; reason: FailureReason }
+  | { type: "done" };
 
 const refuse = (status: number, reason: string) => Response.json({ reason }, { status });
 
-function describeFailure(error: unknown): string {
-  if (error instanceof Anthropic.AuthenticationError) return "The Claude API key was rejected.";
-  if (error instanceof Anthropic.RateLimitError) return "Claude is busy. Try again in a minute.";
-  return "Something went wrong answering that. Try again.";
+function describeFailure(error: unknown): { message: string; reason: FailureReason } {
+  if (error instanceof Anthropic.AuthenticationError) {
+    return { message: "The Claude API key was rejected.", reason: "key" };
+  }
+  if (error instanceof Anthropic.RateLimitError) {
+    return { message: "Claude is busy. Try again in a minute.", reason: "busy" };
+  }
+  return { message: "Something went wrong answering that. Try again.", reason: "failed" };
 }
 
 export async function POST(request: Request): Promise<Response> {
@@ -37,7 +46,12 @@ export async function POST(request: Request): Promise<Response> {
       const send = (event: WireEvent) =>
         controller.enqueue(encoder.encode(`${JSON.stringify(event)}\n`));
       try {
-        const answer = streamAnswer(createClaudeClient(), body.data.messages, createAskContext());
+        const answer = streamAnswer(
+          createClaudeClient(),
+          body.data.messages,
+          createAskContext(),
+          body.data.language,
+        );
         for await (const event of answer) {
           if (cancelled) return;
           send(event);
@@ -45,7 +59,7 @@ export async function POST(request: Request): Promise<Response> {
         send({ type: "done" });
       } catch (error) {
         console.error("Ask failed:", error instanceof Error ? error.name : "unknown error");
-        if (!cancelled) send({ type: "error", message: describeFailure(error) });
+        if (!cancelled) send({ type: "error", ...describeFailure(error) });
       }
       if (!cancelled) controller.close();
     },

@@ -1,6 +1,6 @@
 "use client";
 
-import { setLanguage, useLanguage } from "@/i18n/language";
+import { setLanguage, useLanguage, useT } from "@/i18n/language";
 
 const OPTIONS = [
   { id: "he", label: "עב", name: "עברית" },
@@ -10,8 +10,9 @@ const OPTIONS = [
 /** עברית / English. Remembers the choice in this browser. */
 export function LanguageToggle() {
   const language = useLanguage();
+  const t = useT();
   return (
-    <div role="group" aria-label="Language" className="lang-toggle">
+    <div role="group" aria-label={t("a11y.language")} className="lang-toggle">
       {OPTIONS.map(({ id, label, name }) => (
         <button
           key={id}

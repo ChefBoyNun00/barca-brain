@@ -1,26 +1,27 @@
 import type { SquadPlayer } from "@/domain/home";
 import type { NewsCertainty } from "@/domain/news";
+import type { TextKey } from "@/i18n/dictionary";
 import { T } from "@/i18n/language";
 import { ScoopBadge } from "./ScoopBadge";
 import { StoryArt } from "./StoryArt";
 import { StoryLink } from "./StoryLink";
 import {
   certaintyOf,
-  formatStoryAge,
-  headlineOf,
   isCoveredByBothCities,
   isUntranslated,
   scoopOf,
   standfirstOf,
   type NewsStory,
 } from "./stories";
+import { StoryAge } from "./StoryAge";
+import { StoryHeadline, StoryStandfirst, TranslationPending } from "./StoryText";
 
-export const CERTAINTY_LABELS: Record<NewsCertainty, string> = {
-  official: "Official",
-  reported: "Reported",
-  rumour: "Rumour",
-  opinion: "Opinion",
-  news: "News",
+export const CERTAINTY_LABELS: Record<NewsCertainty, TextKey> = {
+  official: "certainty.official",
+  reported: "certainty.reported",
+  rumour: "certainty.rumour",
+  opinion: "certainty.opinion",
+  news: "certainty.news",
 };
 
 /** wide: picture beside the words. text: no picture, a bold colour block. tile: the default. */
@@ -53,18 +54,26 @@ export function StoryCard({ story, squad, now, size, tone }: StoryCardProps) {
           <div className="story-tags">
             {certainty && (
               <span className="story-certainty" data-certainty={certainty}>
-                {CERTAINTY_LABELS[certainty]}
+                <T k={CERTAINTY_LABELS[certainty]} />
               </span>
             )}
-            {isCoveredByBothCities(story) && <span className="story-both">Both cities</span>}
-            <span className="story-age">{formatStoryAge(story.latestAt, now)}</span>
+            {isCoveredByBothCities(story) && (
+              <span className="story-both">
+                <T k="news.bothCities" />
+              </span>
+            )}
+            <span className="story-age"><StoryAge date={story.latestAt} now={now} /></span>
           </div>
 
-          <Title className="nw-title" lang={untranslated ? "es" : "en"}>
-            {headlineOf(story)}
+          <Title className="nw-title" lang={untranslated ? story.lead.language : undefined} dir="auto">
+            <StoryHeadline story={story} />
           </Title>
-          {standfirst && <p className="nw-summary">{standfirst}</p>}
-          {untranslated && <p className="story-pending">Still in Spanish: translation pending.</p>}
+          {standfirst && (
+            <p className="nw-summary" dir="auto">
+              <StoryStandfirst story={story} />
+            </p>
+          )}
+          {untranslated && <TranslationPending story={story} />}
 
           <div className="nw-card-foot">
             {scoop ? (
@@ -80,7 +89,7 @@ export function StoryCard({ story, squad, now, size, tone }: StoryCardProps) {
             )}
             {story.writeup && size === "lead" && (
               <span className="nw-read">
-                <T k="news.readStory" /> →
+                <T k="news.readStory" /> <T k="arrow.forward" />
               </span>
             )}
           </div>

@@ -4,6 +4,7 @@ import {
   FAN_THREAD_SKIP,
   NEWS_MAX_AGE_DAYS,
   OUTLET_SIDES,
+  PODCAST_MAX_AGE_DAYS,
   SCOOP_JOURNALISTS,
   type NewsFeed,
   type PressSide,
@@ -26,7 +27,9 @@ export function makeDedupeKey(title: string): string {
 
 function isWanted(article: FeedArticle, feed: NewsFeed, now: Date): boolean {
   const age = now.getTime() - article.publishedAt.getTime();
-  if (age > NEWS_MAX_AGE_DAYS * DAY_MS) return false;
+  const maxAgeDays = feed.kind === "podcast" ? PODCAST_MAX_AGE_DAYS : NEWS_MAX_AGE_DAYS;
+  if (age > maxAgeDays * DAY_MS) return false;
+  if (feed.kind === "podcast" && !article.audioUrl) return false;
   if (BLOCKED_OUTLETS.has(article.outlet)) return false;
   if (feed.kind === "fan" && FAN_THREAD_SKIP.test(article.title)) return false;
   if (feed.barcaOnly) return true;
@@ -38,9 +41,15 @@ export function findScoop(text: string): ScoopJournalist | null {
   return SCOOP_JOURNALISTS.find((journalist) => journalist.pattern.test(text))?.id ?? null;
 }
 
+const SIDE_BY_LANGUAGE: Record<NewsFeed["language"], PressSide> = {
+  es: "national",
+  en: "english",
+  he: "israel",
+};
+
 function sideOf(outlet: string, feed: NewsFeed): PressSide {
   if (feed.kind === "video") return "official";
-  return OUTLET_SIDES[outlet] ?? (feed.language === "en" ? "english" : "national");
+  return OUTLET_SIDES[outlet] ?? SIDE_BY_LANGUAGE[feed.language];
 }
 
 export function prepareArticles(

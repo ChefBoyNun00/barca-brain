@@ -1,30 +1,29 @@
-import Image from "next/image";
 import Link from "next/link";
 import { connection } from "next/server";
+import { Icon, type IconName } from "@/components/Icon";
 import { CURRENT_SEASON } from "@/config/football";
 import type { TextKey } from "@/i18n/dictionary";
 import { T } from "@/i18n/language";
-import { Countdown } from "./Countdown";
+import { HomeFooter } from "./HomeFooter";
 import { HomeHero } from "./HomeHero";
 import { getMatchdayState } from "./matchday";
+import { NextMatchPoster } from "./NextMatchPoster";
 import { ResultsTicker } from "./ResultsTicker";
 import { SeasonSelectionProvider } from "./season-selection";
 import { WovenSeason } from "./WovenSeason";
-import { displayCompetition, formatKickoff, formatUpdatedAgo } from "./format";
 import { getHomeData } from "./get-home-data";
 import { getLastPlayedIndex, getNextMatchIndex, summariseSeason } from "./season-story";
-import { TaleOfTheTape } from "./TaleOfTheTape";
 
 const EXPLORE = [
-  { href: "/squad", title: "explore.squad", note: "explore.squadNote" },
-  { href: "/table", title: "explore.table", note: "explore.tableNote" },
-  { href: "/season", title: "explore.ending", note: "explore.endingNote" },
-  { href: "/news", title: "explore.press", note: "explore.pressNote" },
-  { href: "/stats", title: "explore.stats", note: "explore.statsNote" },
-  { href: "/history", title: "explore.history", note: "explore.historyNote" },
-  { href: "/shirt", title: "explore.shirt", note: "explore.shirtNote" },
-  { href: "/ask", title: "explore.ask", note: "explore.askNote" },
-] as const satisfies readonly { href: string; title: TextKey; note: TextKey }[];
+  { href: "/squad", title: "explore.squad", note: "explore.squadNote", icon: "shirt" },
+  { href: "/table", title: "explore.table", note: "explore.tableNote", icon: "table" },
+  { href: "/season", title: "explore.ending", note: "explore.endingNote", icon: "ending" },
+  { href: "/news", title: "explore.press", note: "explore.pressNote", icon: "news" },
+  { href: "/stats", title: "explore.stats", note: "explore.statsNote", icon: "stats" },
+  { href: "/history", title: "explore.history", note: "explore.historyNote", icon: "history" },
+  { href: "/shirt", title: "explore.shirt", note: "explore.shirtNote", icon: "shirt" },
+  { href: "/ask", title: "explore.ask", note: "explore.askNote", icon: "ask" },
+] as const satisfies readonly { href: string; title: TextKey; note: TextKey; icon: IconName }[];
 
 /** Runs per request, so the page always reads the latest ingested data. */
 export async function HomeDashboard() {
@@ -34,8 +33,12 @@ export async function HomeDashboard() {
   if (matches.length === 0) {
     return (
       <section className="page-gutter py-24 text-center">
-        <h1 className="display-title">The shirt isn&apos;t woven yet</h1>
-        <p className="mt-4">Matches will appear here after the next daily update.</p>
+        <h1 className="display-title">
+          <T k="home.empty" />
+        </h1>
+        <p className="mt-4">
+          <T k="home.emptyNote" />
+        </p>
       </section>
     );
   }
@@ -64,37 +67,7 @@ export async function HomeDashboard() {
       </div>
 
       {nextMatch && (
-        <section aria-labelledby="next-up" className="poster reveal">
-          <div className="page-gutter poster-inner">
-            <p id="next-up" className="poster-kicker">
-              <T k="home.nextMatch" />
-            </p>
-            <div className="poster-teams">
-              {nextMatch.opponent?.logoUrl && (
-                <Image src={nextMatch.opponent.logoUrl} alt="" width={96} height={96} unoptimized />
-              )}
-              <p className="poster-opponent">{nextMatch.opponent?.name ?? "To be decided"}</p>
-            </div>
-            <p className="poster-meta">
-              {nextMatch.isHome ? "At home" : "Away"} ·{" "}
-              {[displayCompetition(nextMatch.competition), nextMatch.round]
-                .filter(Boolean)
-                .join(" · ")}{" "}
-              · {formatKickoff(nextMatch.kickoffAt)}
-            </p>
-            <Countdown kickoffAt={nextMatch.kickoffAt} serverNow={now} />
-            <TaleOfTheTape table={table} matches={matches} opponentId={nextMatch.opponent?.id} />
-            <Link
-              className="poster-ask"
-              href={{
-                pathname: "/ask",
-                query: { q: "Preview the next match for me" },
-              }}
-            >
-              Ask Blaugrana for a preview →
-            </Link>
-          </div>
-        </section>
+        <NextMatchPoster match={nextMatch} matches={matches} table={table} now={now} />
       )}
 
       <nav aria-labelledby="explore" className="page-gutter section reveal">
@@ -102,32 +75,24 @@ export async function HomeDashboard() {
           <T k="home.explore" />
         </h2>
         <div className="explore">
-          {EXPLORE.map(({ href, title, note }) => (
+          {EXPLORE.map(({ href, title, note, icon }) => (
             <Link key={href} href={href} className="explore-tile">
+              <span className="explore-icon">
+                <Icon name={icon} />
+              </span>
               <span className="explore-title">
                 <T k={title} />
               </span>
               <span className="explore-note">
                 <T k={note} />
               </span>
+              <Icon name="arrow" className="icon explore-go" />
             </Link>
           ))}
         </div>
       </nav>
 
-      <footer className="page-gutter pb-12 text-center text-sm">
-        {lastUpdatedAt && `${formatUpdatedAgo(lastUpdatedAt, now)}. `}Scores can lag behind real
-        time.
-        <br />
-        Unofficial fan project, not affiliated with FC Barcelona.{" "}
-        <a href="/calendar.ics" className="footer-link">
-          Add fixtures to your calendar
-        </a>{" "}
-        ·{" "}
-        <Link href="/credits" className="footer-link">
-          Credits
-        </Link>
-      </footer>
+      <HomeFooter lastUpdatedAt={lastUpdatedAt} now={now} />
     </SeasonSelectionProvider>
   );
 }

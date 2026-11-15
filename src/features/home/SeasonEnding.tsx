@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { RACE_TEAMS_LIMIT } from "@/config/display";
+import { useLanguage, useT } from "@/i18n/language";
 import type { LeagueRow, SeasonMatch } from "@/domain/home";
 import { formatMatchDate } from "./format";
 import { describeOutcome, type MatchOutcome } from "./season-story";
@@ -28,10 +29,12 @@ type PickTileProps = {
 };
 
 function PickTile({ match, index, pick, rank, onTap }: PickTileProps) {
-  const opponent = match.opponent?.name ?? "To be decided";
-  const venue = match.isHome ? "at home" : "away";
-  const date = formatMatchDate(match.kickoffAt);
-  const word = pick ? describeOutcome(pick) : "Tap";
+  const t = useT();
+  const language = useLanguage();
+  const opponent = match.opponent?.name ?? t("common.tbd");
+  const venue = t(match.isHome ? "venue.home" : "venue.away");
+  const date = formatMatchDate(match.kickoffAt, language);
+  const word = pick ? describeOutcome(pick, language) : t("pick.tap");
   return (
     <button
       type="button"
@@ -39,9 +42,12 @@ function PickTile({ match, index, pick, rank, onTap }: PickTileProps) {
       data-pick={pick ?? "none"}
       data-tone={index % 2 === 0 ? "garnet" : "blue"}
       onClick={onTap}
-      aria-label={`${opponent}, ${venue}, ${date}. ${
-        pick ? `Your pick: ${word}` : "No pick yet"
-      }. Press to change.`}
+      aria-label={t("pick.aria", {
+        opponent,
+        venue,
+        date,
+        state: pick ? t("pick.yours", { word }) : t("pick.none"),
+      })}
     >
       <span className="pick-stripe">
         {pick === "L" && (
@@ -56,9 +62,11 @@ function PickTile({ match, index, pick, rank, onTap }: PickTileProps) {
         )}
         <span className="pick-word">{word}</span>
       </span>
-      <span className="pick-name">{opponent}</span>
+      <span className="pick-name" dir="auto">
+        {opponent}
+      </span>
       <span className="pick-meta">
-        {match.isHome ? "Home" : "Away"}
+        {t(match.isHome ? "match.home" : "match.away")}
         {rank ? ` · ${rank}` : ""}
       </span>
     </button>
@@ -69,6 +77,8 @@ type SeasonEndingProps = { matches: SeasonMatch[]; table: LeagueRow[] };
 
 /** The viewer decides the rest of the league season and sees where it leads. */
 export function SeasonEnding({ matches, table }: SeasonEndingProps) {
+  const t = useT();
+  const language = useLanguage();
   const [savedPicks, savePicks] = useEndingPicks();
   const remaining = getRemainingLeagueMatches(matches);
   // Saved picks for a match that has since been played no longer mean anything.
@@ -78,7 +88,7 @@ export function SeasonEnding({ matches, table }: SeasonEndingProps) {
       return pick ? [[match.id, pick] as const] : [];
     }),
   );
-  const ending = projectEnding(table, remaining, picks);
+  const ending = projectEnding(table, remaining, picks, language);
   if (!ending) return null;
 
   const rankOf = new Map(table.map((row) => [row.teamId, row.rank]));
@@ -93,12 +103,12 @@ export function SeasonEnding({ matches, table }: SeasonEndingProps) {
   return (
     <section id="ending" aria-labelledby="ending-title" className="page-gutter section reveal">
       <h1 id="ending-title" className="section-title">
-        Weave the ending
+        {t("explore.ending")}
       </h1>
       <p className="section-note">
         {remaining.length === 0
-          ? "The league season is over, so there is nothing left to decide."
-          : `${remaining.length} league stripes are still empty. Tap one to choose a win, a draw or a defeat. This is a what-if, not a prediction.`}
+          ? t("ending.over")
+          : t("ending.intro", { count: remaining.length })}
       </p>
 
       {remaining.length > 0 && (
@@ -110,14 +120,14 @@ export function SeasonEnding({ matches, table }: SeasonEndingProps) {
                 className="chip chip-action"
                 onClick={() => savePicks(pickEvery(remaining, "W"))}
               >
-                Win them all
+                {t("ending.winAll")}
               </button>
               <button
                 type="button"
                 className="chip chip-action"
                 onClick={() => savePicks(pickLoseBigGames(remaining, table, BIG_GAME_RIVALS))}
               >
-                Lose the big games
+                {t("ending.loseBig")}
               </button>
               <button
                 type="button"
@@ -125,7 +135,7 @@ export function SeasonEnding({ matches, table }: SeasonEndingProps) {
                 disabled={ending.picked === 0}
                 onClick={() => savePicks({})}
               >
-                Clear my picks
+                {t("ending.clear")}
               </button>
             </div>
             <ol className="picks">
@@ -141,7 +151,7 @@ export function SeasonEnding({ matches, table }: SeasonEndingProps) {
                 </li>
               ))}
             </ol>
-            <p className="section-note">The small number is the opponent&apos;s league position.</p>
+            <p className="section-note">{t("ending.rankNote")}</p>
             {/* On small screens the full verdict sits below the tiles, out of sight while tapping. */}
             <p className="ending-peek" aria-hidden="true">
               <span>{ending.title}</span>
@@ -151,9 +161,9 @@ export function SeasonEnding({ matches, table }: SeasonEndingProps) {
             </p>
           </div>
 
-          <aside className="verdict" aria-label="Where your season ends">
+          <aside className="verdict" aria-label={t("ending.verdict")}>
             <p className="verdict-kicker">
-              {ending.picked} of {ending.remaining} picked
+              {t("ending.picked", { picked: ending.picked, remaining: ending.remaining })}
             </p>
             <div aria-live="polite">
               <p className="verdict-title">{ending.title}</p>
@@ -166,7 +176,7 @@ export function SeasonEnding({ matches, table }: SeasonEndingProps) {
                     {team.logoUrl && (
                       <Image src={team.logoUrl} alt="" width={20} height={20} unoptimized />
                     )}
-                    {team.name}
+                    <bdi>{team.name}</bdi>
                   </span>
                   <span className="tally-number">{team.points}</span>
                   <Tally count={team.points} max={ending.maxPoints} muted={!team.isBarca} dense />
@@ -174,9 +184,9 @@ export function SeasonEnding({ matches, table }: SeasonEndingProps) {
               ))}
             </ul>
             <p className="verdict-detail">
-              A full row is a perfect {ending.maxPoints} points.
+              {t("ending.fullRow", { max: ending.maxPoints })}
               {winsNeeded !== null &&
-                ` Barça need ${winsNeeded} wins from ${ending.remaining} to pass the best rival's current pace.`}
+                ` ${t("ending.winsNeeded", { wins: winsNeeded, remaining: ending.remaining })}`}
             </p>
           </aside>
         </div>

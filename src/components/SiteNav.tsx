@@ -7,39 +7,36 @@ import { Suspense, useState, type ReactNode } from "react";
 import { BARCA_CREST_URL } from "@/config/display";
 import type { TextKey } from "@/i18n/dictionary";
 import { useT } from "@/i18n/language";
+import { Icon, type IconName } from "./Icon";
 import { LanguageToggle } from "./LanguageToggle";
 
 type Section = { href: string; label: TextKey; icon: ReactNode; also?: string[] };
 
-const icon = (paths: string) => (
-  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" className="tab-icon">
-    <path d={paths} />
-  </svg>
-);
+const icon = (name: IconName) => <Icon name={name} className="tab-icon" />;
 
 /** The main features, in the order fans reach for them. Add a page here to add a tab. */
 const PRIMARY: Section[] = [
-  { href: "/", label: "nav.home", icon: icon("M3 11l9-8 9 8v10H15v-7H9v7H3z") },
+  { href: "/", label: "nav.home", icon: icon("home") },
   {
     href: "/news",
     label: "nav.news",
-    icon: icon("M4 4h13v16H6a2 2 0 0 1-2-2zM17 8h3v10a2 2 0 0 1-2 2M8 8h6M8 12h6M8 16h4"),
+    icon: icon("news"),
   },
   {
     href: "/table",
     label: "nav.table",
-    icon: icon("M4 5h16M4 10h16M4 15h16M4 20h10"),
+    icon: icon("table"),
     also: ["/season"],
   },
   {
     href: "/matches",
     label: "nav.matches",
-    icon: icon("M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14H3zM3 10h18M8 2v4M16 2v4"),
+    icon: icon("matches"),
   },
   {
     href: "/squad",
     label: "nav.squad",
-    icon: icon("M8 3L3 6l2 5 3-1v11h8V10l3 1 2-5-5-3a4 4 0 0 1-8 0z"),
+    icon: icon("shirt"),
   },
 ];
 
@@ -48,12 +45,12 @@ const SECONDARY: Section[] = [
   {
     href: "/stats",
     label: "nav.stats",
-    icon: icon("M5 20V10M12 20V4M19 20v-7"),
+    icon: icon("stats"),
   },
   {
     href: "/history",
     label: "nav.history",
-    icon: icon("M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7v5l3 3"),
+    icon: icon("history"),
   },
 ];
 
@@ -62,11 +59,11 @@ const EXTRA: Section[] = [
   {
     href: "/shirt",
     label: "nav.shirt",
-    icon: icon("M8 3L3 6l2 5 3-1v11h8V10l3 1 2-5-5-3a4 4 0 0 1-8 0z"),
+    icon: icon("shirt"),
   },
 ];
 
-const MORE_ICON = icon("M5 12h.01M12 12h.01M19 12h.01");
+const MORE_ICON = icon("more");
 
 function isActive(pathname: string, { href, also = [] }: Section): boolean {
   if (href === "/") return pathname === "/";
@@ -81,7 +78,7 @@ function NavShell({ pathname }: { pathname: string }) {
   const moreIsActive = [...SECONDARY, ...EXTRA].some((section) => isActive(pathname, section));
   return (
     <>
-      <nav aria-label="Main" className="nav">
+      <nav aria-label={t("a11y.main")} className="nav">
         <div className="nav-inner">
           <Link href="/" className="brand">
             <Image src={BARCA_CREST_URL} alt="" width={28} height={28} unoptimized />
@@ -103,7 +100,7 @@ function NavShell({ pathname }: { pathname: string }) {
         </div>
       </nav>
       {/* On phones the same links sit at the bottom, where a thumb can reach them. */}
-      <nav aria-label="Tabs" className="tabbar">
+      <nav aria-label={t("a11y.tabs")} className="tabbar">
         {moreOpen && (
           <ul className="tabbar-more">
             {[...SECONDARY, ...EXTRA].map((section) => (

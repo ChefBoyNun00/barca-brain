@@ -3,6 +3,8 @@
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { ASK_MAX_MESSAGES } from "@/config/ai";
+import type { TextKey } from "@/i18n/dictionary";
+import { useLanguage, useT } from "@/i18n/language";
 import { readAccessCode, saveAccessCode } from "./access-code";
 import { AnswerText } from "./AnswerText";
 import { readAnswerEvents } from "./read-answer";
@@ -15,19 +17,23 @@ type Turn = {
   error: string | null;
 };
 
-const SUGGESTIONS = [
-  "What are the Spanish papers saying today?",
-  "How do we do when we're behind at half-time?",
-  "Preview the next match for me",
-  "Compare Lamine Yamal and Raphinha this season",
-  "Explain the next match to a friend who has never watched football",
-  "Which transfer rumours are worth believing?",
+const SUGGESTIONS: readonly TextKey[] = [
+  "q.papers",
+  "q.behind",
+  "q.preview",
+  "q.compare",
+  "q.explain",
+  "q.rumours",
 ];
 
-const REFUSALS: Record<string, string> = {
-  limit: "That's a lot of questions for one hour. Try again a little later.",
-  "not-configured": "Ask Blaugrana isn't switched on yet: it needs a Claude API key.",
-  invalid: "That message couldn't be sent. Try a shorter one.",
+/** Why the server said no, or why an answer failed, in words for the visitor. */
+const REFUSALS: Record<string, TextKey> = {
+  limit: "chat.limit",
+  "not-configured": "chat.notConfigured",
+  invalid: "chat.invalid",
+  key: "chat.keyRejected",
+  busy: "chat.busy",
+  failed: "chat.answerFailed",
 };
 
 function toHistory(turns: Turn[], question: string) {
@@ -42,12 +48,14 @@ function toHistory(turns: Turn[], question: string) {
 
 type AskChatProps = {
   /** Replaces the starter questions, for example with ones that fit the page you are on. */
-  suggestions?: readonly string[];
+  suggestions?: readonly TextKey[];
   /** The /ask page can be opened with ?q=... to ask something straight away. */
   readQuestionFromUrl?: boolean;
 };
 
 export function AskChat({ suggestions = SUGGESTIONS, readQuestionFromUrl = true }: AskChatProps) {
+  const t = useT();
+  const language = useLanguage();
   const urlQuestion = useSearchParams().get("q") ?? "";
   const firstQuestion = readQuestionFromUrl ? urlQuestion : "";
   const [turns, setTurns] = useState<Turn[]>([]);
@@ -72,7 +80,7 @@ export function AskChat({ suggestions = SUGGESTIONS, readQuestionFromUrl = true 
     );
 
   async function ask(question: string, previous: Turn[], code = readAccessCode()) {
-    setTurns([...previous, { question, answer: "", status: "Thinking", sources: [], error: null }]);
+    setTurns([...previous, { question, answer: "", status: t("chat.thinking"), sources: [], error: null }]);
     setDraft("");
     setIsAnswering(true);
     abort.current = new AbortController();
@@ -81,7 +89,7 @@ export function AskChat({ suggestions = SUGGESTIONS, readQuestionFromUrl = true 
       const response = await fetch("/api/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-ask-code": code },
-        body: JSON.stringify({ messages: toHistory(previous, question) }),
+        body: JSON.stringify({ messages: toHistory(previous, question), language }),
         signal: abort.current.signal,
       });
 
@@ -95,7 +103,7 @@ export function AskChat({ suggestions = SUGGESTIONS, readQuestionFromUrl = true 
         const { reason } = (await response.json().catch(() => ({}))) as { reason?: string };
         updateLast({
           status: null,
-          error: REFUSALS[reason ?? ""] ?? "That didn't work. Try again.",
+          error: t(REFUSALS[reason ?? ""] ?? "chat.failed"),
         });
         return;
       }
@@ -106,12 +114,15 @@ export function AskChat({ suggestions = SUGGESTIONS, readQuestionFromUrl = true 
           updateLast((turn) => ({ answer: turn.answer + event.text, status: null }));
         }
         if (event.type === "sources") updateLast({ sources: event.labels });
-        if (event.type === "error") updateLast({ status: null, error: event.message });
+        if (event.type === "error") {
+          const known = REFUSALS[event.reason ?? ""];
+          updateLast({ status: null, error: known ? t(known) : event.message });
+        }
       }
       updateLast({ status: null });
     } catch (error) {
       const stopped = error instanceof DOMException && error.name === "AbortError";
-      updateLast({ status: null, error: stopped ? null : "The connection dropped. Try again." });
+      updateLast({ status: null, error: stopped ? null : t("chat.dropped") });
     } finally {
       setIsAnswering(false);
     }
@@ -148,8 +159,8 @@ export function AskChat({ suggestions = SUGGESTIONS, readQuestionFromUrl = true 
       {turns.length === 0 && (
         <div className="chat-start">
           <p className="chat-tip">
-            <strong>Paste anything in Spanish</strong>, like a tweet or a quote, and it comes back
-            in plain English with the football context explained.
+            <strong>{t("chat.tipStrong")}</strong>
+            {t("chat.tipRest")}
           </p>
           <ul className="chat-suggestions">
             {suggestions.map((suggestion) => (
@@ -157,9 +168,9 @@ export function AskChat({ suggestions = SUGGESTIONS, readQuestionFromUrl = true 
                 <button
                   type="button"
                   className="chip chip-action"
-                  onClick={() => void ask(suggestion, turns)}
+                  onClick={() => void ask(t(suggestion), turns)}
                 >
-                  {suggestion}
+                  {t(suggestion)}
                 </button>
               </li>
             ))}
@@ -170,8 +181,10 @@ export function AskChat({ suggestions = SUGGESTIONS, readQuestionFromUrl = true 
       <ol className="chat-turns">
         {turns.map((turn, index) => (
           <li key={index}>
-            <p className="chat-question">{turn.question}</p>
-            <div className="chat-answer">
+            <p className="chat-question" dir="auto">
+              {turn.question}
+            </p>
+            <div className="chat-answer" dir="auto">
               {turn.answer && <AnswerText text={turn.answer} />}
               {turn.status && (
                 <p role="status" className="chat-status">
@@ -183,13 +196,15 @@ export function AskChat({ suggestions = SUGGESTIONS, readQuestionFromUrl = true 
                   {turn.error}{" "}
                   {index === turns.length - 1 && (
                     <button type="button" className="chat-retry" onClick={retryLast}>
-                      Retry
+                      {t("chat.retry")}
                     </button>
                   )}
                 </p>
               )}
               {turn.sources.length > 0 && (
-                <p className="chat-sources">Answered from: {turn.sources.join(" · ")}</p>
+                <p className="chat-sources">
+                  {t("chat.answeredFrom", { sources: turn.sources.join(" · ") })}
+                </p>
               )}
             </div>
           </li>
@@ -199,7 +214,7 @@ export function AskChat({ suggestions = SUGGESTIONS, readQuestionFromUrl = true 
 
       {needsCode && (
         <form className="chat-code" onSubmit={submitCode}>
-          <label htmlFor="ask-code">Enter your access code to ask</label>
+          <label htmlFor="ask-code">{t("chat.codeLabel")}</label>
           <div>
             <input
               id="ask-code"
@@ -209,7 +224,7 @@ export function AskChat({ suggestions = SUGGESTIONS, readQuestionFromUrl = true 
               onChange={(event) => setCodeDraft(event.target.value)}
             />
             <button type="submit" className="btn-primary" disabled={!codeDraft.trim()}>
-              Continue
+              {t("chat.continue")}
             </button>
           </div>
         </form>
@@ -217,8 +232,9 @@ export function AskChat({ suggestions = SUGGESTIONS, readQuestionFromUrl = true 
 
       <form className="chat-input" onSubmit={submit}>
         <textarea
-          aria-label="Your question"
-          placeholder="Ask anything, or paste Spanish to translate"
+          aria-label={t("chat.inputLabel")}
+          placeholder={t("chat.placeholder")}
+          dir="auto"
           rows={2}
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
@@ -226,11 +242,11 @@ export function AskChat({ suggestions = SUGGESTIONS, readQuestionFromUrl = true 
         />
         {isAnswering ? (
           <button type="button" className="chip" onClick={() => abort.current?.abort()}>
-            Stop
+            {t("chat.stop")}
           </button>
         ) : (
           <button type="submit" className="btn-primary" disabled={!draft.trim()}>
-            Ask
+            {t("chat.ask")}
           </button>
         )}
       </form>

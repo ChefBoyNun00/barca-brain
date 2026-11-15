@@ -4,10 +4,11 @@ import Image from "next/image";
 import { useEffect, useRef, useState, type PointerEvent } from "react";
 import { Segmented } from "@/components/Segmented";
 import type { TextKey } from "@/i18n/dictionary";
-import { useT } from "@/i18n/language";
+import { useLanguage, useT } from "@/i18n/language";
+import { formatScore } from "@/i18n/numbers";
 import { BARCA_CREST_URL, REPLAY_STEP_MS } from "@/config/display";
 import type { SeasonMatch } from "@/domain/home";
-import { displayCompetition, formatKickoff, formatMatchDate } from "./format";
+import { displayCompetition, displayRound, formatKickoff, formatMatchDate } from "./format";
 import { SEASON_FILTERS } from "./season-filters";
 import { prefersReducedMotion, useSeasonSelection } from "./season-selection";
 import {
@@ -70,11 +71,13 @@ function MatchSide({ name, logoUrl }: { name: string; logoUrl: string | null }) 
 }
 
 function MatchDetail({ match }: { match: SeasonMatch }) {
+  const t = useT();
+  const language = useLanguage();
   const outcome = getMatchOutcome(match);
   const hasHalfTime = match.halfTimeFor !== null && match.halfTimeAgainst !== null;
-  const barca = { name: "Barça", logoUrl: BARCA_CREST_URL as string | null };
+  const barca = { name: t("common.barca"), logoUrl: BARCA_CREST_URL as string | null };
   const opponent = {
-    name: match.opponent?.name ?? "To be decided",
+    name: match.opponent?.name ?? t("common.tbd"),
     logoUrl: match.opponent?.logoUrl ?? null,
   };
   const [left, right] = match.isHome ? [barca, opponent] : [opponent, barca];
@@ -85,23 +88,28 @@ function MatchDetail({ match }: { match: SeasonMatch }) {
   return (
     <div className="match-detail" key={match.id}>
       <p className="match-meta">
-        {[displayCompetition(match.competition), match.round].filter(Boolean).join(" · ")}
+        {[displayCompetition(match.competition, language), displayRound(match.round, language)]
+          .filter(Boolean)
+          .join(" · ")}
       </p>
       <div className="match-line">
         <MatchSide name={left.name} logoUrl={left.logoUrl} />
-        <p className="match-score">{outcome ? `${leftGoals}–${rightGoals}` : "v"}</p>
+        <p className="match-score">{outcome ? formatScore(language, leftGoals, rightGoals) : t("common.vs")}</p>
         <MatchSide name={right.name} logoUrl={right.logoUrl} />
       </div>
       <p className="match-note">
         {outcome
           ? [
-              describeOutcome(outcome),
-              formatMatchDate(match.kickoffAt),
-              hasHalfTime && `Barça ${match.halfTimeFor}–${match.halfTimeAgainst} at half-time`,
+              describeOutcome(outcome, language),
+              formatMatchDate(match.kickoffAt, language),
+              hasHalfTime &&
+                t("season.halfTime", {
+                  score: formatScore(language, match.halfTimeFor, match.halfTimeAgainst),
+                }),
             ]
               .filter(Boolean)
               .join(" · ")
-          : `Still to come · ${formatKickoff(match.kickoffAt)}`}
+          : t("season.toCome", { when: formatKickoff(match.kickoffAt, language) })}
       </p>
     </div>
   );
@@ -118,6 +126,7 @@ type WovenSeasonProps = { matches: SeasonMatch[]; lastPlayedIndex: number; nextI
 
 export function WovenSeason({ matches, lastPlayedIndex, nextIndex }: WovenSeasonProps) {
   const t = useT();
+  const language = useLanguage();
   const { selected, select } = useSeasonSelection();
   const [filterId, setFilterId] = useState("all");
   const [isReplaying, setIsReplaying] = useState(false);
@@ -165,10 +174,10 @@ export function WovenSeason({ matches, lastPlayedIndex, nextIndex }: WovenSeason
   if (!match) return null;
 
   return (
-    <section id={SEASON_SECTION_ID} aria-label="The season, one stripe per match">
+    <section id={SEASON_SECTION_ID} aria-label={t("season.aria")}>
       <div className="page-gutter wall-controls">
         <Segmented
-          label="Show matches from"
+          label={t("season.filterLabel")}
           choices={SEASON_FILTERS.map(({ id }) => ({ id, label: t(`filter.${id}` as TextKey) }))}
           value={filterId}
           onChange={setFilterId}
@@ -209,8 +218,8 @@ export function WovenSeason({ matches, lastPlayedIndex, nextIndex }: WovenSeason
             max={lastIndex}
             value={selected}
             onChange={(event) => chooseMatch(Number(event.target.value))}
-            aria-label="Choose a match"
-            aria-valuetext={describeMatch(match)}
+            aria-label={t("season.choose")}
+            aria-valuetext={describeMatch(match, language)}
           />
         </div>
         <div className="wall-crests" aria-hidden="true">
@@ -232,7 +241,7 @@ export function WovenSeason({ matches, lastPlayedIndex, nextIndex }: WovenSeason
         <button
           type="button"
           className="wall-step"
-          aria-label="Previous match"
+          aria-label={t("season.prev")}
           disabled={selected === 0}
           onClick={() => chooseMatch(selected - 1)}
         >
@@ -242,7 +251,7 @@ export function WovenSeason({ matches, lastPlayedIndex, nextIndex }: WovenSeason
         <button
           type="button"
           className="wall-step"
-          aria-label="Next match"
+          aria-label={t("season.next")}
           disabled={selected === lastIndex}
           onClick={() => chooseMatch(selected + 1)}
         >
@@ -256,7 +265,7 @@ export function WovenSeason({ matches, lastPlayedIndex, nextIndex }: WovenSeason
         <summary>{t("season.list")}</summary>
         <ol>
           {matches.map((item) => (
-            <li key={item.id}>{describeMatch(item)}</li>
+            <li key={item.id}>{describeMatch(item, language)}</li>
           ))}
         </ol>
       </details>

@@ -1,6 +1,7 @@
 import { POINTS_FOR } from "@/config/display";
 import type { LeagueRow, SeasonMatch } from "@/domain/home";
-import { getMatchOutcome, ordinal, type MatchOutcome } from "./season-story";
+import { translate, type Language } from "@/i18n/dictionary";
+import { getMatchOutcome, type MatchOutcome } from "./season-story";
 
 export type Picks = Record<string, MatchOutcome>;
 
@@ -22,7 +23,8 @@ export type Ending = {
 const OPPOSITE: Record<MatchOutcome, MatchOutcome> = { W: "L", D: "D", L: "W" };
 const PICK_ORDER: (MatchOutcome | undefined)[] = [undefined, "W", "D", "L"];
 
-const points = (count: number) => `${count} point${count === 1 ? "" : "s"}`;
+const points = (count: number, language: Language) =>
+  count === 1 ? translate(language, "sim.point") : translate(language, "sim.points", { n: count });
 
 /** League matches with no result yet. A cancelled match will never have one. */
 export function getRemainingLeagueMatches(matches: SeasonMatch[]): SeasonMatch[] {
@@ -80,22 +82,27 @@ function projectBarca(row: LeagueRow, remaining: SeasonMatch[], picks: Picks) {
   };
 }
 
-function describeBasis(picked: number, remaining: number): string {
-  if (picked === 0) return "If everyone keeps taking points at today's rate.";
-  const yours = picked === 1 ? "Your 1 pick" : `Your ${picked} picks`;
-  if (picked === remaining) return `${yours}, with rivals at today's rate in their other games.`;
-  return `${yours}, with everything else at today's rate.`;
+function describeBasis(picked: number, remaining: number, language: Language): string {
+  if (picked === 0) return translate(language, "sim.basisNone");
+  const yours =
+    picked === 1 ? translate(language, "sim.yoursOne") : translate(language, "sim.yours", { n: picked });
+  return translate(language, picked === remaining ? "sim.basisAll" : "sim.basisSome", { yours });
 }
 
-function buildTitle(finish: FinishRow[], barca: FinishRow, barcaRank: number): string {
+function buildTitle(
+  finish: FinishRow[],
+  barca: FinishRow,
+  barcaRank: number,
+  language: Language,
+): string {
   const bestRival = finish.find((row) => !row.isBarca);
-  if (!bestRival) return "Champions";
+  if (!bestRival) return translate(language, "sim.champions");
   const lead = barca.points - bestRival.points;
-  if (lead > 0) return `Champions by ${points(lead)}`;
-  if (lead === 0) return `Level with ${bestRival.name}`;
+  if (lead > 0) return translate(language, "sim.championsBy", { points: points(lead, language) });
+  if (lead === 0) return translate(language, "sim.level", { team: bestRival.name });
   const leader = finish[0];
   const gap = (leader?.points ?? barca.points) - barca.points;
-  return `${ordinal(barcaRank)}, ${points(gap)} short`;
+  return translate(language, "sim.short", { rank: barcaRank, points: points(gap, language) });
 }
 
 /**
@@ -107,6 +114,7 @@ export function projectEnding(
   table: LeagueRow[],
   remaining: SeasonMatch[],
   picks: Picks,
+  language: Language = "en",
 ): Ending | null {
   const barcaRow = table.find((row) => row.isBarca);
   if (!barcaRow) return null;
@@ -136,8 +144,8 @@ export function projectEnding(
     picked,
     remaining: remaining.length,
     maxPoints: seasonLength * POINTS_FOR.W,
-    title: buildTitle(finish, barca, barcaRank),
-    detail: describeBasis(picked, remaining.length),
+    title: buildTitle(finish, barca, barcaRank, language),
+    detail: describeBasis(picked, remaining.length, language),
   };
 }
 

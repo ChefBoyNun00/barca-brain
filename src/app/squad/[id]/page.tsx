@@ -4,8 +4,9 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 import { PageLoader } from "@/components/PageLoader";
 import { SiteNav } from "@/components/SiteNav";
-import { ShareBar } from "@/features/share/ShareBar";
+import { PlayerShare } from "@/features/squad/PlayerShare";
 import { getSquadData } from "@/features/squad/get-squad-data";
+import { T } from "@/i18n/language";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -26,14 +27,7 @@ async function Detail({ params }: Props) {
   const { id } = await params;
   const player = await findPlayer(id);
   if (!player) notFound();
-  return (
-    <>
-      <p className="section-note">This is the picture people see when you share this player.</p>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img className="share-preview" src={`/card/player/${id}`} alt={`${player.name}'s season`} />
-      <ShareBar path={`/squad/${id}`} cardPath={`/card/player/${id}`} title={player.name} />
-    </>
-  );
+  return <PlayerShare id={id} name={player.name} />;
 }
 
 export default function PlayerPage({ params }: Props) {
@@ -41,9 +35,13 @@ export default function PlayerPage({ params }: Props) {
     <>
       <SiteNav />
       <main className="page-gutter flex-1 pt-10 pb-16">
-        <p className="kicker">Share a player</p>
-        <h1 className="display-title mt-3">The player</h1>
-        <Suspense fallback={<PageLoader label="Loading" />}>
+        <p className="kicker">
+          <T k="share.playerKicker" />
+        </p>
+        <h1 className="display-title mt-3">
+          <T k="share.playerTitle" />
+        </h1>
+        <Suspense fallback={<PageLoader />}>
           <Detail params={params} />
         </Suspense>
       </main>

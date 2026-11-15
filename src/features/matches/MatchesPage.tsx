@@ -14,7 +14,9 @@ export async function MatchesPage() {
         <h1 className="section-title">
           <T k="matches.title" />
         </h1>
-        <p className="section-note">Matches will appear after the next daily update.</p>
+        <p className="section-note">
+          <T k="matches.empty" />
+        </p>
       </section>
     );
   }

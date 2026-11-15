@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { connection } from "next/server";
+import { T } from "@/i18n/language";
 import { LeagueTable } from "../home/LeagueTable";
 import { getSeasonData } from "../season/get-season-data";
 
@@ -12,7 +13,7 @@ export async function TablePage() {
       <LeagueTable table={table} matches={matches} />
       <div className="page-gutter mt-6">
         <Link href="/season" className="chip chip-action">
-          Play out the rest of the season →
+          <T k="table.playOut" /> <T k="arrow.forward" />
         </Link>
       </div>
     </>

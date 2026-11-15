@@ -1,4 +1,5 @@
 import { connection } from "next/server";
+import { T } from "@/i18n/language";
 import { SeasonEnding } from "../home/SeasonEnding";
 import { getSeasonData } from "./get-season-data";
 
@@ -10,8 +11,12 @@ export async function SeasonPage() {
   if (matches.length === 0 || table.length === 0) {
     return (
       <section className="page-gutter section">
-        <h1 className="section-title">Weave the ending</h1>
-        <p className="section-note">This will appear after the next daily update.</p>
+        <h1 className="section-title">
+          <T k="explore.ending" />
+        </h1>
+        <p className="section-note">
+          <T k="ending.empty" />
+        </p>
       </section>
     );
   }

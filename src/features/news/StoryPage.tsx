@@ -1,14 +1,16 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
+import type { PressSide } from "@/config/news";
+import type { TextKey } from "@/i18n/dictionary";
 import { T } from "@/i18n/language";
+import { AskLink } from "../ask/AskLink";
 import { CertaintyMeter } from "./CertaintyMeter";
 import { getStoryData } from "./get-story-data";
 import { ScoopBadge } from "./ScoopBadge";
 import { StoryArt } from "./StoryArt";
 import { StoryCard } from "./StoryCard";
 import {
-  formatStoryAge,
   headlineOf,
   isCoveredByBothCities,
   meterStepOf,
@@ -16,14 +18,17 @@ import {
   standfirstOf,
   topicOf,
 } from "./stories";
+import { StoryAge } from "./StoryAge";
+import { StoryHeadline, StoryStandfirst } from "./StoryText";
 
 const SIDE_LABELS = {
-  barcelona: "Barcelona press",
-  madrid: "Madrid press",
-  national: "Spanish press",
-  english: "English press",
-  official: "Club",
-} as const;
+  barcelona: "press.barcelona",
+  madrid: "press.madrid",
+  national: "press.national",
+  english: "press.english",
+  israel: "press.israel",
+  official: "press.official",
+} as const satisfies Record<PressSide, TextKey>;
 
 /** One story, in full. Without a write-up yet, each outlet's own summary stands in. */
 export async function StoryPage({ topic }: { topic: string }) {
@@ -39,7 +44,7 @@ export async function StoryPage({ topic }: { topic: string }) {
   return (
     <article className="sp">
       <Link href="/news" className="sp-back">
-        ← <T k="news.back" />
+        <T k="arrow.back" /> <T k="news.back" />
       </Link>
 
       <header className="sp-head">
@@ -48,17 +53,27 @@ export async function StoryPage({ topic }: { topic: string }) {
             <T k={`news.${topicOf(story)}`} />
           </span>
           {topicOf(story) === "transfers" && <CertaintyMeter step={meterStepOf(story)} />}
-          {isCoveredByBothCities(story) && <span className="story-both">Both cities</span>}
+          {isCoveredByBothCities(story) && (
+            <span className="story-both">
+              <T k="news.bothCities" />
+            </span>
+          )}
         </div>
-        <h1 className="sp-title">{headlineOf(story)}</h1>
-        {standfirst && <p className="sp-standfirst">{standfirst}</p>}
+        <h1 className="sp-title" dir="auto">
+          <StoryHeadline story={story} />
+        </h1>
+        {standfirst && (
+          <p className="sp-standfirst" dir="auto">
+            <StoryStandfirst story={story} />
+          </p>
+        )}
         <p className="sp-meta">
           {scoop && <ScoopBadge by={scoop} />}
           <span>
             <T k="news.outlets" vars={{ count: story.outlets.length }} />
           </span>
           <span>
-            <T k="news.updated" vars={{ age: formatStoryAge(story.latestAt, now) }} />
+            <StoryAge date={story.latestAt} now={now} label="news.updated" />
           </span>
         </p>
       </header>
@@ -73,12 +88,14 @@ export async function StoryPage({ topic }: { topic: string }) {
             <>
               <div className="sp-body">
                 {writeup.body.map((paragraph) => (
-                  <p key={paragraph}>{paragraph}</p>
+                  <p key={paragraph} dir="auto">
+                    {paragraph}
+                  </p>
                 ))}
               </div>
 
               {writeup.quotes.map((quote) => (
-                <figure key={quote.text} className="sp-quote">
+                <figure key={quote.text} className="sp-quote" dir="auto">
                   <blockquote>“{quote.text}”</blockquote>
                   <figcaption>
                     {quote.speaker} · <cite>{quote.outlet}</cite>
@@ -91,7 +108,7 @@ export async function StoryPage({ topic }: { topic: string }) {
                   <h2 id="sp-next-title">
                     <T k="news.whatsNext" />
                   </h2>
-                  <p>{writeup.whatsNext}</p>
+                  <p dir="auto">{writeup.whatsNext}</p>
                 </section>
               )}
               <p className="sp-ai-note">
@@ -107,8 +124,10 @@ export async function StoryPage({ topic }: { topic: string }) {
                 {story.coverage.map((article) => (
                   <li key={article.id}>
                     <p className="sp-coverage-outlet">{article.outlet}</p>
-                    <p className="sp-coverage-title">{article.titleEn ?? article.titleOriginal}</p>
-                    {article.summaryEn && <p>{article.summaryEn}</p>}
+                    <p className="sp-coverage-title" dir="auto">
+                      {article.titleEn ?? article.titleOriginal}
+                    </p>
+                    {article.summaryEn && <p dir="auto">{article.summaryEn}</p>}
                   </li>
                 ))}
               </ul>
@@ -124,7 +143,9 @@ export async function StoryPage({ topic }: { topic: string }) {
               </h2>
               <ul>
                 {writeup.keyFacts.map((fact) => (
-                  <li key={fact}>{fact}</li>
+                  <li key={fact} dir="auto">
+                    {fact}
+                  </li>
                 ))}
               </ul>
             </section>
@@ -142,12 +163,13 @@ export async function StoryPage({ topic }: { topic: string }) {
             </ul>
           )}
 
-          <Link
-            href={{ pathname: "/ask", query: { q: `Tell me more about: ${headlineOf(story)}` } }}
+          <AskLink
+            question="news.askQuery"
+            vars={{ headline: headlineOf(story) }}
             className="sp-ask"
           >
-            <T k="news.askAbout" /> →
-          </Link>
+            <T k="news.askAbout" /> <T k="arrow.forward" />
+          </AskLink>
 
           <section className="sp-sources" aria-labelledby="sp-sources-title">
             <h2 id="sp-sources-title">
@@ -160,7 +182,7 @@ export async function StoryPage({ topic }: { topic: string }) {
                     {article.outlet}
                   </a>
                   <span>
-                    {SIDE_LABELS[article.pressSide]} · {formatStoryAge(article.publishedAt, now)}
+                    <T k={SIDE_LABELS[article.pressSide]} /> · <StoryAge date={article.publishedAt} now={now} />
                   </span>
                 </li>
               ))}

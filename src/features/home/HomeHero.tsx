@@ -6,6 +6,7 @@ import { CountUp } from "./CountUp";
 import type { TextKey } from "@/i18n/dictionary";
 import { T } from "@/i18n/language";
 import { formatSeason } from "./format";
+import { HeadlineLine } from "./HeadlineLine";
 import { buildHeadlineParts, type SeasonSummary } from "./season-story";
 import { MatchdayBanner } from "./MatchdayBanner";
 import type { MatchdayState } from "./matchday";
@@ -61,9 +62,9 @@ export function HomeHero({ season, summary, total, standing, matchday, now }: Ho
           </p>
         </div>
         <h1 className="hero-title">
-          {buildHeadlineParts(summary, standing).map(({ key, vars }, index) => (
+          {buildHeadlineParts(summary, standing).map(({ key, vars, competition }, index) => (
             <span key={key} className={index === 0 ? "block" : "block hero-hot"}>
-              <T k={key} vars={vars} />
+              <HeadlineLine k={key} vars={vars} competition={competition} />
             </span>
           ))}
         </h1>

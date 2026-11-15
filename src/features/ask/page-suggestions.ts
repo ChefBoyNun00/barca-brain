@@ -1,39 +1,16 @@
-/** Starter questions that fit the page you are looking at. Anything else gets the default set. */
-const BY_PAGE: { prefix: string; questions: readonly string[] }[] = [
-  {
-    prefix: "/squad",
-    questions: [
-      "Who has scored the most for us this season?",
-      "Which La Masia players are in the squad?",
-      "Compare Lamine Yamal and Raphinha this season",
-    ],
-  },
-  {
-    prefix: "/table",
-    questions: [
-      "Who are our closest rivals in the table?",
-      "How many points do we need to be safe at the top?",
-      "How are we doing against the teams around us?",
-    ],
-  },
-  {
-    prefix: "/matches",
-    questions: [
-      "What was our best win this season?",
-      "How do we do when we're behind at half-time?",
-      "Preview the next match for me",
-    ],
-  },
-  {
-    prefix: "/news",
-    questions: [
-      "What are the Spanish papers saying today?",
-      "Which transfer rumours are worth believing?",
-      "Where do the Barcelona and Madrid papers disagree?",
-    ],
-  },
+import type { TextKey } from "@/i18n/dictionary";
+
+/**
+ * Starter questions that fit the page you are looking at. Anything else gets the default set.
+ * They are dictionary keys, so a Hebrew reader asks in Hebrew and gets a Hebrew answer.
+ */
+const BY_PAGE: { prefix: string; questions: readonly TextKey[] }[] = [
+  { prefix: "/squad", questions: ["q.topScorer", "q.masia", "q.compare"] },
+  { prefix: "/table", questions: ["q.rivals", "q.safe", "q.around"] },
+  { prefix: "/matches", questions: ["q.bestWin", "q.behind", "q.preview"] },
+  { prefix: "/news", questions: ["q.papers", "q.rumours", "q.disagree"] },
 ];
 
-export function suggestionsFor(pathname: string): readonly string[] | undefined {
+export function suggestionsFor(pathname: string): readonly TextKey[] | undefined {
   return BY_PAGE.find(({ prefix }) => pathname.startsWith(prefix))?.questions;
 }

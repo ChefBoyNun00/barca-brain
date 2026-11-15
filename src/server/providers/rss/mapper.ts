@@ -52,7 +52,9 @@ function mapItem(raw: unknown, feed: NewsFeed): FeedArticle | null {
   if (!parsed.success) return null;
   const item = parsed.data;
 
-  const url = toWebUrl(item.link);
+  const audioUrl = feed.kind === "podcast" && item.enclosure ? toWebUrl(item.enclosure) : null;
+  // A podcast episode without its own page links to its audio file instead.
+  const url = toWebUrl(item.link ?? "") ?? (feed.kind === "podcast" ? audioUrl : null);
   const outlet = feed.outlet ?? sourceName(item.source)?.trim();
   const publishedAt = new Date(item.pubDate);
   if (!url || !outlet || Number.isNaN(publishedAt.getTime())) return null;
@@ -62,7 +64,7 @@ function mapItem(raw: unknown, feed: NewsFeed): FeedArticle | null {
   const snippet = feed.outlet && item.description ? trimSnippet(toPlainText(item.description)) : null;
   if (!title) return null;
 
-  return { url, outlet, title, snippet, publishedAt };
+  return { url, outlet, title, snippet, publishedAt, audioUrl };
 }
 
 export function mapFeedItems(items: unknown[], feed: NewsFeed): FeedArticle[] {

@@ -5,6 +5,7 @@ import { LEAGUE_MATCHES } from "@/config/football";
 import type { SquadPlayer } from "@/domain/home";
 import { T } from "@/i18n/language";
 import type { TextKey } from "@/i18n/dictionary";
+import { formatSigned } from "@/i18n/numbers";
 import { MatchCard } from "../matches/MatchCard";
 import { getJersey } from "../squad/jersey-data";
 import { getPlayerTotals } from "../squad/squad-stats";
@@ -36,15 +37,18 @@ function RecordBar({ label, record }: { label: TextKey; record: Record3 }) {
     <div className="split">
       <p className="split-label">
         <T k={label} />
-        <span>
-          {record.wins}-{record.draws}-{record.losses}
+        {/* Three separate pieces, so wins come first in either reading direction, like the bar. */}
+        <span className="split-record">
+          <span>{record.wins}</span>-<span>{record.draws}</span>-<span>{record.losses}</span>
         </span>
       </p>
-      <div
-        className="split-bar"
-        role="img"
-        aria-label={`${record.wins} W ${record.draws} D ${record.losses} L`}
-      >
+      <span id={`record-${label}`} className="sr-only">
+        <T
+          k="stats.recordAria"
+          vars={{ wins: record.wins, draws: record.draws, losses: record.losses }}
+        />
+      </span>
+      <div className="split-bar" role="img" aria-labelledby={`record-${label}`}>
         {parts.map(({ key, count }) => (
           <span key={key} data-part={key} style={{ flexGrow: count / total }}>
             {count > 0 && <span aria-hidden="true">{count}</span>}
@@ -140,14 +144,14 @@ export async function StatsPage() {
         <T k="stats.note" />
       </p>
 
-      <div className="num-grid">
+      <div className="num-grid num-grid-eight">
         <Tile label="stats.played" value={numbers.played} index={0} />
         <Tile label="stats.wins" value={numbers.wins} index={1} />
         <Tile label="stats.draws" value={numbers.draws} index={2} />
         <Tile label="stats.defeats" value={numbers.losses} index={3} />
         <Tile label="stats.goalsFor" value={numbers.goalsFor} index={4} />
         <Tile label="stats.goalsAgainst" value={numbers.goalsAgainst} index={5} />
-        <Tile label="stats.difference" value={difference > 0 ? `+${difference}` : difference} index={6} />
+        <Tile label="stats.difference" value={formatSigned(difference)} index={6} />
         <Tile label="stats.cleanSheets" value={numbers.cleanSheets} index={7} />
       </div>
 

@@ -1,4 +1,8 @@
+"use client";
+
 import Link from "next/link";
+import { useLanguage, useT } from "@/i18n/language";
+import { formatScore, formatSigned } from "@/i18n/numbers";
 import Image from "next/image";
 import type { LeagueRow, SeasonMatch } from "@/domain/home";
 import { FormPips } from "./FormPips";
@@ -9,21 +13,25 @@ type Meeting = { match: SeasonMatch };
 
 function goalDifference({ goalsFor, goalsAgainst }: LeagueRow): string {
   if (goalsFor === null || goalsAgainst === null) return "–";
-  const difference = goalsFor - goalsAgainst;
-  return difference > 0 ? `+${difference}` : String(difference);
+  return formatSigned(goalsFor - goalsAgainst);
 }
 
 function MeetingButton({ match }: Meeting) {
+  const t = useT();
+  const language = useLanguage();
   const outcome = getMatchOutcome(match);
+  const description = describeMatch(match, language);
   return (
     <Link
       href={`/matches#match-${match.id}`}
       className="meeting"
       data-outcome={outcome ?? "none"}
-      aria-label={`Open the match: ${describeMatch(match)}`}
-      title={describeMatch(match)}
+      aria-label={t("table.open", { match: description })}
+      title={description}
     >
-      {outcome ? `${match.goalsFor}–${match.goalsAgainst}` : formatMatchDate(match.kickoffAt)}
+      {outcome
+        ? formatScore(language, match.goalsFor, match.goalsAgainst)
+        : formatMatchDate(match.kickoffAt, language)}
     </Link>
   );
 }
@@ -32,6 +40,7 @@ type LeagueTableProps = { table: LeagueRow[]; matches: SeasonMatch[] };
 
 /** The league table, with Barça's meetings against each side linking back to the shirt. */
 export function LeagueTable({ table, matches }: LeagueTableProps) {
+  const t = useT();
   const meetingsByTeam = new Map<string, Meeting[]>();
   matches.forEach((match) => {
     if (!match.isLeague || !match.opponent) return;
@@ -42,44 +51,42 @@ export function LeagueTable({ table, matches }: LeagueTableProps) {
   return (
     <section id="table" aria-labelledby="table-title" className="page-gutter section reveal">
       <h1 id="table-title" className="section-title">
-        The table
+        {t("table.title")}
       </h1>
-      <p className="section-note">
-        Tap a score or date to open that match. Scores are Barça&apos;s first.
-      </p>
+      <p className="section-note">{t("table.note")}</p>
       {table.length === 0 ? (
-        <p className="section-note">The table will appear after the next daily update.</p>
+        <p className="section-note">{t("table.empty")}</p>
       ) : (
         <div className="league-wrap">
           <table className="league">
             <thead>
               <tr>
                 <th scope="col">
-                  <span className="sr-only">Position</span>
+                  <span className="sr-only">{t("table.position")}</span>
                 </th>
                 <th scope="col" className="league-team">
-                  Team
+                  {t("table.team")}
                 </th>
                 <th scope="col" className="league-wide">
-                  P
+                  {t("table.played")}
                 </th>
                 <th scope="col" className="league-wide">
-                  W
+                  {t("table.won")}
                 </th>
                 <th scope="col" className="league-wide">
-                  D
+                  {t("table.drawn")}
                 </th>
                 <th scope="col" className="league-wide">
-                  L
+                  {t("table.lost")}
                 </th>
                 <th scope="col" className="league-wide">
-                  GD
+                  {t("table.difference")}
                 </th>
-                <th scope="col">Pts</th>
+                <th scope="col">{t("table.points")}</th>
                 <th scope="col" className="league-wide">
-                  Form
+                  {t("table.form")}
                 </th>
-                <th scope="col">v Barça</th>
+                <th scope="col">{t("table.vBarca")}</th>
               </tr>
             </thead>
             <tbody>
@@ -91,7 +98,7 @@ export function LeagueTable({ table, matches }: LeagueTableProps) {
                       {row.logoUrl && (
                         <Image src={row.logoUrl} alt="" width={24} height={24} unoptimized />
                       )}
-                      {row.name}
+                      <bdi>{row.name}</bdi>
                     </span>
                   </th>
                   <td className="league-wide">{row.played ?? "–"}</td>

@@ -4,7 +4,7 @@ const AnswerEventSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("status"), label: z.string() }),
   z.object({ type: z.literal("text"), text: z.string() }),
   z.object({ type: z.literal("sources"), labels: z.array(z.string()) }),
-  z.object({ type: z.literal("error"), message: z.string() }),
+  z.object({ type: z.literal("error"), message: z.string(), reason: z.string().optional() }),
   z.object({ type: z.literal("done") }),
 ]);
 

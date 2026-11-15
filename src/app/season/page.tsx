@@ -14,7 +14,7 @@ export default function SeasonRoute() {
     <>
       <SiteNav />
       <main className="flex-1 pb-16">
-        <Suspense fallback={<PageLoader label="Loading" />}>
+        <Suspense fallback={<PageLoader />}>
           <SeasonPage />
         </Suspense>
       </main>

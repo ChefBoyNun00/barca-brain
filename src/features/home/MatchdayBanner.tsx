@@ -1,7 +1,10 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { BARCA_CREST_URL } from "@/config/display";
-import { T } from "@/i18n/language";
+import { T, useLanguage, useT } from "@/i18n/language";
+import { formatScore } from "@/i18n/numbers";
 import { displayCompetition, formatKickoff } from "./format";
 import { MatchClock } from "./MatchClock";
 import type { MatchdayState } from "./matchday";
@@ -15,16 +18,22 @@ function Crest({ url }: { url: string | null }) {
 
 /** The top of the home page on match day: before, during and just after a match. */
 export function MatchdayBanner({ state, now }: { state: MatchdayState; now: Date }) {
+  const t = useT();
+  const language = useLanguage();
   if (state.kind === "none") return null;
   const { match, isClasico, kind } = state;
-  const opponent = match.opponent?.name ?? "To be decided";
+  const opponent = match.opponent?.name ?? t("common.tbd");
+  const barca = t("common.barca");
+  const names = match.isHome
+    ? t("common.versus", { home: barca, away: opponent })
+    : t("common.versus", { home: opponent, away: barca });
   const outcome = getMatchOutcome(match);
   const labelKey = isClasico
     ? "matchday.clasico"
     : kind === "fulltime"
       ? "matchday.fulltime"
       : "matchday.matchday";
-  const venue = match.isHome ? "At home" : "Away";
+  const venue = t(match.isHome ? "common.atHome" : "common.away");
   // The home side is on the left, with its crest, as on a scoreboard.
   const opponentCrest = match.opponent?.logoUrl ?? null;
   const [left, right] = match.isHome
@@ -37,7 +46,7 @@ export function MatchdayBanner({ state, now }: { state: MatchdayState; now: Date
       data-kind={kind}
       data-clasico={isClasico}
       data-outcome={outcome ?? "none"}
-      aria-label={`Barça v ${opponent}`}
+      aria-label={t("common.versus", { home: barca, away: opponent })}
     >
       <div className="page-gutter matchday-inner">
         <p className="matchday-label">
@@ -58,17 +67,13 @@ export function MatchdayBanner({ state, now }: { state: MatchdayState; now: Date
               <>
                 <span className="matchday-score">
                   {match.isHome
-                    ? `${match.goalsFor}–${match.goalsAgainst}`
-                    : `${match.goalsAgainst}–${match.goalsFor}`}
+                    ? formatScore(language, match.goalsFor, match.goalsAgainst)
+                    : formatScore(language, match.goalsAgainst, match.goalsFor)}
                 </span>
-                <span className="matchday-names">
-                  {match.isHome ? `Barça v ${opponent}` : `${opponent} v Barça`}
-                </span>
+                <span className="matchday-names">{names}</span>
               </>
             ) : (
-              <span className="matchday-names">
-                {match.isHome ? `Barça v ${opponent}` : `${opponent} v Barça`}
-              </span>
+              <span className="matchday-names">{names}</span>
             )}
           </p>
           <Crest url={right} />
@@ -77,18 +82,18 @@ export function MatchdayBanner({ state, now }: { state: MatchdayState; now: Date
         <p className="matchday-note">
           {kind === "today" && (
             <>
-              {venue} · {displayCompetition(match.competition)} · {formatKickoff(match.kickoffAt)}
-              {" · kick-off in "}
+              {venue} · {displayCompetition(match.competition, language)} ·{" "}
+              {formatKickoff(match.kickoffAt, language)} · {t("matchday.kickoffIn")}{" "}
               <MatchClock kickoffAt={match.kickoffAt} serverNow={now} />
             </>
           )}
-          {kind === "live" && "Scores update once a day, so check back after the final whistle."}
-          {kind === "fulltime" && outcome && `${describeOutcome(outcome)} · ${venue}`}
+          {kind === "live" && t("matchday.liveNote")}
+          {kind === "fulltime" && outcome && `${describeOutcome(outcome, language)} · ${venue}`}
         </p>
 
         {isClasico && (
           <Link href="/news" className="chip chip-action matchday-link">
-            What Barcelona and Madrid papers are saying →
+            {t("matchday.papers")} {t("arrow.forward")}
           </Link>
         )}
       </div>

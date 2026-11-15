@@ -21,7 +21,7 @@ export async function getStoryData(rawTopic: string) {
   if (!grouped) return null;
 
   const story: NewsStory = { ...grouped, writeup };
-  const related = news.stories
+  const related = news.world
     .filter((other) => other.id !== story.id && topicOf(other) === topicOf(story))
     .slice(0, NEWS_RELATED_LIMIT);
   return { now: news.now, story, squad: news.squad, related };

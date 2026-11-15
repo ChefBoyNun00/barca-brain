@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { Big_Shoulders, Heebo, Inter } from "next/font/google";
 import { AskDrawer } from "@/features/ask/AskDrawer";
 import { IntroSplash } from "@/components/IntroSplash";
+import { LanguageReady } from "@/components/LanguageReady";
+import { SiteFooter } from "@/components/SiteFooter";
 import { INTRO_STORAGE_KEY, LANGUAGE_STORAGE_KEY } from "@/config/display";
-import { RTL_LANGUAGES } from "@/i18n/dictionary";
+import { LANGUAGES, RTL_LANGUAGES } from "@/i18n/dictionary";
 import "./globals.css";
 
 const inter = Inter({
@@ -27,9 +29,11 @@ const INTRO_SKIP_SCRIPT = `try{if(sessionStorage.getItem(${JSON.stringify(INTRO_
 
 /**
  * Puts the saved language on the page before it paints, so a Hebrew reader never sees the layout
- * jump from left-to-right to right-to-left. Only our own constants go into it.
+ * jump from left-to-right to right-to-left. The text itself is still English until the app
+ * starts, so it also marks the page as waiting (data-lang-pending), which keeps it hidden until
+ * <LanguageReady /> sees the switch. Only our own constants go into it.
  */
-const LANGUAGE_SCRIPT = `try{var l=localStorage.getItem(${JSON.stringify(LANGUAGE_STORAGE_KEY)});if(l&&${JSON.stringify(["en", ...RTL_LANGUAGES])}.indexOf(l)>-1){document.documentElement.lang=l;document.documentElement.dir=${JSON.stringify(RTL_LANGUAGES)}.indexOf(l)>-1?"rtl":"ltr"}}catch(e){}`;
+const LANGUAGE_SCRIPT = `try{var l=localStorage.getItem(${JSON.stringify(LANGUAGE_STORAGE_KEY)}),d=document.documentElement;if(l&&${JSON.stringify(LANGUAGES)}.indexOf(l)>-1){d.lang=l;d.dir=${JSON.stringify(RTL_LANGUAGES)}.indexOf(l)>-1?"rtl":"ltr";if(l!=="en")d.dataset.langPending=l}}catch(e){}`;
 
 /** Link previews need full addresses. Vercel tells us the live one; locally it is localhost. */
 const siteUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
@@ -58,8 +62,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body className="min-h-full flex flex-col">
         <IntroSplash />
+        <LanguageReady />
         {children}
         <div aria-hidden="true" className="mosaic-band" />
+        <SiteFooter />
         <AskDrawer />
       </body>
     </html>
