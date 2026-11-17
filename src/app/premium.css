@@ -1,0 +1,1567 @@
+/* ==========================================================================
+   The premium layer
+   Loaded after globals.css (see layout.tsx), so for the same selector this file wins.
+   What it does, in order:
+     1. Re-tunes the shared tokens: warm stone and paper for reading, deep night for drama.
+     2. The header, the full-screen menu, and the curtain that lifts on every page change.
+     3. Movement for every page: things rise in as they scroll into view (CSS only).
+     4. Quieter building blocks: type, pills, cards (with a slight tilt under the mouse).
+     5. The home page's sections: hero, motto band, season cards, explore list.
+   Rule of thumb: fewer colours, more space, slow easing. If something shouts, quiet it.
+   TODO(debt): globals.css still holds the old nav/tab-bar and ticker rules (.nav, .tabbar, .ticker), which nothing
+   renders now — delete them in a cleanup change, not mixed into this one.
+   ========================================================================== */
+
+/* ---------- 1. Tokens ---------- */
+
+:root {
+  /* Reading surfaces: stone like a stadium concourse, paper for cards. */
+  --stone: #ebe6dc;
+  --paper: #f6f2ea;
+  --night: #0b0a16;
+  --night-2: #13111f;
+  --ivory: #f4efe6;
+  --gold-soft: #cfa64e;
+  --line-warm: rgba(21, 18, 28, 0.12);
+
+  --off-white: var(--stone);
+  --surface: var(--paper);
+  --surface-sunken: var(--stone);
+  --border: var(--line-warm);
+  --line: var(--line-warm);
+  --text-heading: #15121c;
+  --text-secondary: #57525e;
+  --primary-wash: #e4ddd0;
+  --primary-soft: #dcd3c3;
+  --barca-navy: var(--night);
+
+  --shadow-sm: 0 1px 2px rgba(21, 18, 28, 0.06);
+  --shadow-md: 0 10px 30px -18px rgba(21, 18, 28, 0.35);
+  --shadow-lg: 0 30px 60px -30px rgba(21, 18, 28, 0.45);
+
+  /* Corners are tighter: softer than sharp, never bubbly. */
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+
+  /* Slow out, no bounce. */
+  --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-curtain: cubic-bezier(0.76, 0, 0.24, 1);
+  --hdr-h: 64px;
+
+  --font-caption: var(--font-mono), ui-monospace, monospace;
+  /* Film grain: grey noise drawn at 7% strength inside the image, so it can sit on any surface. */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E");
+}
+
+/* Hebrew has no typewriter face of its own here, so captions fall back to Heebo. */
+[dir="rtl"] {
+  --font-caption: var(--font-hebrew), sans-serif;
+}
+
+body {
+  background-color: var(--stone);
+  background-image: var(--grain);
+  background-size: 180px;
+  color: var(--text-secondary);
+}
+
+/* The phone tab bar is gone (the menu replaced it), so its reserved space goes too. */
+@media (max-width: 639px) {
+  body {
+    padding-bottom: 0;
+  }
+
+  .ask-launch {
+    inset-block-end: 1rem;
+  }
+}
+
+:where(.hdr, .menu, .curtain, .poster) {
+  --focus-ring: var(--barca-gold);
+}
+
+/* ---------- 2a. Header ---------- */
+
+/* Always there, never hiding: the main pages are one tap away from anywhere. Solid, not
+   blurred: a blur behind a sticky bar has to be redrawn on every frame of a scroll. */
+.hdr {
+  position: sticky;
+  top: 0;
+  z-index: 70;
+  color: var(--ivory);
+  background: var(--night);
+}
+
+.hdr[data-open] {
+  background: transparent;
+}
+
+.hdr-inner {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  height: 64px;
+  max-width: 1440px;
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 3vw, 2.5rem);
+}
+
+/* The main pages, right in the bar. */
+.hdr-links {
+  flex: 1;
+  min-width: 0;
+}
+
+.hdr-links ul {
+  display: flex;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.hdr-links a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  padding-inline: 0.875rem;
+  color: rgba(244, 239, 230, 0.72);
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.hdr-links a:hover {
+  color: var(--ivory);
+}
+
+.hdr-links a[aria-current="page"] {
+  color: var(--ivory);
+}
+
+/* A short gold line under the page you are on. */
+.hdr-links a[aria-current="page"]::after {
+  content: "";
+  position: absolute;
+  inset: auto 0.875rem 6px;
+  height: 2px;
+  background: var(--gold-soft);
+}
+
+/* Phones: the links move to a row of their own under the logo, swiped sideways. */
+@media (max-width: 899px) {
+  :root {
+    --hdr-h: 108px;
+  }
+
+  .hdr-inner {
+    flex-wrap: wrap;
+    row-gap: 0;
+    height: auto;
+    padding-block: 0.5rem 0;
+  }
+
+  .hdr-brand {
+    flex: 1;
+  }
+
+  .hdr-links {
+    order: 3;
+    flex-basis: 100%;
+    margin-inline: calc(-1 * clamp(1rem, 3vw, 2.5rem));
+    overflow-x: auto;
+    scrollbar-width: none;
+    mask-image: linear-gradient(90deg, #000 85%, transparent);
+  }
+
+  [dir="rtl"] .hdr-links {
+    mask-image: linear-gradient(270deg, #000 85%, transparent);
+  }
+
+  .hdr-links::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hdr-links ul {
+    justify-content: flex-start;
+    padding-inline: calc(clamp(1rem, 3vw, 2.5rem) - 0.875rem);
+  }
+
+  /* The language switch lives in the full menu on phones; the bar has no room for it. */
+  .hdr-lang {
+    display: none;
+  }
+}
+
+.hdr-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: var(--tap);
+  color: inherit;
+  text-decoration: none;
+}
+
+.hdr-name {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.hdr-menu {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.875rem;
+  min-height: var(--tap);
+  padding-inline: 0.5rem;
+  color: inherit;
+  font-family: var(--font-caption);
+  font-size: 0.75rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.hdr-menu-lines {
+  display: grid;
+  gap: 6px;
+  width: 26px;
+}
+
+.hdr-menu-lines span {
+  display: block;
+  height: 2px;
+  background: currentColor;
+  transform: skewX(-24deg);
+  transition: transform 0.5s var(--ease-premium);
+}
+
+.hdr-menu-lines span:last-child {
+  width: 70%;
+  justify-self: end;
+}
+
+.hdr-menu:hover .hdr-menu-lines span:last-child {
+  width: 100%;
+}
+
+.hdr-menu[aria-expanded="true"] .hdr-menu-lines span:first-child {
+  transform: translateY(4px) rotate(45deg);
+}
+
+.hdr-menu[aria-expanded="true"] .hdr-menu-lines span:last-child {
+  width: 100%;
+  transform: translateY(-4px) rotate(-45deg);
+}
+
+/* ---------- 2b. Full-screen menu ---------- */
+
+.menu {
+  position: fixed;
+  inset: 0;
+  z-index: 65;
+  overflow-y: auto;
+  color: var(--ivory);
+  background:
+    radial-gradient(60% 50% at 85% 20%, rgba(165, 0, 68, 0.35), transparent 70%),
+    radial-gradient(50% 50% at 10% 90%, rgba(0, 77, 152, 0.35), transparent 70%),
+    var(--night);
+  clip-path: inset(0 0 100% 0);
+  visibility: hidden;
+  transition:
+    clip-path 0.8s var(--ease-curtain),
+    visibility 0s linear 0.8s;
+}
+
+.menu[data-open] {
+  clip-path: inset(0 0 0 0);
+  visibility: visible;
+  transition:
+    clip-path 0.8s var(--ease-curtain),
+    visibility 0s;
+}
+
+.menu-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+  padding: calc(var(--hdr-h) + 2rem) clamp(1rem, 3vw, 2.5rem) 2rem;
+}
+
+.menu-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+  column-gap: 3rem;
+}
+
+.menu-links li {
+  overflow: hidden;
+  border-bottom: 1px solid rgba(244, 239, 230, 0.1);
+}
+
+.menu-links a {
+  display: flex;
+  align-items: baseline;
+  gap: 1.25rem;
+  padding-block: 0.5rem;
+  color: rgba(244, 239, 230, 0.86);
+  text-decoration: none;
+  transform: translateY(110%);
+  transition:
+    transform 0.9s var(--ease-premium) calc(0.15s + var(--i) * 0.045s),
+    color 0.3s ease;
+}
+
+.menu[data-open] .menu-links a {
+  transform: none;
+}
+
+.menu-num {
+  color: var(--gold-soft);
+  font-family: var(--font-caption);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+}
+
+.menu-word {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 800;
+  line-height: 1.05;
+  text-transform: uppercase;
+  transition: transform 0.5s var(--ease-premium);
+}
+
+.menu-links a:hover {
+  color: var(--ivory);
+}
+
+.menu-links a:hover .menu-word {
+  transform: translateX(0.75rem);
+}
+
+[dir="rtl"] .menu-links a:hover .menu-word {
+  transform: translateX(-0.75rem);
+}
+
+.menu-links a[aria-current="page"] {
+  color: var(--gold-soft);
+}
+
+.menu-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 3rem;
+  opacity: 0;
+  transition: opacity 0.6s ease 0.5s;
+}
+
+.menu[data-open] .menu-foot {
+  opacity: 1;
+}
+
+.menu-motto {
+  color: rgba(244, 239, 230, 0.55);
+  font-family: var(--font-caption);
+  font-size: 0.75rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+/* The page behind the open menu stays where it is. */
+:root[data-menu-open] {
+  overflow: hidden;
+}
+
+/* ---------- 2c. The curtain between pages ---------- */
+
+.curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  pointer-events: none;
+  background: var(--night);
+  clip-path: inset(0 0 100% 0);
+}
+
+.curtain-band {
+  position: absolute;
+  inset: auto 0 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--barca-blue), var(--barca-garnet), var(--gold-soft));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .curtain {
+    animation: curtainLift 0.95s var(--ease-curtain) both;
+  }
+
+  .page-enter {
+    animation: pageFade 0.7s ease 0.25s both;
+  }
+}
+
+/* ---------- 3. Things rise in as they scroll into view ----------
+   Pure CSS (a scroll timeline), so it needs no script and never fights React. It plays forward
+   as an element enters and reverses if you scroll back up. Browsers without scroll timelines
+   simply show everything. The /club story has its own, richer reveals, so it is left out. */
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    main:not(.story)
+      :is(
+        .section-title,
+        .section-head,
+        .section-note,
+        .match-card,
+        .nw-card,
+        .moment,
+        .player-card,
+        .league,
+        .tally,
+        .leaders,
+        .board-month-title,
+        .rd-item,
+        .rd-brief,
+        .weave-section .page-gutter > *,
+        .poster-inner > *,
+        .room > *,
+        .credits > *,
+        .front-hottest,
+        .briefing,
+        .podcast,
+        table,
+        figure
+      ) {
+      animation: riseIn linear both;
+      animation-timeline: view();
+      /* Done by the time a quarter of it is on screen, so content never feels like it lags. */
+      animation-range: entry 0% entry 25%;
+    }
+
+    /* Big photos drift a little slower than the page: depth without a gimmick. */
+    .hero-stadium,
+    .story-art-photo img {
+      animation: drift linear both;
+      animation-timeline: view();
+    }
+  }
+}
+
+/* ---------- 4. Building blocks ---------- */
+
+.display-title {
+  font-weight: 800;
+  letter-spacing: -0.005em;
+  line-height: 0.9;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .display-title {
+    animation: maskRise 1.1s var(--ease-premium) 0.35s both;
+  }
+}
+
+/* Small labels above titles: typewriter capitals, wide apart, with a short rule. */
+.kicker,
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--barca-garnet);
+  font-family: var(--font-caption);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.kicker::before,
+.eyebrow::before {
+  content: "";
+  width: 1.75rem;
+  height: 1px;
+  background: currentColor;
+}
+
+[dir="rtl"] :is(.kicker, .eyebrow, .hdr-menu, .menu-motto) {
+  letter-spacing: 0.02em;
+}
+
+.section {
+  padding-block: clamp(4rem, 9vw, 7rem) 0;
+}
+
+.section-title {
+  font-weight: 800;
+  letter-spacing: -0.005em;
+}
+
+/* Pills: one dark, one light. No gradients, no glow. */
+.btn-primary,
+.chip-action,
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: var(--tap);
+  padding: 0.75rem 1.5rem;
+  border: 0;
+  border-radius: var(--radius-pill);
+  color: var(--ivory);
+  background: var(--night);
+  box-shadow: none;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition:
+    transform 0.4s var(--ease-premium),
+    background-color 0.3s ease;
+}
+
+.btn-primary:hover,
+.chip-action:hover,
+.pill:hover {
+  transform: translateY(-2px);
+  background: var(--barca-garnet);
+  box-shadow: none;
+}
+
+.pill-light {
+  color: var(--night);
+  background: var(--ivory);
+}
+
+.pill-light:hover {
+  color: var(--ivory);
+}
+
+/* Filter chips and switches: paper, with night for the chosen one. No gradients. */
+.chip,
+.segmented {
+  border-color: var(--line-warm);
+  background: var(--paper);
+}
+
+.chip {
+  font-weight: 500;
+}
+
+.chip:hover:not(:disabled) {
+  border-color: var(--text-heading);
+}
+
+.chip[aria-pressed="true"] {
+  color: var(--ivory);
+  background: var(--night);
+  border-color: var(--night);
+}
+
+.segmented-thumb {
+  background: var(--night);
+  transition: transform 0.6s var(--ease-premium);
+}
+
+/* Cards: paper on stone, a hairline instead of a heavy shadow. */
+:is(.match-card, .nw-card, .explore-tile, .moment-card, .player-card, .league, .tally) {
+  border-color: var(--line-warm);
+  border-radius: var(--radius-lg);
+  background-color: var(--paper);
+  box-shadow: var(--shadow-sm);
+}
+
+/* The tilt (src/components/motion/PointerTilt.tsx writes --rx/--ry while the mouse is over it). */
+:is([data-tilt], .match-card, .explore-tile, .nw-card, .moment-card) {
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition:
+    transform 0.6s var(--ease-premium),
+    box-shadow 0.4s ease;
+}
+
+:is([data-tilt], .match-card, .explore-tile, .nw-card, .moment-card)[data-tilting] {
+  /* Repeated here so the tilt beats the older hover lift in globals.css. */
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  box-shadow: var(--shadow-lg);
+  transition:
+    transform 0.12s linear,
+    box-shadow 0.4s ease;
+}
+
+
+/* Gold pills on tags were the loudest thing on the page: now quiet outlined captions. */
+.moment-tags > span,
+.scoop {
+  border: 1px solid currentColor;
+  color: var(--barca-garnet);
+  background: transparent;
+  font-family: var(--font-caption);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+}
+
+.moment-card {
+  border-inline-start-width: 1px;
+}
+
+.moment-year {
+  -webkit-text-stroke-color: rgba(21, 18, 28, 0.25);
+}
+
+/* ---------- Dark surfaces ---------- */
+
+.hero,
+.poster,
+.site-foot {
+  background-color: var(--night);
+}
+
+.poster-kicker {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--gold-soft);
+  font-family: var(--font-caption);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.poster-kicker::before {
+  content: "";
+  width: 1.75rem;
+  height: 1px;
+  background: currentColor;
+}
+
+/* Night with a little club colour in the corners, and grain, instead of a moving gradient. */
+.poster {
+  margin-top: 0;
+  padding-block: clamp(4rem, 9vw, 7rem);
+  background:
+    radial-gradient(55% 60% at 90% 10%, rgba(165, 0, 68, 0.38), transparent 70%),
+    radial-gradient(45% 55% at 5% 95%, rgba(0, 77, 152, 0.4), transparent 70%),
+    var(--grain),
+    var(--night);
+  background-size: auto, auto, 180px, auto;
+  animation: none;
+}
+
+/* ---------- 5. Home ---------- */
+
+.hero {
+  margin-bottom: 0;
+  min-height: calc(100svh - var(--hdr-h));
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.hero-stadium {
+  /* A little larger than its frame, so the slow drift never shows an edge. */
+  scale: 1.14;
+  opacity: 0.55;
+  filter: saturate(0.6) contrast(1.05);
+}
+
+/* The woven stripes over the photo are gone: two endless animations on a full-screen layer cost
+   a repaint every frame, and the photo reads better clean. */
+.hero-stripes {
+  display: none;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(11, 10, 22, 0.35) 0%, transparent 35%, rgba(11, 10, 22, 0.92) 100%),
+    var(--grain);
+  background-size: auto, 180px;
+  opacity: 0.95;
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  padding-block: 4rem clamp(3rem, 7vw, 5rem);
+}
+
+.hero-kicker {
+  font-family: var(--font-caption);
+  font-size: 0.75rem;
+  letter-spacing: 0.22em;
+}
+
+.hero-title {
+  font-weight: 800;
+  letter-spacing: -0.005em;
+}
+
+.hero-hot {
+  color: var(--gold-soft);
+}
+
+/* Stats: big numbers on a hairline, no boxes. */
+.hero-stats {
+  gap: 0;
+  margin-top: 3rem;
+  border-top: 1px solid rgba(244, 239, 230, 0.18);
+}
+
+.hero-stat,
+.hero-stat:nth-child(n) {
+  padding: 1.25rem 1.5rem 0 0;
+  color: var(--ivory);
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  outline: 0;
+  backdrop-filter: none;
+  transform: none;
+}
+
+.hero-stat:hover {
+  transform: none;
+}
+
+[dir="rtl"] .hero-stat {
+  padding: 1.25rem 0 0 1.5rem;
+}
+
+.hero-stat::before,
+.hero-stat::after {
+  display: none;
+}
+
+.hero-stat-number {
+  color: var(--ivory);
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 700;
+}
+
+.hero-stat-label,
+.hero-stat-number {
+  padding-top: 0;
+}
+
+.hero-stat-label {
+  margin-top: 0.5rem;
+  color: var(--gold-soft);
+  font-family: var(--font-caption);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+}
+
+/* A line of the motto that slides as you scroll past. The whole band opens the story. */
+.motto-band {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  padding-block: clamp(2.5rem, 6vw, 4.5rem);
+  color: var(--text-heading);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line-warm);
+}
+
+.motto-track {
+  display: flex;
+  width: max-content;
+  white-space: nowrap;
+}
+
+.motto-track > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 2.5rem;
+  padding-inline-end: 2.5rem;
+  color: transparent;
+  font-family: var(--font-display);
+  font-size: clamp(4rem, 12vw, 10rem);
+  font-weight: 800;
+  line-height: 0.9;
+  text-transform: uppercase;
+  -webkit-text-stroke: 1.5px var(--text-heading);
+  transition: color 0.6s var(--ease-premium);
+}
+
+.motto-track > span:nth-child(even) {
+  color: var(--barca-garnet);
+  -webkit-text-stroke-color: transparent;
+}
+
+.motto-dot {
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 50%;
+  background: var(--gold-soft);
+}
+
+.motto-band:hover .motto-track > span:nth-child(odd) {
+  color: var(--text-heading);
+}
+
+.motto-cta {
+  position: absolute;
+  inset-block-end: 1rem;
+  inset-inline-end: clamp(1rem, 3vw, 2.5rem);
+  font-family: var(--font-caption);
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .motto-track {
+      animation: slideAcross linear both;
+      animation-timeline: view();
+    }
+
+    [dir="rtl"] .motto-track {
+      animation-name: slideAcrossRtl;
+    }
+  }
+}
+
+.surface-stone {
+  position: relative;
+  overflow: hidden;
+}
+
+.weave-section {
+  padding-block: clamp(4rem, 9vw, 7rem) 2rem;
+}
+
+.weave-section .section-title {
+  margin-bottom: 2rem;
+}
+
+/* The floating Ask button: a night pill with a gold edge instead of a yellow slab. */
+.ask-launch {
+  color: var(--ivory);
+  background: var(--night);
+  box-shadow:
+    0 0 0 1px rgba(207, 166, 78, 0.55),
+    0 18px 40px -16px rgba(0, 0, 0, 0.6);
+}
+
+/* ---------- Keyframes ---------- */
+
+@keyframes curtainLift {
+  0% { clip-path: inset(0 0 0 0); }
+  100% { clip-path: inset(0 0 100% 0); }
+}
+
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    translate: 0 20px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes drift {
+  from { translate: 0 -6%; }
+  to { translate: 0 6%; }
+}
+
+@keyframes maskRise {
+  from {
+    clip-path: inset(0 0 100% 0);
+    translate: 0 0.25em;
+  }
+  to {
+    clip-path: inset(0 0 -10% 0);
+    translate: 0 0;
+  }
+}
+
+@keyframes slideAcross {
+  from { transform: translateX(0); }
+  to { transform: translateX(-35%); }
+}
+
+@keyframes slideAcrossRtl {
+  from { transform: translateX(0); }
+  to { transform: translateX(35%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hdr,
+  .menu,
+  .menu-links a {
+    transition: none;
+  }
+}
+
+/* ---------- Page-specific quieting ---------- */
+
+/* The Replay button is both a chip and an action: the action look wins. */
+.chip.chip-action {
+  color: var(--ivory);
+  background: var(--night);
+  border-color: var(--night);
+}
+
+.chip.chip-action:hover {
+  background: var(--barca-garnet);
+  border-color: var(--barca-garnet);
+}
+
+/* Stats tiles: paper cards with ink numbers and a hairline, not striped navy slabs. */
+.num-tile,
+.num-tile:nth-child(n) {
+  color: var(--text-heading);
+  background: var(--paper);
+  border: 1px solid var(--line-warm);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.num-tile-value {
+  color: var(--text-heading);
+  font-weight: 800;
+}
+
+.num-tile-label {
+  color: var(--text-secondary);
+  font-family: var(--font-caption);
+  font-weight: 400;
+  letter-spacing: 0.16em;
+}
+
+/* The one standout number gets the night treatment, once. */
+.pace {
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  background:
+    radial-gradient(60% 80% at 90% 0%, rgba(165, 0, 68, 0.45), transparent 70%),
+    var(--night);
+  outline: 0;
+  box-shadow: var(--shadow-lg);
+}
+
+.pace-value {
+  color: var(--gold-soft);
+}
+
+.pace-label {
+  font-family: var(--font-caption);
+  font-weight: 500;
+  letter-spacing: 0.18em;
+}
+
+.stats-heading {
+  border-inline-start: 0;
+  padding-inline-start: 0;
+}
+
+/* News: the chosen edition is night (World) or a thin flag-blue frame (Israel), never a gradient. */
+.edition-tab {
+  border-width: 1px;
+  border-color: var(--line-warm);
+  background: var(--paper);
+}
+
+.edition-tab[data-edition="world"][aria-current="page"] {
+  background: var(--night);
+}
+
+.story-art-badge,
+.sp-topic {
+  color: var(--ivory);
+  background: rgba(11, 10, 22, 0.78);
+  backdrop-filter: blur(6px);
+  font-family: var(--font-caption);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+}
+
+.heat-bar::after {
+  background: var(--barca-garnet);
+}
+
+/* The floating Ask button steps aside while the menu is open (it would cover the language switch). */
+:root[data-menu-open] .ask-launch {
+  visibility: hidden;
+}
+
+/* ---------- Scrolling stays light ----------
+   Endless animations with blend modes repaint on every frame you scroll past them. */
+.mosaic-band::after {
+  display: none;
+}
+
+/* ==========================================================================
+   The news reader (src/features/news/Reader.tsx)
+   One centred column, like a well-made magazine: serif headlines, quiet captions,
+   the outlet's photo credited on the photo. Nothing ranked with bars or coloured badges.
+   ========================================================================== */
+
+:root {
+  --font-read: var(--font-serif), Georgia, "Times New Roman", serif;
+  --read-width: 46rem;
+}
+
+[dir="rtl"] {
+  --font-read: var(--font-serif-he), var(--font-hebrew), serif;
+}
+
+.rd-page > *,
+.home-news > * {
+  max-width: var(--read-width);
+  margin-inline: auto;
+}
+
+.rd-masthead {
+  padding-block: clamp(2.5rem, 7vw, 4.5rem) 1.5rem;
+}
+
+.rd-masthead-title {
+  margin-top: 0.75rem;
+  color: var(--text-heading);
+  font-family: var(--font-read);
+  font-size: clamp(3rem, 8vw, 5.25rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+[dir="rtl"] .rd-masthead-title {
+  letter-spacing: 0;
+  line-height: 1.1;
+}
+
+.rd-masthead-intro {
+  margin-top: 1rem;
+  font-size: 1.0625rem;
+}
+
+/* The two editions as quiet text tabs with an underline, not big coloured boxes. */
+.edition-switch {
+  display: flex;
+  gap: 1.75rem;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid var(--line-warm);
+}
+
+.edition-switch .edition-tab,
+.edition-switch .edition-tab[aria-current="page"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: var(--tap);
+  padding: 0;
+  margin-bottom: -1px;
+  color: var(--text-secondary);
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  box-shadow: none;
+  transform: none;
+}
+
+.edition-switch .edition-tab[aria-current="page"] {
+  color: var(--text-heading);
+  border-bottom-color: var(--text-heading);
+}
+
+.edition-switch .edition-label {
+  color: inherit;
+  font-family: var(--font-caption);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.edition-switch .edition-note {
+  display: none;
+}
+
+.edition-switch .edition-flag {
+  transform: scale(0.7);
+}
+
+/* In brief: the whole morning in a few lines. */
+.rd-brief {
+  margin-block: 2rem 1rem;
+  padding: 1.5rem 1.75rem;
+  border-inline-start: 2px solid var(--gold-soft);
+  background: var(--paper);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+[dir="rtl"] .rd-brief {
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+}
+
+.rd-brief-headline {
+  margin-top: 0.75rem;
+  color: var(--text-heading);
+  font-family: var(--font-read);
+  font-size: 1.5rem;
+  line-height: 1.25;
+}
+
+.rd-brief-list {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-inline-start: 1.1rem;
+  list-style: "–  ";
+  font-size: 0.9875rem;
+  line-height: 1.6;
+}
+
+/* Shared bits of a story: what it is, how solid, who and when. */
+.rd-label {
+  color: var(--barca-garnet);
+  font-family: var(--font-caption);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.rd-label [data-certainty="rumour"],
+.rd-label [data-certainty="opinion"] {
+  color: var(--text-secondary);
+}
+
+.rd-meta {
+  margin-top: 0.75rem;
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+}
+
+/* The photo, with the outlet's credit on it. */
+.rd-photo {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: var(--primary-wash);
+}
+
+.rd-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1.2s var(--ease-premium);
+}
+
+.rd-credit {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 1.5rem 0.75rem 0.5rem;
+  color: rgba(255, 255, 255, 0.9);
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.55), transparent);
+  font-family: var(--font-caption);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-align: end;
+}
+
+/* Our own art stands in when there is no photo: it fills the same frame. */
+:is(.rd-lead-picture, .rd-item-picture) .story-art {
+  height: 100%;
+}
+
+/* The lead story: the photo first, big; the words under it. */
+.rd-lead {
+  margin-top: 2rem;
+}
+
+.rd-lead-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.rd-lead-picture {
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+}
+
+.rd-lead-words {
+  padding-top: 1.5rem;
+}
+
+.rd-lead-title {
+  margin-top: 0.75rem;
+  color: var(--text-heading);
+  font-family: var(--font-read);
+  font-size: clamp(2rem, 4.5vw, 3rem);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+}
+
+[dir="rtl"] .rd-lead-title {
+  letter-spacing: 0;
+  line-height: 1.2;
+}
+
+.rd-lead-summary {
+  margin-top: 1rem;
+  color: var(--text-heading);
+  font-size: 1.125rem;
+  line-height: 1.65;
+  opacity: 0.85;
+}
+
+.rd-read {
+  display: inline-block;
+  margin-top: 1.25rem;
+  color: var(--text-heading);
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-bottom: 1px solid var(--gold-soft);
+}
+
+/* The rest: one column of summaries, a small photo on the reading-end side. */
+.rd-list {
+  margin-top: 2.5rem;
+  border-top: 1px solid var(--line-warm);
+}
+
+.rd-item-link {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(6.5rem, 22vw, 11rem);
+  align-items: start;
+  gap: 1.25rem;
+  padding-block: 1.5rem;
+  border-bottom: 1px solid var(--line-warm);
+  color: inherit;
+  text-decoration: none;
+}
+
+.rd-item-picture {
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+}
+
+.rd-item-title {
+  margin-top: 0.5rem;
+  color: var(--text-heading);
+  font-family: var(--font-read);
+  font-size: clamp(1.25rem, 2.6vw, 1.5rem);
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.rd-item-summary {
+  display: -webkit-box;
+  margin-top: 0.5rem;
+  overflow: hidden;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* Hover: the headline underlines and the photo leans in, slowly. */
+:is(.rd-lead-link, .rd-item-link):hover :is(.rd-lead-title, .rd-item-title) {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+:is(.rd-lead-link, .rd-item-link):hover .rd-photo img {
+  transform: scale(1.03);
+}
+
+.rd-more-list .rd-list {
+  margin-top: 0;
+  border-top: 0;
+}
+
+.rd-more {
+  display: flex;
+  margin: 2rem auto 0;
+}
+
+/* ---------- Home: today's three stories ---------- */
+
+.home-news {
+  padding-block: clamp(3.5rem, 8vw, 6rem) 1rem;
+}
+
+.home-news-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.home-news-head .section-title {
+  font-family: var(--font-read);
+  font-size: clamp(2.25rem, 5vw, 3.25rem);
+  font-weight: 400;
+  text-transform: none;
+}
+
+.home-news .rd-list {
+  margin-top: 1.5rem;
+}
+
+/* The match poster's comparison, folded away until asked for. */
+.poster-more {
+  margin-top: 2rem;
+  border-top: 1px solid rgba(244, 239, 230, 0.15);
+}
+
+.poster-more > summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  margin-top: 0.75rem;
+  color: var(--ivory);
+  font-family: var(--font-caption);
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+[dir="rtl"] .poster-more > summary {
+  letter-spacing: 0.02em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rd-photo img {
+    transition: none;
+  }
+}
+
+/* ---------- One story, in full (StoryPage.tsx): the same reading voice as the reader ---------- */
+
+.sp-title {
+  font-family: var(--font-read);
+  font-weight: 400;
+  line-height: 1.04;
+  letter-spacing: -0.015em;
+  text-transform: none;
+}
+
+[dir="rtl"] .sp-title {
+  letter-spacing: 0;
+  line-height: 1.15;
+}
+
+.sp-standfirst {
+  font-weight: 400;
+}
+
+.sp-art {
+  aspect-ratio: 16 / 9;
+  max-height: 70vh;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+}
+
+.sp-art .story-art {
+  height: 100%;
+}
+
+.sp-body p {
+  font-size: 1.125rem;
+  line-height: 1.8;
+}
+
+/* The big painted first letter belonged to the old look. */
+.sp-body p:first-child::first-letter {
+  float: none;
+  margin: 0;
+  color: inherit;
+  font: inherit;
+}
+
+.sp-related {
+  max-width: var(--read-width);
+}
+
+/* Story page sidebar and quotes: hairlines and serif, not dashed boxes and gradients. */
+.sp-facts {
+  border: 0;
+  border-inline-start: 2px solid var(--gold-soft);
+  border-radius: 0;
+  background: var(--paper);
+  outline: 0;
+  box-shadow: none;
+}
+
+.sp-facts li::before {
+  background: var(--gold-soft);
+}
+
+.sp-ask {
+  color: var(--ivory);
+  background: var(--night);
+  border-radius: var(--radius-pill);
+}
+
+.sp-sources {
+  border: 1px solid var(--line-warm);
+  background: var(--paper);
+  box-shadow: none;
+}
+
+.sp-quote {
+  border-inline-start-width: 2px;
+  border-color: var(--gold-soft);
+  background: transparent;
+}
+
+.sp-quote blockquote {
+  font-family: var(--font-read);
+  font-weight: 400;
+  text-transform: none;
+}
+
+.sp-back {
+  color: var(--text-heading);
+}
+
+/* ---------- Photo backgrounds (src/components/PhotoBackdrop.tsx) ----------
+   The club's big nights, faded in behind sections. The files are small (about 600px wide), so
+   they are never shown bright and sharp: on dark sections they sit dim under the words, on
+   light pages they are faint and fade out before the content. */
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.backdrop img {
+  object-fit: cover;
+}
+
+/* Dark sections: a dim, slightly desaturated photo under the section's own colour wash. */
+.backdrop[data-tone="night"] {
+  /* Fade in and out at the top and bottom, so one section melts into the next. */
+  mask-image: linear-gradient(180deg, transparent 0%, #000 22%, #000 72%, transparent 100%);
+}
+
+.backdrop[data-tone="night"] img {
+  opacity: 0.34;
+  filter: saturate(0.6) contrast(1.1) brightness(0.9);
+  scale: 1.12;
+}
+
+/* A chapter set long before the photo: aged to sepia, like an archive print. */
+.backdrop[data-archival] img {
+  filter: grayscale(1) sepia(0.45) contrast(1.15) brightness(0.85);
+  opacity: 0.28;
+}
+
+/* The poster carries a lot of text and numbers: a quieter photo. */
+.poster .backdrop img {
+  opacity: 0.24;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* A slow drift as the section passes, so the photo feels further away than the words. */
+    .backdrop[data-tone="night"] img {
+      animation: backdropDrift linear both;
+      animation-timeline: view();
+    }
+  }
+}
+
+@keyframes backdropDrift {
+  from { translate: 0 -4%; }
+  to { translate: 0 4%; }
+}
+
+/* Light pages: behind the top of the page only, under the content. */
+.backdrop[data-tone="page"] {
+  inset: 0 0 auto;
+  height: min(80vh, 760px);
+  z-index: 0;
+  mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.55) 40%, transparent 100%);
+}
+
+.backdrop[data-tone="page"] img {
+  opacity: 0.2;
+  filter: grayscale(0.5) sepia(0.25) contrast(1.05);
+}
+
+.backdrop[data-tone="page"] ~ main {
+  position: relative;
+  z-index: 1;
+}
+
+/* Sections that hold a backdrop: everything else sits on top of it. */
+.poster {
+  position: relative;
+  overflow: hidden;
+}
+
+.poster > :not(.backdrop) {
+  position: relative;
+}
+
+/* Home's motto band, on a photo: it turns night, and the letters turn ivory. */
+.motto-band[data-photo] {
+  color: var(--ivory);
+  background: var(--night);
+  border-bottom: 0;
+}
+
+.motto-band[data-photo] .backdrop img {
+  opacity: 0.45;
+}
+
+.motto-band[data-photo] .motto-track {
+  position: relative;
+}
+
+.motto-band[data-photo] .motto-track > span {
+  -webkit-text-stroke-color: var(--ivory);
+}
+
+.motto-band[data-photo] .motto-track > span:nth-child(even) {
+  color: var(--ivory);
+}
+
+.motto-band[data-photo]:hover .motto-track > span:nth-child(odd) {
+  color: var(--ivory);
+}
+
+.motto-band[data-photo] .motto-cta {
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop img {
+    animation: none;
+  }
+}

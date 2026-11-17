@@ -6,7 +6,12 @@ import {
 } from "@/config/news";
 import type { NewsArticle } from "@/domain/news";
 import { getAppDatabase } from "@/server/db/app-database";
-import { getRecentArticles, getRecentMedia, getStoryWriteups } from "@/server/db/queries/news";
+import {
+  getLatestBriefing,
+  getRecentArticles,
+  getRecentMedia,
+  getStoryWriteups,
+} from "@/server/db/queries/news";
 import { getSquad } from "@/server/db/queries/squad";
 import { getCurrentTeamScope } from "@/server/db/team-scope";
 import type { Db } from "@/server/db/client";
@@ -29,15 +34,16 @@ async function toStories(db: Db, articles: NewsArticle[]): Promise<NewsStory[]> 
 export async function getNewsData(edition: NewsEdition = "world") {
   const db = getAppDatabase();
   const israel = edition === "israel";
-  const [worldArticles, israelArticles, squad, podcasts] = await Promise.all([
+  const [worldArticles, israelArticles, squad, podcasts, briefing] = await Promise.all([
     getRecentArticles(db, NEWS_PAGE_LIMIT, NEWS_EDITIONS.world),
     israel ? getRecentArticles(db, NEWS_PAGE_LIMIT, NEWS_EDITIONS.israel) : [],
     getSquad(db, getCurrentTeamScope()),
     israel ? getRecentMedia(db, "podcast", NEWS_PODCASTS_LIMIT, NEWS_EDITIONS.israel) : [],
+    israel ? null : getLatestBriefing(db),
   ]);
   const [world, local] = await Promise.all([
     toStories(db, worldArticles),
     toStories(db, israelArticles),
   ]);
-  return { now: new Date(), world, israel: local, squad, podcasts };
+  return { now: new Date(), world, israel: local, squad, podcasts, briefing };
 }

@@ -40,6 +40,8 @@ export type NewsFeed = {
   barcaOnly: boolean;
   /** Set on a search for one journalist's reporting: every item it finds credits them. */
   scoopBy?: ScoopJournalist;
+  /** Headlines to leave out of this feed: adverts, or posts that arrive through another feed. */
+  skip?: RegExp;
 };
 
 // Marca's own feed is left out on purpose: it stopped updating in June 2025.
@@ -170,14 +172,29 @@ export const NEWS_FEEDS: NewsFeed[] = [
   // The Israeli press, in Hebrew. Sport5, Sport1 (ספורט 1), Israel Hayom and Maariv have no
   // working feed of their own, so they arrive through Google News. Walla's feed is its Spanish
   // league section; ONE and ynet are whole sports sections, filtered down to Barça.
+  // Google News must be asked with "he": the old code "iw" returns one item instead of ~40.
+  // The search covers both spellings: ברצלונה (the press) and בארסה (the fans).
   {
     id: "google-news-he",
     format: "rss",
     kind: "article",
     language: "he",
-    url: "https://news.google.com/rss/search?q=%D7%91%D7%A8%D7%A6%D7%9C%D7%95%D7%A0%D7%94+when:2d&hl=iw&gl=IL&ceid=IL:iw",
+    url: "https://news.google.com/rss/search?q=%28%D7%91%D7%A8%D7%A6%D7%9C%D7%95%D7%A0%D7%94+OR+%D7%91%D7%90%D7%A8%D7%A1%D7%94%29+when:2d&hl=he&gl=IL&ceid=IL:he",
     outlet: null,
     barcaOnly: false,
+  },
+  // Barça Mania, the club's official supporters' club in Israel: match reports, analysis,
+  // interviews and history, in Hebrew. Its podcast episodes ("פרק 210: ...") come in through the
+  // podcast feed below, and its shopping guides are adverts, so both are skipped here.
+  {
+    id: "barcamania-site",
+    format: "rss",
+    kind: "article",
+    language: "he",
+    url: "https://www.barcamania.co.il/feed/",
+    outlet: "בארסה מאניה",
+    barcaOnly: true,
+    skip: /^פרק \d+|^מדריך:/,
   },
   {
     id: "one",
@@ -250,6 +267,14 @@ export const NEWS_FEEDS: NewsFeed[] = [
 export const BARCA_KEYWORDS =
   /bar[cç]a|barcelona|blaugrana|azulgrana|cul[eé]s?\b|ברצלונה|בארסה|ברסה|בלאוגרנה|קאמפ נואו/i;
 
+/**
+ * The Israeli press covers Barcelona's basketball team at least as much as the football one
+ * (Euroleague, Israeli players), and both are just "ברצלונה". These words, or a basketball-size
+ * score such as 83:108, mean the item is not about football. Hebrew feeds only.
+ */
+export const NOT_FOOTBALL_HE =
+  /כדורסל|יורוליג|יורוקאפ|\bNBA\b|\bACB\b|ריבאונד|אסיסטים|שלשות|כדוריד|פוטסל|(?:[5-9]\d|1\d\d)[:\-–](?:[5-9]\d|1\d\d)/i;
+
 /** Spanish football press leans by city, which is worth knowing when reading it. */
 export const OUTLET_SIDES: Record<string, PressSide> = {
   "FC Barcelona": "official",
@@ -319,6 +344,13 @@ export const BLOCKED_OUTLETS = new Set([
 export const NEWS_USER_AGENT = "BarcaBrain/0.1 (https://github.com/ChefBoyNun00/barca-brain)";
 export const NEWS_REQUEST_TIMEOUT_MS = 15_000;
 export const NEWS_SNIPPET_MAX_CHARS = 500;
+/**
+ * Feed photos from these hosts are tracking pixels or ad beacons, not pictures (El Mundo's feed
+ * puts one where a photo would be). Add a host here if a beacon ever shows up on the page.
+ */
+export const NEWS_IMAGE_BLOCKED_HOSTS = ["imrworldwide.com", "doubleclick.net", "feedburner.com", "pixel.wp.com"];
+/** Longer than this and it is not a photo address we want in our database. */
+export const NEWS_IMAGE_URL_MAX_CHARS = 1_000;
 
 /** Older items are ignored, so a feed that freezes can never pass old news off as new. */
 export const NEWS_MAX_AGE_DAYS = 3;
@@ -335,6 +367,14 @@ export const NEWS_CATCH_ALL_TOPICS = ["other", "general", "news", "misc"];
 
 /** Full write-ups per run, biggest stories first, so cost stays bounded. */
 export const NEWS_STORIES_PER_RUN = 12;
+
+/**
+ * The Hebrew pass, for readers in Israel. Headlines go in batches like the translation step.
+ * The first run after launch catches up on the backlog; after that only new items need it.
+ */
+export const HEBREW_HEADLINES_PER_RUN = 150;
+export const HEBREW_BATCH_SIZE = 25;
+export const HEBREW_STORIES_PER_RUN = 20;
 /** The most coverage one write-up is written from. */
 export const NEWS_STORY_SOURCES_LIMIT = 25;
 
@@ -351,13 +391,17 @@ export const HOME_STORIES_LIMIT = 3;
  * latest of them. So a story everyone is still writing about beats a big one from yesterday.
  */
 export const NEWS_HEAT_HALF_LIFE_HOURS = 12;
-/** Stories on the heat chart under the lead. Only the biggest make the page. */
-export const NEWS_HEAT_CHART_LIMIT = 5;
-/** Stories both cities' press are telling, shown side by side. */
-export const NEWS_SPIN_LIMIT = 2;
-/** Big stories abroad the Israeli press has not picked up yet. */
-export const NEWS_NOT_IN_ISRAEL_LIMIT = 3;
 export const NEWS_RELATED_LIMIT = 4;
 export const STORY_PAGE_SOURCES_LIMIT = 40;
 export const NEWS_PODCASTS_LIMIT = 4;
+/** The "In brief" summary only shows while it is this fresh; older, it would describe old news. */
+export const NEWS_BRIEFING_FRESH_HOURS = 24;
+/** The lead story is chosen from this many of the most important ones (firm news with a photo). */
+export const NEWS_LEAD_CANDIDATES = 5;
+/** The news page opens with this many stories; the rest wait behind "More stories". */
+export const NEWS_FIRST_STORIES = 6;
+/** Today's top stories shown on the home page, before "All the news". */
+export const HOME_NEWS_STORIES = 3;
+/** How many stories the page holds at most, counting the ones behind "More stories". */
+export const NEWS_READER_LIMIT = 18;
 export const PLAYER_STORIES_LIMIT = 3;

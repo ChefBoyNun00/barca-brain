@@ -5,14 +5,15 @@ import { useLanguage, useT } from "@/i18n/language";
 import { formatScore } from "@/i18n/numbers";
 import type { LeagueRow, SeasonMatch } from "@/domain/home";
 import { FormPips } from "./FormPips";
-import { formatMatchDate } from "./format";
+import { displayTeam, formatMatchDate } from "./format";
 import { buildTape, findLastMeeting } from "./tale-of-the-tape";
 
 function TapeTeam({ team }: { team: LeagueRow }) {
+  const language = useLanguage();
   return (
     <div className="tape-team">
       {team.logoUrl && <Image src={team.logoUrl} alt="" width={40} height={40} unoptimized />}
-      <span>{team.name}</span>
+      <span>{displayTeam(team.name, language)}</span>
     </div>
   );
 }
@@ -41,7 +42,7 @@ export function TaleOfTheTape({ table, matches, opponentId }: TaleOfTheTapeProps
             <div className="tape-middle">
               <dt>{label}</dt>
               <dd className="sr-only">
-                {t("tape.values", { barca, rival: tape.rival.name, rivalValue: rival })}
+                {t("tape.values", { barca, rival: displayTeam(tape.rival.name, language), rivalValue: rival })}
               </dd>
               <div aria-hidden="true" className="tape-bar">
                 <span style={{ flexGrow: barcaShare }} />
@@ -64,7 +65,7 @@ export function TaleOfTheTape({ table, matches, opponentId }: TaleOfTheTapeProps
           {t("tape.last", {
             date: formatMatchDate(lastMeeting.kickoffAt, language),
             score: formatScore(language, lastMeeting.goalsFor, lastMeeting.goalsAgainst),
-            rival: tape.rival.name,
+            rival: displayTeam(tape.rival.name, language),
             venue: t(lastMeeting.isHome ? "venue.home" : "venue.away"),
           })}
         </p>

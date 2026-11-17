@@ -74,6 +74,8 @@ export type FeedArticle = {
   author?: string | null;
   /** Podcasts only: the episode's audio file. */
   audioUrl?: string | null;
+  /** The photo the outlet attached to the article, when it gave one. */
+  imageUrl?: string | null;
 };
 
 export interface NewsProvider {

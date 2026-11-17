@@ -1,8 +1,8 @@
 import { z } from "zod";
 import type { FeedKind, NewsLanguage, PressSide, ScoopJournalist } from "@/config/news";
-import { NEWS_CATCH_ALL_TOPICS, SCOOP_JOURNALISTS } from "@/config/news";
-import type { BriefingBullet } from "@/domain/news";
-import type { StorySource, Translation, WrittenStory } from "@/server/news/types";
+import { NEWS_CATCH_ALL_TOPICS, PRESS_SIDES, SCOOP_JOURNALISTS } from "@/config/news";
+import type { BriefingBullet, BriefingText, WriteupText } from "@/domain/news";
+import type { HebrewHeadline, HeadlineToTranslate, StorySource, Translation, WrittenStory } from "@/server/news/types";
 import type { FeedArticle } from "@/server/providers/types";
 import type { Db } from "../client";
 
@@ -19,8 +19,8 @@ export async function insertArticle(db: Db, article: ArticleToStore): Promise<bo
   const { rows } = await db.query(
     `insert into news_articles
        (url, dedupe_key, outlet, press_side, title_original, snippet_original, published_at,
-        kind, language, scoop_by, video_id, author, audio_url)
-     values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+        kind, language, scoop_by, video_id, author, audio_url, image_url)
+     values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
      on conflict do nothing
      returning id`,
     [
@@ -37,9 +37,19 @@ export async function insertArticle(db: Db, article: ArticleToStore): Promise<bo
       article.videoId ?? null,
       article.author ?? null,
       article.audioUrl ?? null,
+      article.imageUrl ?? null,
     ],
   );
-  return rows.length > 0;
+  if (rows.length > 0) return true;
+  // Already stored: still give it the feed's photo if it has none yet (rows saved before the
+  // photo column existed, or a feed that added the photo later). Never replaces a photo.
+  if (article.imageUrl) {
+    await db.query(
+      `update news_articles set image_url = $2 where url = $1 and image_url is null`,
+      [article.url, article.imageUrl],
+    );
+  }
+  return false;
 }
 
 const UntranslatedSchema = z.array(
@@ -191,7 +201,8 @@ export async function getTopicsToWrite(db: Db, days: number, limit: number) {
 
 const StorySourceRowSchema = z.object({
   outlet: z.string(),
-  press_side: z.enum(["barcelona", "madrid", "national", "english", "official"]),
+  // From the one list in config, so a new side (Israel was missed here) can never be refused.
+  press_side: z.enum(PRESS_SIDES),
   published_at: z.coerce.date(),
   title_en: z.string(),
   summary_en: z.string().nullable(),
@@ -245,7 +256,7 @@ export async function saveStory(
        key_facts = excluded.key_facts, quotes = excluded.quotes,
        whats_next = excluded.whats_next, certainty = excluded.certainty,
        article_count = excluded.article_count, latest_article_at = excluded.latest_article_at,
-       written_at = now()`,
+       written_at = now(), hebrew = null`,
     [
       story.topic,
       story.headline,
@@ -272,4 +283,125 @@ export async function deleteOldNews(db: Db, keepDays: number): Promise<void> {
     `delete from news_stories where latest_article_at < now() - make_interval(days => $1)`,
     [keepDays],
   );
+}
+
+// ---------- Hebrew, for readers in Israel ----------
+
+/**
+ * Israeli outlets already write in Hebrew, so their own headline and snippet are the Hebrew text:
+ * no translation needed. Returns how many articles it filled.
+ */
+export async function copyHebrewOriginals(db: Db): Promise<number> {
+  const { rows } = await db.query(
+    `update news_articles set title_he = title_original, summary_he = snippet_original
+     where kind = 'article' and language = 'he' and title_he is null
+     returning id`,
+  );
+  return rows.length;
+}
+
+const HeadlineRowSchema = z.array(
+  z.object({ id: z.string(), title_en: z.string(), summary_en: z.string().nullable() }),
+);
+
+/** Translated, relevant articles from outside Israel that have no Hebrew yet, newest first. */
+export async function getArticlesWithoutHebrew(
+  db: Db,
+  maxAgeDays: number,
+  limit: number,
+): Promise<HeadlineToTranslate[]> {
+  const { rows } = await db.query(
+    `select id, title_en, summary_en from news_articles
+     where kind = 'article' and is_relevant and title_en is not null and title_he is null
+       and language <> 'he' and published_at > now() - make_interval(days => $1)
+     order by published_at desc
+     limit $2`,
+    [maxAgeDays, limit],
+  );
+  return HeadlineRowSchema.parse(rows).map((row) => ({
+    id: row.id,
+    title: row.title_en,
+    summary: row.summary_en,
+  }));
+}
+
+export async function saveHebrewHeadline(db: Db, headline: HebrewHeadline): Promise<void> {
+  await db.query(`update news_articles set title_he = $2, summary_he = $3 where id = $1`, [
+    headline.id,
+    headline.titleHe,
+    headline.summaryHe,
+  ]);
+}
+
+const StoryTextRowSchema = z.array(
+  z.object({
+    topic: z.string(),
+    headline: z.string(),
+    standfirst: z.string(),
+    body: z.array(z.string()),
+    key_facts: z.array(z.string()),
+    quotes: z.array(z.object({ text: z.string(), speaker: z.string(), outlet: z.string() })),
+    whats_next: z.string().nullable(),
+  }),
+);
+
+/** Write-ups with no Hebrew yet (new, or rewritten since), the most recent first. */
+export async function getStoriesWithoutHebrew(
+  db: Db,
+  limit: number,
+): Promise<Array<WriteupText & { topic: string }>> {
+  const { rows } = await db.query(
+    `select topic, headline, standfirst, body, key_facts, quotes, whats_next from news_stories
+     where hebrew is null
+     order by latest_article_at desc
+     limit $1`,
+    [limit],
+  );
+  return StoryTextRowSchema.parse(rows).map((row) => ({
+    topic: row.topic,
+    headline: row.headline,
+    standfirst: row.standfirst,
+    body: row.body,
+    keyFacts: row.key_facts,
+    quotes: row.quotes,
+    whatsNext: row.whats_next,
+  }));
+}
+
+/**
+ * Saves a story's Hebrew, but only onto the English it was translated from: if the story was
+ * rewritten in between, the headline differs and nothing is saved, so it is retried next run.
+ */
+export async function saveStoryHebrew(
+  db: Db,
+  story: { topic: string; englishHeadline: string; hebrew: WriteupText },
+): Promise<void> {
+  await db.query(`update news_stories set hebrew = $3 where topic = $1 and headline = $2`, [
+    story.topic,
+    story.englishHeadline,
+    JSON.stringify(story.hebrew),
+  ]);
+}
+
+const BriefingTextRowSchema = z.array(
+  z.object({
+    id: z.string(),
+    headline: z.string(),
+    bullets: z.array(z.object({ text: z.string(), topic: z.string().nullable() })),
+  }),
+);
+
+/** The latest briefing, if it has no Hebrew yet. Older briefings are never shown, so never translated. */
+export async function getBriefingWithoutHebrew(
+  db: Db,
+): Promise<(BriefingText & { id: string }) | null> {
+  const { rows } = await db.query(
+    `select id, headline, bullets from news_briefings
+     where hebrew is null and created_at = (select max(created_at) from news_briefings)`,
+  );
+  return BriefingTextRowSchema.parse(rows)[0] ?? null;
+}
+
+export async function saveBriefingHebrew(db: Db, id: string, hebrew: BriefingText): Promise<void> {
+  await db.query(`update news_briefings set hebrew = $2 where id = $1`, [id, JSON.stringify(hebrew)]);
 }

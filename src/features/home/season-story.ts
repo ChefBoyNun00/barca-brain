@@ -1,7 +1,7 @@
 import { translate, type Language, type TextKey, type TextVars } from "@/i18n/dictionary";
 import { formatScore } from "@/i18n/numbers";
 import type { HomeStanding, SeasonMatch } from "@/domain/home";
-import { displayCompetition, formatMatchDate } from "./format";
+import { displayCompetition, displayTeam, formatMatchDate } from "./format";
 
 export type MatchOutcome = "W" | "D" | "L";
 
@@ -49,7 +49,7 @@ export function outcomeLetter(outcome: MatchOutcome, language: Language = "en"):
 
 /** One plain sentence per match, for screen readers and the list view. */
 export function describeMatch(match: SeasonMatch, language: Language = "en"): string {
-  const opponent = match.opponent?.name ?? translate(language, "common.opponentTbd");
+  const opponent = match.opponent ? displayTeam(match.opponent.name, language) : translate(language, "common.opponentTbd");
   const venue = translate(language, match.isHome ? "venue.home" : "venue.away");
   const date = formatMatchDate(match.kickoffAt, language);
   const outcome = getMatchOutcome(match);

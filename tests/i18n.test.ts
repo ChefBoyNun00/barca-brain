@@ -51,7 +51,7 @@ describe("translations", () => {
 
   it("isolates names and scores in Hebrew so they keep their own direction", () => {
     expect(translate("he", "ticker.result", { score: "2–1", opponent: "Sevilla FC" })).toBe(
-      "ברסה \u20682–1\u2069 \u2068Sevilla FC\u2069",
+      "בארסה \u20682–1\u2069 \u2068Sevilla FC\u2069",
     );
     // English is left exactly as written.
     expect(translate("en", "ticker.result", { score: "2–1", opponent: "Sevilla FC" })).toBe(

@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { PhotoBackdrop } from "@/components/PhotoBackdrop";
+import { BACKDROPS } from "@/config/moments";
 import { SiteNav } from "@/components/SiteNav";
 import { HistoryTimeline } from "@/features/history/HistoryTimeline";
 import { T } from "@/i18n/language";
@@ -12,6 +14,7 @@ export default function HistoryPage() {
   return (
     <>
       <SiteNav />
+      <PhotoBackdrop moment={BACKDROPS.page.history} tone="page" priority />
       <main className="page-gutter flex-1 pt-10 pb-16">
         <p className="kicker">Més que un club</p>
         <h1 className="display-title mt-3">

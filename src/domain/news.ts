@@ -20,6 +20,9 @@ export type NewsArticle = {
   /** Null until translated. The page then shows the Spanish and says so. */
   titleEn: string | null;
   summaryEn: string | null;
+  /** Null until the Hebrew pass reaches it. Israeli outlets' own Hebrew, else a translation. */
+  titleHe: string | null;
+  summaryHe: string | null;
   category: NewsCategory | null;
   certainty: NewsCertainty | null;
   topic: string | null;
@@ -27,6 +30,8 @@ export type NewsArticle = {
   language: NewsLanguage;
   /** Set when the story comes from a named journalist, such as Fabrizio Romano. */
   scoopBy: ScoopJournalist | null;
+  /** The outlet's own photo for the article, from its feed. Credited to the outlet on the page. */
+  imageUrl: string | null;
 };
 
 /** A club video, a fan thread or a podcast episode: shown as it is, never translated or grouped. */
@@ -45,25 +50,33 @@ export type NewsMedia = {
 
 export type BriefingBullet = { text: string; topic: string | null };
 
-export type NewsBriefing = {
+export type BriefingText = { headline: string; bullets: BriefingBullet[] };
+
+export type NewsBriefing = BriefingText & {
   createdAt: Date;
-  headline: string;
-  bullets: BriefingBullet[];
   storyCount: number;
+  /** The same briefing in Hebrew; null until translated. */
+  hebrew: BriefingText | null;
 };
 
 export type StoryQuote = { text: string; speaker: string; outlet: string };
 
-/** The full story, written in our own words from every outlet's coverage. */
-export type StoryWriteup = {
-  topic: string;
+/** The words of a write-up, in one language. */
+export type WriteupText = {
   headline: string;
   standfirst: string;
   body: string[];
   keyFacts: string[];
   quotes: StoryQuote[];
   whatsNext: string | null;
+};
+
+/** The full story, written in our own words from every outlet's coverage. */
+export type StoryWriteup = WriteupText & {
+  topic: string;
   certainty: NewsCertainty;
   articleCount: number;
   writtenAt: Date;
+  /** The same write-up in Hebrew; null until translated. */
+  hebrew: WriteupText | null;
 };

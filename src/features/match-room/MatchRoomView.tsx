@@ -12,7 +12,7 @@ import type {
 } from "@/domain/match-room";
 import type { TextKey } from "@/i18n/dictionary";
 import { useLanguage, useT } from "@/i18n/language";
-import { displayCompetition, displayRound, formatKickoff, formatUpdatedAgo } from "../home/format";
+import { displayCompetition, displayRound, displayTeam, formatKickoff, formatUpdatedAgo } from "../home/format";
 import { formatExpectedReturn, formatMinute } from "./format";
 
 const EVENT_LABELS: Record<MatchEventKind, TextKey> = {
@@ -299,7 +299,7 @@ export function MatchRoomView({ match, room, now }: { match: SeasonMatch; room: 
   const t = useT();
   const language = useLanguage();
   const barcaName = t("common.barca");
-  const opponentName = match.opponent?.name ?? t("common.tbd");
+  const opponentName = match.opponent ? displayTeam(match.opponent.name, language) : t("common.tbd");
   const kickedOff = now.getTime() >= match.kickoffAt.getTime();
 
   if (room === null) {

@@ -24,6 +24,67 @@ export const COMPETITION_DISPLAY_NAMES_HE: Record<string, string> = {
   "FIFA Club World Cup": "מונדיאל המועדונים",
 };
 
+/**
+ * Teams as the Israeli sports press writes them, keyed by the short name the provider sends.
+ * Spanish teams use their full Hebrew name where the press does (אתלטיקו מדריד, not "Atleti").
+ * A team not listed shows as it arrives, in Latin letters. Add new opponents here.
+ */
+export const TEAM_DISPLAY_NAMES_HE: Record<string, string> = {
+  // La Liga
+  "Barça": "בארסה",
+  "Real Madrid": "ריאל מדריד",
+  Atleti: "אתלטיקו מדריד",
+  Athletic: "אתלטיק בילבאו",
+  "Real Betis": "בטיס",
+  "Real Sociedad": "ריאל סוסיאדד",
+  "Sevilla FC": "סביליה",
+  Villarreal: "ויאריאל",
+  Valencia: "ולנסיה",
+  Celta: "סלטה ויגו",
+  Osasuna: "אוסאסונה",
+  "Alavés": "אלאבס",
+  Espanyol: "אספניול",
+  "Rayo Vallecano": "ראיו וייקאנו",
+  Getafe: "חטאפה",
+  Levante: "לבאנטה",
+  Elche: "אלצ׳ה",
+  "Málaga": "מלאגה",
+  Deportivo: "דפורטיבו לה קורוניה",
+  Santander: "ראסינג סנטנדר",
+  // Europe
+  Arsenal: "ארסנל",
+  Liverpool: "ליברפול",
+  "Man City": "מנצ׳סטר סיטי",
+  "Man United": "מנצ׳סטר יונייטד",
+  "Aston Villa": "אסטון וילה",
+  PSG: "פריז סן ז׳רמן",
+  Lille: "ליל",
+  "RC Lens": "לאנס",
+  Bayern: "באיירן מינכן",
+  Dortmund: "דורטמונד",
+  "RB Leipzig": "לייפציג",
+  Stuttgart: "שטוטגרט",
+  Inter: "אינטר",
+  Napoli: "נאפולי",
+  Roma: "רומא",
+  "Como 1907": "קומו",
+  Porto: "פורטו",
+  "Sporting CP": "ספורטינג ליסבון",
+  PSV: "פ.ס.וו איינדהובן",
+  Feyenoord: "פיינורד",
+  "Club Brugge": "קלאב ברוז׳",
+  Galatasaray: "גלאטסראיי",
+  "Fenerbahçe": "פנרבחצ׳ה",
+  Shaktar: "שחטאר דונייצק",
+  "PAE AEK": "אא״ק אתונה",
+  "Slavia Praha": "סלביה פראג",
+  "Sl. Bratislava": "סלובן ברטיסלבה",
+  LASK: "לאסק לינץ",
+  "Bodø/Glimt": "בודו/גלימט",
+  Viking: "ויקינג",
+  "Sabah FK": "סבאח",
+};
+
 export const POINTS_FOR = { W: 3, D: 1, L: 0 } as const;
 
 /** How long each stripe stays on screen when the season replays. */

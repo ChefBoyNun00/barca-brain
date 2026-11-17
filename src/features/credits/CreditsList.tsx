@@ -1,4 +1,5 @@
 import { connection } from "next/server";
+import { ALL_MOMENTS } from "@/config/moments";
 import { STADIUM_PHOTO } from "@/config/photos";
 import type { SquadPlayer } from "@/domain/home";
 import { getAppDatabase } from "@/server/db/app-database";
@@ -22,6 +23,12 @@ export async function CreditsList() {
           <a href={STADIUM_PHOTO.pageUrl} target="_blank" rel="noreferrer">
             {STADIUM_PHOTO.credit}, {STADIUM_PHOTO.license}
           </a>
+        </li>
+        <li>
+          <span className="credits-player">
+            <T k="credits.moments" />
+          </span>
+          <span>{[...new Set(ALL_MOMENTS.map((moment) => moment.credit))].join(", ")}</span>
         </li>
       </ul>
       {/* CC BY-SA asks us to say when a photo has been changed. */}

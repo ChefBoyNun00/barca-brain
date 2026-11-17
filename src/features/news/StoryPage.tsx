@@ -9,17 +9,19 @@ import { CertaintyMeter } from "./CertaintyMeter";
 import { getStoryData } from "./get-story-data";
 import { ScoopBadge } from "./ScoopBadge";
 import { StoryArt } from "./StoryArt";
-import { StoryCard } from "./StoryCard";
+import { OutletPhoto } from "./OutletPhoto";
+import { ReaderItem } from "./Reader";
 import {
   headlineOf,
   isCoveredByBothCities,
   meterStepOf,
+  photoOf,
   scoopOf,
   standfirstOf,
   topicOf,
 } from "./stories";
 import { StoryAge } from "./StoryAge";
-import { StoryHeadline, StoryStandfirst } from "./StoryText";
+import { CoverageText, StoryBody, StoryHeadline, StoryKeyFacts, StoryStandfirst } from "./StoryText";
 
 const SIDE_LABELS = {
   barcelona: "press.barcelona",
@@ -40,6 +42,7 @@ export async function StoryPage({ topic }: { topic: string }) {
   const scoop = scoopOf(story);
   const standfirst = standfirstOf(story);
   const players = squad.filter((player) => story.players.includes(player.name));
+  const photo = photoOf(story);
 
   return (
     <article className="sp">
@@ -78,39 +81,25 @@ export async function StoryPage({ topic }: { topic: string }) {
         </p>
       </header>
 
+      {/* The outlet's photo, credited; our own art when no outlet gave one, or it will not load. */}
       <div className="sp-art">
-        <StoryArt story={story} squad={squad} size="hero" />
+        {photo ? (
+          <OutletPhoto
+            src={photo.url}
+            priority
+            credit={<T k="news.photoBy" vars={{ outlet: photo.outlet }} />}
+            fallback={<StoryArt story={story} squad={squad} size="hero" />}
+          />
+        ) : (
+          <StoryArt story={story} squad={squad} size="hero" />
+        )}
       </div>
 
       <div className="sp-layout">
         <div className="sp-main">
           {writeup ? (
             <>
-              <div className="sp-body">
-                {writeup.body.map((paragraph) => (
-                  <p key={paragraph} dir="auto">
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
-
-              {writeup.quotes.map((quote) => (
-                <figure key={quote.text} className="sp-quote" dir="auto">
-                  <blockquote>“{quote.text}”</blockquote>
-                  <figcaption>
-                    {quote.speaker} · <cite>{quote.outlet}</cite>
-                  </figcaption>
-                </figure>
-              ))}
-
-              {writeup.whatsNext && (
-                <section className="sp-next" aria-labelledby="sp-next-title">
-                  <h2 id="sp-next-title">
-                    <T k="news.whatsNext" />
-                  </h2>
-                  <p dir="auto">{writeup.whatsNext}</p>
-                </section>
-              )}
+              <StoryBody writeup={writeup} />
               <p className="sp-ai-note">
                 <T k="news.aiNote" vars={{ count: writeup.articleCount }} />
               </p>
@@ -124,10 +113,7 @@ export async function StoryPage({ topic }: { topic: string }) {
                 {story.coverage.map((article) => (
                   <li key={article.id}>
                     <p className="sp-coverage-outlet">{article.outlet}</p>
-                    <p className="sp-coverage-title" dir="auto">
-                      {article.titleEn ?? article.titleOriginal}
-                    </p>
-                    {article.summaryEn && <p dir="auto">{article.summaryEn}</p>}
+                    <CoverageText article={article} />
                   </li>
                 ))}
               </ul>
@@ -136,20 +122,7 @@ export async function StoryPage({ topic }: { topic: string }) {
         </div>
 
         <aside className="sp-side">
-          {writeup && writeup.keyFacts.length > 0 && (
-            <section className="sp-facts" aria-labelledby="sp-facts-title">
-              <h2 id="sp-facts-title">
-                <T k="news.keyFacts" />
-              </h2>
-              <ul>
-                {writeup.keyFacts.map((fact) => (
-                  <li key={fact} dir="auto">
-                    {fact}
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
+          {writeup && <StoryKeyFacts writeup={writeup} />}
 
           {players.length > 0 && (
             <ul className="sp-players">
@@ -193,14 +166,14 @@ export async function StoryPage({ topic }: { topic: string }) {
 
       {related.length > 0 && (
         <section className="sp-related" aria-labelledby="sp-related-title">
-          <h2 id="sp-related-title" className="nw-section-title">
+          <h2 id="sp-related-title" className="eyebrow">
             <T k="news.related" />
           </h2>
-          <div className="nw-grid">
+          <ol className="rd-list">
             {related.map((other) => (
-              <StoryCard key={other.id} story={other} squad={squad} now={now} size="tile" />
+              <ReaderItem key={other.id} story={other} squad={squad} now={now} />
             ))}
-          </div>
+          </ol>
         </section>
       )}
     </article>

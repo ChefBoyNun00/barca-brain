@@ -4,7 +4,7 @@ import Image from "next/image";
 import { RACE_TEAMS_LIMIT } from "@/config/display";
 import { useLanguage, useT } from "@/i18n/language";
 import type { LeagueRow, SeasonMatch } from "@/domain/home";
-import { formatMatchDate } from "./format";
+import { displayTeam, formatMatchDate } from "./format";
 import { describeOutcome, type MatchOutcome } from "./season-story";
 import {
   getFinishPreview,
@@ -31,7 +31,7 @@ type PickTileProps = {
 function PickTile({ match, index, pick, rank, onTap }: PickTileProps) {
   const t = useT();
   const language = useLanguage();
-  const opponent = match.opponent?.name ?? t("common.tbd");
+  const opponent = match.opponent ? displayTeam(match.opponent.name, language) : t("common.tbd");
   const venue = t(match.isHome ? "venue.home" : "venue.away");
   const date = formatMatchDate(match.kickoffAt, language);
   const word = pick ? describeOutcome(pick, language) : t("pick.tap");
@@ -176,7 +176,7 @@ export function SeasonEnding({ matches, table }: SeasonEndingProps) {
                     {team.logoUrl && (
                       <Image src={team.logoUrl} alt="" width={20} height={20} unoptimized />
                     )}
-                    <bdi>{team.name}</bdi>
+                    <bdi>{displayTeam(team.name, language)}</bdi>
                   </span>
                   <span className="tally-number">{team.points}</span>
                   <Tally count={team.points} max={ending.maxPoints} muted={!team.isBarca} dense />

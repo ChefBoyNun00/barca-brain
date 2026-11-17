@@ -1,4 +1,6 @@
 import Image from "next/image";
+import Link from "next/link";
+import { Icon } from "@/components/Icon";
 import { BARCA_CREST_URL } from "@/config/display";
 import { STADIUM_PHOTO } from "@/config/photos";
 import type { HomeStanding } from "@/domain/home";
@@ -84,6 +86,10 @@ export function HomeHero({ season, summary, total, standing, matchday, now }: Ho
             </div>
           ))}
         </dl>
+        <Link href="/club" className="hero-story">
+          <T k="hero.story" />
+          <Icon name="arrow" className="icon icon-flip" />
+        </Link>
       </div>
     </header>
   );

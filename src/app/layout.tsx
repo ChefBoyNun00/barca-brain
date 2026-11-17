@@ -1,12 +1,16 @@
 import type { Metadata } from "next";
-import { Big_Shoulders, Heebo, Inter } from "next/font/google";
+import { Big_Shoulders, Heebo, IBM_Plex_Mono, Inter } from "next/font/google";
 import { AskDrawer } from "@/features/ask/AskDrawer";
 import { IntroSplash } from "@/components/IntroSplash";
+import { serifFontClasses } from "@/components/serif-fonts";
+import { PointerTilt } from "@/components/motion/PointerTilt";
 import { LanguageReady } from "@/components/LanguageReady";
 import { SiteFooter } from "@/components/SiteFooter";
 import { INTRO_STORAGE_KEY, LANGUAGE_STORAGE_KEY } from "@/config/display";
 import { LANGUAGES, RTL_LANGUAGES } from "@/i18n/dictionary";
 import "./globals.css";
+// The premium layer: loaded after globals.css so its look wins. See the note at its top.
+import "./premium.css";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -18,7 +22,14 @@ const display = Big_Shoulders({
   subsets: ["latin"],
 });
 
-// The two fonts above have no Hebrew letters, so Hebrew pages switch to Heebo.
+// Small captions and labels: wide-spaced capitals in a typewriter face.
+const mono = IBM_Plex_Mono({
+  variable: "--font-mono",
+  subsets: ["latin"],
+  weight: ["400", "500"],
+});
+
+// The fonts above have no Hebrew letters, so Hebrew pages switch to Heebo.
 const hebrew = Heebo({
   variable: "--font-hebrew",
   subsets: ["hebrew", "latin"],
@@ -52,7 +63,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${display.variable} ${hebrew.variable} h-full antialiased`}
+      className={`${inter.variable} ${display.variable} ${hebrew.variable} ${mono.variable} ${serifFontClasses} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>
@@ -62,6 +73,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body className="min-h-full flex flex-col">
         <IntroSplash />
+        <PointerTilt />
         <LanguageReady />
         {children}
         <div aria-hidden="true" className="mosaic-band" />

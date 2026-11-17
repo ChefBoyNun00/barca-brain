@@ -6,7 +6,7 @@ import { formatScore, formatSigned } from "@/i18n/numbers";
 import Image from "next/image";
 import type { LeagueRow, SeasonMatch } from "@/domain/home";
 import { FormPips } from "./FormPips";
-import { formatMatchDate } from "./format";
+import { displayTeam, formatMatchDate } from "./format";
 import { describeMatch, getMatchOutcome } from "./season-story";
 
 type Meeting = { match: SeasonMatch };
@@ -41,6 +41,7 @@ type LeagueTableProps = { table: LeagueRow[]; matches: SeasonMatch[] };
 /** The league table, with Barça's meetings against each side linking back to the shirt. */
 export function LeagueTable({ table, matches }: LeagueTableProps) {
   const t = useT();
+  const language = useLanguage();
   const meetingsByTeam = new Map<string, Meeting[]>();
   matches.forEach((match) => {
     if (!match.isLeague || !match.opponent) return;
@@ -98,7 +99,7 @@ export function LeagueTable({ table, matches }: LeagueTableProps) {
                       {row.logoUrl && (
                         <Image src={row.logoUrl} alt="" width={24} height={24} unoptimized />
                       )}
-                      <bdi>{row.name}</bdi>
+                      <bdi>{displayTeam(row.name, language)}</bdi>
                     </span>
                   </th>
                   <td className="league-wide">{row.played ?? "–"}</td>

@@ -6,15 +6,11 @@ import { AtomFeedSchema, RssFeedSchema } from "./schemas";
 
 const PROVIDER_NAME = "rss";
 
-const parser = new XMLParser({
-  ignoreAttributes: true,
-  parseTagValue: false,
-  htmlEntities: true,
-  isArray: (name) => name === "item",
-});
-
-/** Podcasts keep attributes, because the audio file's address is one. */
-const podcastParser = new XMLParser({
+/**
+ * Keeps attributes, because the addresses we want live in them: a podcast's audio file, and the
+ * photo in a news item's enclosure or Media RSS tag.
+ */
+const attributeParser = new XMLParser({
   ignoreAttributes: false,
   attributeNamePrefix: "@_",
   parseTagValue: false,
@@ -59,8 +55,7 @@ export function createRssProvider(deps: Deps = {}): NewsProvider {
         if (!parsed.success) throw unrecognised();
         return mapAtomEntries(parsed.data.feed.entry, feed);
       }
-      const rssParser = feed.kind === "podcast" ? podcastParser : parser;
-      const parsed = RssFeedSchema.safeParse(rssParser.parse(text));
+      const parsed = RssFeedSchema.safeParse(attributeParser.parse(text));
       if (!parsed.success) throw unrecognised();
       return mapFeedItems(parsed.data.rss.channel.item, feed);
     },

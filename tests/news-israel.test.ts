@@ -3,15 +3,20 @@ import { NEWS_EDITIONS, NEWS_FEEDS, PRESS_SIDES, type NewsFeed } from "@/config/
 import { chooseNewsEdition, parseNewsEdition } from "@/features/news/news-edition";
 import {
   coverageIn,
+  hebrewHeadlineOf,
   findAbroad,
   groupStories,
   heatOf,
   notYetIn,
+  orderForReader,
+  photoOf,
   rankByHeat,
   spinsOf,
 } from "@/features/news/stories";
 import type { NewsArticle } from "@/domain/news";
-import { prepareArticles } from "@/server/news/prepare";
+import type { NewsStory } from "@/features/news/stories";
+import { assertCleanHebrew } from "@/server/ai/news-ai";
+import { makeDedupeKey, prepareArticles } from "@/server/news/prepare";
 import { createRssProvider } from "@/server/providers/rss/provider";
 
 const now = new Date();
@@ -85,6 +90,63 @@ describe("the Israeli press", () => {
     expect(prepareArticles([spam], google, now)).toEqual([]);
   });
 
+  it("gives different Hebrew headlines different keys, so none is dropped as a repeat", () => {
+    // Before the fix, both of these became "" and only the first one was ever stored.
+    expect(makeDedupeKey("פליק חשף: ההחלטה לגבי כוכב ברצלונה")).not.toBe(
+      makeDedupeKey("ברצלונה פנתה למנצ'סטר סיטי"),
+    );
+    expect(makeDedupeKey("פליק חשף: ההחלטה!")).toBe(makeDedupeKey("פליק חשף ההחלטה"));
+    // Spanish and English keys are unchanged.
+    expect(makeDedupeKey("¡El BARÇA, campeón!")).toBe("el barca campeon");
+  });
+
+  it("leaves out Barcelona's basketball team, which the Israeli press covers as much", () => {
+    const item = (title: string) => ({ url: `https://x.test/${title}`, outlet: "ONE", title, snippet: null, publishedAt: now });
+    const kept = prepareArticles(
+      [
+        item("צפו: ברצלונה רשמה ניצחון תשיעי ברציפות עם 83:108 על אוברדויר"),
+        item("ברצלונה ביורוליג: הפסד בפריז"),
+        item("ברצלונה ניצחה 1:2 את אתלטיקו"),
+        item("ברצלונה נגד ריאל ב־21:00 הערב"),
+      ],
+      hebrewFeed,
+      now,
+    );
+    expect(kept.map((article) => article.title)).toEqual([
+      "ברצלונה ניצחה 1:2 את אתלטיקו",
+      "ברצלונה נגד ריאל ב־21:00 הערב",
+    ]);
+  });
+
+  it("reads Barça Mania's site, without its podcast posts or adverts", () => {
+    const feed = NEWS_FEEDS.find((candidate) => candidate.id === "barcamania-site");
+    expect(feed?.language).toBe("he");
+    const item = (title: string) => ({ url: `https://x.test/${title}`, outlet: "בארסה מאניה", title, snippet: null, publishedAt: now });
+    const kept = prepareArticles(
+      [
+        item("פרמין הפך את הערב: 1-2 על אתלטיקו במטרופוליטנו"),
+        item("פרק 210: בארסה איתנו עם ניצחון ענק"),
+        item("מדריך: איך להשיג חולצות כדורגל חדשות"),
+      ],
+      feed!,
+      now,
+    );
+    expect(kept.map((article) => article.title)).toEqual(["פרמין הפך את הערב: 1-2 על אתלטיקו במטרופוליטנו"]);
+    expect(kept[0]?.pressSide).toBe("israel");
+  });
+
+  it("refuses Hebrew with letters from another alphabet, but allows Latin outlet names", () => {
+    expect(() => assertCleanHebrew({ body: ["מתאו מורטו, שדיבר ב־DAZN"] })).not.toThrow();
+    expect(() => assertCleanHebrew({ body: ["מתאו מוретו"] })).toThrow(/another alphabet/);
+    expect(() => assertCleanHebrew({ headline: "בארסה ניצחה α" })).toThrow();
+  });
+
+  it("asks Google News in Hebrew with the current language code", () => {
+    const google = NEWS_FEEDS.find((feed) => feed.id === "google-news-he");
+    expect(google?.url).toContain("hl=he");
+    expect(google?.url).not.toContain("iw");
+  });
+
   it("has Israeli article feeds and podcasts configured", () => {
     const hebrew = NEWS_FEEDS.filter((feed) => feed.language === "he");
     expect(hebrew.some((feed) => feed.kind === "article")).toBe(true);
@@ -133,16 +195,56 @@ describe("choosing an edition", () => {
       publishedAt: now,
       titleEn: "Pedri is back",
       summaryEn: null,
+      titleHe: null,
+      summaryHe: null,
       category: "match",
       certainty: "news",
       topic: "pedri-back",
       playerNames: [],
       language,
       scoopBy: null,
+      imageUrl: null,
     });
     const [story] = groupStories([article("md", "es"), article("one", "he")]);
     expect(coverageIn(story!, "he")?.id).toBe("one");
     expect(coverageIn(story!, "en")).toBeNull();
+  });
+
+  it("gives Hebrew readers the best Hebrew there is, and none when there is none", () => {
+    const article = (id: string, language: NewsArticle["language"], titleHe: string | null): NewsArticle => ({
+      id,
+      url: `https://${id}.test`,
+      outlet: id,
+      pressSide: language === "he" ? "israel" : "barcelona",
+      titleOriginal: language === "he" ? "כותרת של ONE" : "Titular",
+      snippetOriginal: null,
+      publishedAt: now,
+      titleEn: "Pedri is back",
+      summaryEn: null,
+      titleHe,
+      summaryHe: null,
+      category: "match",
+      certainty: "news",
+      topic: "pedri-back",
+      playerNames: [],
+      language,
+      scoopBy: null,
+      imageUrl: null,
+    });
+    const story = (articles: NewsArticle[], hebrewWriteup: string | null = null): NewsStory => ({
+      ...groupStories(articles)[0]!,
+      writeup: hebrewWriteup
+        ? {
+            topic: "pedri-back", headline: "Pedri is back", standfirst: "s", body: ["b"], keyFacts: [],
+            quotes: [], whatsNext: null, certainty: "news", articleCount: 1, writtenAt: now,
+            hebrew: { headline: hebrewWriteup, standfirst: "ת", body: ["ג"], keyFacts: [], quotes: [], whatsNext: null },
+          }
+        : null,
+    });
+    expect(hebrewHeadlineOf(story([article("md", "es", null)]))).toBeNull();
+    expect(hebrewHeadlineOf(story([article("md", "es", "פדרי חוזר")]))).toBe("פדרי חוזר");
+    expect(hebrewHeadlineOf(story([article("md", "es", "פדרי חוזר"), article("one", "he", null)]))).toBe("כותרת של ONE");
+    expect(hebrewHeadlineOf(story([article("md", "es", "פדרי חוזר")], "הכתבה שלנו"))).toBe("הכתבה שלנו");
   });
 });
 
@@ -160,12 +262,15 @@ const make = (
   publishedAt: new Date(now.getTime() - (over.hoursAgo ?? 0) * HOUR),
   titleEn: `headline ${id}`,
   summaryEn: null,
+  titleHe: null,
+  summaryHe: null,
   category: "match",
   certainty: "news",
   topic: "pedri-back",
   playerNames: [],
   language: "es",
   scoopBy: null,
+  imageUrl: null,
   ...over,
 });
 
@@ -236,5 +341,39 @@ describe("Israel and the world", () => {
     const missing = notYetIn(world, israel.slice(0, 1), 5).map((story) => story.id);
     expect(missing).toEqual(["yamal-contract"]);
     expect(notYetIn(world, israel, 5)).toEqual([]);
+  });
+});
+
+describe("a story's photo", () => {
+  it("uses the lead's photo, else borrows one from other coverage, else none", () => {
+    const [none] = groupStories([make("a"), make("b")]);
+    expect(photoOf(none!)).toBeNull();
+    const [borrowed] = groupStories([make("a"), make("b", { imageUrl: "https://img.test/b.jpg" })]);
+    expect(photoOf(borrowed!)).toEqual({ url: "https://img.test/b.jpg", outlet: "b" });
+  });
+});
+
+describe("the reader's order", () => {
+  const story = (id: string, count: number, over: Partial<NewsArticle> = {}) =>
+    Array.from({ length: count }, (_, index) => make(`${id}${index}`, { topic: id, ...over }));
+  const order = (articles: NewsArticle[]) =>
+    orderForReader(
+      groupStories(articles).map((one) => ({ ...one, writeup: null })),
+      now,
+      10,
+    ).map((one) => one.id);
+
+  it("leads with firm news that has a photo, not the hottest opinion piece", () => {
+    const articles = [
+      ...story("opinion", 5, { certainty: "opinion", imageUrl: "https://img.test/o.jpg" }),
+      ...story("plain", 3, { certainty: "reported" }),
+      ...story("injury", 2, { certainty: "official", imageUrl: "https://img.test/i.jpg" }),
+    ];
+    expect(order(articles)).toEqual(["injury", "opinion", "plain"]);
+  });
+
+  it("leaves out stories still waiting for their translation", () => {
+    const articles = [...story("done", 2), make("raw", { titleEn: null, topic: null })];
+    expect(order(articles)).toEqual(["done"]);
   });
 });

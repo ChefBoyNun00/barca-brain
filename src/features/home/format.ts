@@ -3,6 +3,7 @@ import {
   COMPETITION_DISPLAY_NAMES_HE,
   DISPLAY_LOCALES,
   DISPLAY_TIME_ZONE,
+  TEAM_DISPLAY_NAMES_HE,
 } from "@/config/display";
 import { isTextKey, translate, type Language } from "@/i18n/dictionary";
 
@@ -20,6 +21,15 @@ export function displayCompetition(name: string, language: Language = "en"): str
 }
 
 /**
+ * A team as fans in the visitor's language know it: "ויאריאל" in Hebrew, "Villarreal" in English.
+ * Only for showing. Comparisons (is this the Clásico?) must use the stored name.
+ */
+export function displayTeam(name: string, language: Language = "en"): string {
+  if (language === "he") return TEAM_DISPLAY_NAMES_HE[name] ?? name;
+  return name;
+}
+
+/**
  * The round as the provider names it ("Matchday 12", "Quarter finals"), in the visitor's language.
  * English keeps the stored text exactly; a round the dictionary doesn't know shows as stored.
  */
@@ -31,7 +41,24 @@ export function displayRound(round: string | null, language: Language = "en"): s
   return isTextKey(key) ? translate(language, key) : round;
 }
 
+/**
+ * The provider stores a fixture whose kickoff isn't set yet at midnight UTC (02:00 in Israel).
+ * No La Liga or European match starts then, so that time means "to be confirmed", never a real time.
+ */
+export function isKickoffTimeKnown(date: Date): boolean {
+  return date.getUTCHours() !== 0 || date.getUTCMinutes() !== 0;
+}
+
 export function formatKickoff(date: Date, language: Language = "en"): string {
+  if (!isKickoffTimeKnown(date)) {
+    const day = new Intl.DateTimeFormat(DISPLAY_LOCALES[language], {
+      timeZone: DISPLAY_TIME_ZONE,
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+    }).format(date);
+    return `${day} · ${translate(language, "time.tbc")}`;
+  }
   return new Intl.DateTimeFormat(DISPLAY_LOCALES[language], {
     timeZone: DISPLAY_TIME_ZONE,
     weekday: "short",

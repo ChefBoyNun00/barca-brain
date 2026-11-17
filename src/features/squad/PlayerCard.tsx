@@ -146,7 +146,7 @@ export function PlayerCard({
                 {playerStories.map(({ id, lead }) => (
                   <li key={id}>
                     <a href={lead.url} target="_blank" rel="noreferrer" dir="auto">
-                      {lead.titleEn ?? lead.titleOriginal}
+                      {(language === "he" && lead.titleHe) || lead.titleEn || lead.titleOriginal}
                     </a>{" "}
                     <span>{lead.outlet}</span>
                   </li>

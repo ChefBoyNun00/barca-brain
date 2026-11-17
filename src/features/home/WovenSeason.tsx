@@ -8,7 +8,7 @@ import { useLanguage, useT } from "@/i18n/language";
 import { formatScore } from "@/i18n/numbers";
 import { BARCA_CREST_URL, REPLAY_STEP_MS } from "@/config/display";
 import type { SeasonMatch } from "@/domain/home";
-import { displayCompetition, displayRound, formatKickoff, formatMatchDate } from "./format";
+import { displayCompetition, displayRound, displayTeam, formatKickoff, formatMatchDate } from "./format";
 import { SEASON_FILTERS } from "./season-filters";
 import { prefersReducedMotion, useSeasonSelection } from "./season-selection";
 import {
@@ -77,7 +77,7 @@ function MatchDetail({ match }: { match: SeasonMatch }) {
   const hasHalfTime = match.halfTimeFor !== null && match.halfTimeAgainst !== null;
   const barca = { name: t("common.barca"), logoUrl: BARCA_CREST_URL as string | null };
   const opponent = {
-    name: match.opponent?.name ?? t("common.tbd"),
+    name: match.opponent ? displayTeam(match.opponent.name, language) : t("common.tbd"),
     logoUrl: match.opponent?.logoUrl ?? null,
   };
   const [left, right] = match.isHome ? [barca, opponent] : [opponent, barca];

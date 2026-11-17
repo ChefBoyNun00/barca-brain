@@ -3,67 +3,30 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Suspense, useState, type ReactNode } from "react";
+import { Suspense, useEffect, useRef, useState, type CSSProperties } from "react";
 import { BARCA_CREST_URL } from "@/config/display";
 import type { TextKey } from "@/i18n/dictionary";
 import { useT } from "@/i18n/language";
-import { Icon, type IconName } from "./Icon";
 import { LanguageToggle } from "./LanguageToggle";
 
-type Section = { href: string; label: TextKey; icon: ReactNode; also?: string[] };
+/** inBar: shown right in the header (and the phone's link row), not only in the full menu. */
+type Section = { href: string; label: TextKey; also?: string[]; inBar?: boolean };
 
-const icon = (name: IconName) => <Icon name={name} className="tab-icon" />;
-
-/** The main features, in the order fans reach for them. Add a page here to add a tab. */
-const PRIMARY: Section[] = [
-  { href: "/", label: "nav.home", icon: icon("home") },
-  {
-    href: "/news",
-    label: "nav.news",
-    icon: icon("news"),
-  },
-  {
-    href: "/table",
-    label: "nav.table",
-    icon: icon("table"),
-    also: ["/season"],
-  },
-  {
-    href: "/matches",
-    label: "nav.matches",
-    icon: icon("matches"),
-  },
-  {
-    href: "/squad",
-    label: "nav.squad",
-    icon: icon("shirt"),
-  },
+/** Every page, in the order the menu lists them. Add a page here to add it to the menu. */
+const SECTIONS: Section[] = [
+  { href: "/", label: "nav.home", inBar: true },
+  { href: "/news", label: "nav.news", inBar: true },
+  { href: "/matches", label: "nav.matches", inBar: true },
+  { href: "/table", label: "nav.table", also: ["/season"], inBar: true },
+  { href: "/squad", label: "nav.squad", inBar: true },
+  { href: "/club", label: "nav.club", inBar: true },
+  { href: "/stats", label: "nav.stats" },
+  { href: "/history", label: "nav.history" },
+  { href: "/shirt", label: "nav.shirt" },
+  { href: "/ask", label: "nav.ask" },
 ];
 
-/** More pages. On a wide screen they sit in the top bar, on a phone behind the More tab. */
-const SECONDARY: Section[] = [
-  {
-    href: "/stats",
-    label: "nav.stats",
-    icon: icon("stats"),
-  },
-  {
-    href: "/history",
-    label: "nav.history",
-    icon: icon("history"),
-  },
-];
-
-/** Only in the More menu on phones: the desktop top bar has no room for it. */
-const EXTRA: Section[] = [
-  {
-    href: "/shirt",
-    label: "nav.shirt",
-    icon: icon("shirt"),
-  },
-];
-
-const MORE_ICON = icon("more");
+const MENU_ID = "site-menu";
 
 function isActive(pathname: string, { href, also = [] }: Section): boolean {
   if (href === "/") return pathname === "/";
@@ -72,87 +35,126 @@ function isActive(pathname: string, { href, also = [] }: Section): boolean {
 
 function NavShell({ pathname }: { pathname: string }) {
   const t = useT();
-  // The menu is open for one page only, so moving to another page closes it by itself.
-  const [moreOpenFor, setMoreOpenFor] = useState<string | null>(null);
-  const moreOpen = moreOpenFor === pathname;
-  const moreIsActive = [...SECONDARY, ...EXTRA].some((section) => isActive(pathname, section));
+  // The menu belongs to one page, so arriving on another page closes it by itself.
+  const [openFor, setOpenFor] = useState<string | null>(null);
+  const open = openFor === pathname;
+  const toggle = useRef<HTMLButtonElement>(null);
+  const menu = useRef<HTMLDivElement>(null);
+  const links = useRef<HTMLElement>(null);
+
+  // On a phone the links are a sideways row: bring the current page's link into view.
+  useEffect(() => {
+    const row = links.current;
+    const current = row?.querySelector<HTMLElement>('[aria-current="page"]');
+    if (!row || !current || row.scrollWidth <= row.clientWidth) return;
+    const rowBox = row.getBoundingClientRect();
+    const linkBox = current.getBoundingClientRect();
+    row.scrollLeft += linkBox.left + linkBox.width / 2 - (rowBox.left + rowBox.width / 2);
+  }, [pathname]);
+
+  // While the menu is open: the page behind stays still, Escape closes it, and focus moves in.
+  useEffect(() => {
+    if (!open) return;
+    const button = toggle.current;
+    document.documentElement.dataset.menuOpen = "";
+    menu.current?.querySelector<HTMLElement>("a")?.focus();
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpenFor(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      delete document.documentElement.dataset.menuOpen;
+      window.removeEventListener("keydown", onKey);
+      button?.focus();
+    };
+  }, [open]);
+
   return (
     <>
-      <nav aria-label={t("a11y.main")} className="nav">
-        <div className="nav-inner">
-          <Link href="/" className="brand">
-            <Image src={BARCA_CREST_URL} alt="" width={28} height={28} unoptimized />
-            <span className="brand-name">Barça Brain</span>
+      <header className="hdr" data-open={open || undefined}>
+        <div className="hdr-inner">
+          <Link href="/" className="hdr-brand" aria-label="Barça Brain">
+            <Image src={BARCA_CREST_URL} alt="" width={30} height={30} unoptimized />
+            <span className="hdr-name">Barça Brain</span>
           </Link>
-          <ul className="nav-links">
-            {[...PRIMARY, ...SECONDARY].map((section) => (
-              <li key={section.href}>
-                <Link
-                  href={section.href}
-                  aria-current={isActive(pathname, section) ? "page" : undefined}
-                >
-                  {t(section.label)}
-                </Link>
-              </li>
-            ))}
-          </ul>
-          <LanguageToggle />
+          <nav ref={links} aria-label={t("a11y.main")} className="hdr-links">
+            <ul>
+              {SECTIONS.filter((section) => section.inBar).map((section) => (
+                <li key={section.href}>
+                  <Link
+                    href={section.href}
+                    aria-current={isActive(pathname, section) ? "page" : undefined}
+                  >
+                    {t(section.label)}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <div className="hdr-lang">
+            <LanguageToggle />
+          </div>
+          <button
+            ref={toggle}
+            type="button"
+            className="hdr-menu"
+            aria-expanded={open}
+            aria-controls={MENU_ID}
+            onClick={() => setOpenFor(open ? null : pathname)}
+          >
+            <span className="hdr-menu-word">{t(open ? "nav.close" : "nav.more")}</span>
+            <span aria-hidden="true" className="hdr-menu-lines">
+              <span />
+              <span />
+            </span>
+          </button>
         </div>
-      </nav>
-      {/* On phones the same links sit at the bottom, where a thumb can reach them. */}
-      <nav aria-label={t("a11y.tabs")} className="tabbar">
-        {moreOpen && (
-          <ul className="tabbar-more">
-            {[...SECONDARY, ...EXTRA].map((section) => (
-              <li key={section.href}>
+      </header>
+
+      <div
+        ref={menu}
+        id={MENU_ID}
+        className="menu"
+        data-open={open || undefined}
+        role="dialog"
+        aria-modal="true"
+        aria-label={t("a11y.allPages")}
+        // inert, not hidden: hidden would cut the closing animation off. CSS hides it after.
+        inert={!open}
+      >
+        <nav aria-label={t("a11y.allPages")} className="menu-inner">
+          <ol className="menu-links">
+            {SECTIONS.map((section, index) => (
+              <li key={section.href} style={{ "--i": index } as CSSProperties}>
                 <Link
                   href={section.href}
                   aria-current={isActive(pathname, section) ? "page" : undefined}
+                  onClick={() => setOpenFor(null)}
                 >
-                  {section.icon}
-                  <span>{t(section.label)}</span>
+                  <span className="menu-num">{String(index + 1).padStart(2, "0")}</span>
+                  <span className="menu-word">{t(section.label)}</span>
                 </Link>
               </li>
             ))}
-          </ul>
-        )}
-        <ul>
-          {PRIMARY.map((section) => (
-            <li key={section.href}>
-              <Link
-                href={section.href}
-                aria-current={isActive(pathname, section) ? "page" : undefined}
-              >
-                {section.icon}
-                <span>{t(section.label)}</span>
-              </Link>
-            </li>
-          ))}
-          <li>
-            <button
-              type="button"
-              aria-expanded={moreOpen}
-              aria-current={moreIsActive ? "page" : undefined}
-              onClick={() => setMoreOpenFor(moreOpen ? null : pathname)}
-            >
-              {MORE_ICON}
-              <span>{t("nav.more")}</span>
-            </button>
-          </li>
-        </ul>
-      </nav>
+          </ol>
+          <div className="menu-foot">
+            <p className="menu-motto">Més que un club</p>
+            <LanguageToggle />
+          </div>
+        </nav>
+      </div>
     </>
   );
 }
 
-/** Reads the current page, so the active tab lights up. */
+/** Reads the current page, so the menu can mark where you are. */
 function ActiveNav() {
   return <NavShell pathname={usePathname()} />;
 }
 
 /**
  * The address is only known at request time on pages like /matches/[id], so it loads inside
- * Suspense. Until it does, the nav shows with no tab lit, so it is never missing.
+ * Suspense. Until it does, the header shows with nothing marked, so it is never missing.
  */
 export function SiteNav() {
   return (

@@ -6,16 +6,31 @@ import type { SquadPlayer } from "@/domain/home";
 import { T } from "@/i18n/language";
 import type { TextKey } from "@/i18n/dictionary";
 import { formatSigned } from "@/i18n/numbers";
+import { getLastPlayedIndex, getNextMatchIndex } from "../home/season-story";
+import { SeasonSelectionProvider } from "../home/season-selection";
+import { WovenSeason } from "../home/WovenSeason";
 import { MatchCard } from "../matches/MatchCard";
 import { getJersey } from "../squad/jersey-data";
 import { getPlayerTotals } from "../squad/squad-stats";
 import { getStatsData } from "./get-stats-data";
-import { buildSeasonNumbers, projectPoints, type Record3 } from "./season-stats";
+import {
+  buildSeasonNumbers,
+  projectPoints,
+  type Record3,
+} from "./season-stats";
 
 const TOP_PLAYERS = 5;
 
 /** `index` staggers the entrance, so the tiles arrive one after another. */
-function Tile({ label, value, index }: { label: TextKey; value: string | number; index: number }) {
+function Tile({
+  label,
+  value,
+  index,
+}: {
+  label: TextKey;
+  value: string | number;
+  index: number;
+}) {
   return (
     <div className="num-tile" style={{ "--i": index } as CSSProperties}>
       <span className="num-tile-value">{value}</span>
@@ -39,13 +54,18 @@ function RecordBar({ label, record }: { label: TextKey; record: Record3 }) {
         <T k={label} />
         {/* Three separate pieces, so wins come first in either reading direction, like the bar. */}
         <span className="split-record">
-          <span>{record.wins}</span>-<span>{record.draws}</span>-<span>{record.losses}</span>
+          <span>{record.wins}</span>-<span>{record.draws}</span>-
+          <span>{record.losses}</span>
         </span>
       </p>
       <span id={`record-${label}`} className="sr-only">
         <T
           k="stats.recordAria"
-          vars={{ wins: record.wins, draws: record.draws, losses: record.losses }}
+          vars={{
+            wins: record.wins,
+            draws: record.draws,
+            losses: record.losses,
+          }}
         />
       </span>
       <div className="split-bar" role="img" aria-labelledby={`record-${label}`}>
@@ -73,7 +93,9 @@ function Leaders({
   const ranked = players
     .map((player) => ({ player, value: pick(player) }))
     .filter(({ value }) => value > 0)
-    .sort((a, b) => b.value - a.value || a.player.name.localeCompare(b.player.name))
+    .sort(
+      (a, b) => b.value - a.value || a.player.name.localeCompare(b.player.name),
+    )
     .slice(0, TOP_PLAYERS);
   const top = ranked[0]?.value ?? 1;
   return (
@@ -83,9 +105,15 @@ function Leaders({
       </h3>
       <ol>
         {ranked.map(({ player, value }, index) => (
-          <li key={player.id} data-first={index === 0} style={{ "--i": index } as CSSProperties}>
+          <li
+            key={player.id}
+            data-first={index === 0}
+            style={{ "--i": index } as CSSProperties}
+          >
             <Link href={`/squad/${player.id}`}>
-              <span className="leaders-number">{getJersey(player).number ?? "–"}</span>
+              <span className="leaders-number">
+                {getJersey(player).number ?? "–"}
+              </span>
               <span className="leaders-name">{player.name}</span>
               <span className="leaders-bar" aria-hidden="true">
                 <span style={{ width: `${(value / top) * 100}%` }} />
@@ -124,7 +152,9 @@ export async function StatsPage() {
   }
 
   const difference = numbers.goalsFor - numbers.goalsAgainst;
-  const pace = barca?.played ? projectPoints(barca.points, barca.played, LEAGUE_MATCHES) : null;
+  const pace = barca?.played
+    ? projectPoints(barca.points, barca.played, LEAGUE_MATCHES)
+    : null;
   const halves = numbers.firstHalfGoals + numbers.secondHalfGoals;
   const standout = [
     { label: "stats.biggestWin" as const, match: numbers.biggestWin },
@@ -132,113 +162,166 @@ export async function StatsPage() {
     { label: "stats.highestScoring" as const, match: numbers.highestScoring },
   ].filter(
     (item, index, all) =>
-      item.match !== null && all.findIndex((other) => other.match?.id === item.match?.id) === index,
+      item.match !== null &&
+      all.findIndex((other) => other.match?.id === item.match?.id) === index,
   );
 
+  const lastPlayedIndex = getLastPlayedIndex(matches);
   return (
-    <section className="page-gutter section">
-      <h1 className="section-title">
-        <T k="stats.title" />
-      </h1>
-      <p className="section-note">
-        <T k="stats.note" />
-      </p>
-
-      <div className="num-grid num-grid-eight">
-        <Tile label="stats.played" value={numbers.played} index={0} />
-        <Tile label="stats.wins" value={numbers.wins} index={1} />
-        <Tile label="stats.draws" value={numbers.draws} index={2} />
-        <Tile label="stats.defeats" value={numbers.losses} index={3} />
-        <Tile label="stats.goalsFor" value={numbers.goalsFor} index={4} />
-        <Tile label="stats.goalsAgainst" value={numbers.goalsAgainst} index={5} />
-        <Tile label="stats.difference" value={formatSigned(difference)} index={6} />
-        <Tile label="stats.cleanSheets" value={numbers.cleanSheets} index={7} />
-      </div>
-
-      {pace !== null && (
-        <p className="pace">
-          <span className="pace-label">
-            <T k="stats.pace" />
-          </span>
-          <span className="pace-value">{pace}</span>
-          <span className="pace-note">
-            <T k="stats.paceNote" vars={{ matches: LEAGUE_MATCHES }} />
-          </span>
+    <>
+      <section className="page-gutter section">
+        <h1 className="section-title">
+          <T k="stats.title" />
+        </h1>
+        <p className="section-note">
+          <T k="stats.note" />
         </p>
-      )}
 
-      <div className="stats-columns">
-        <div>
-          <h2 className="stats-heading">
-            <T k="stats.venue" />
-          </h2>
-          <RecordBar label="stats.home" record={numbers.home} />
-          <RecordBar label="stats.away" record={numbers.away} />
+        <div className="num-grid num-grid-eight">
+          <Tile label="stats.played" value={numbers.played} index={0} />
+          <Tile label="stats.wins" value={numbers.wins} index={1} />
+          <Tile label="stats.draws" value={numbers.draws} index={2} />
+          <Tile label="stats.defeats" value={numbers.losses} index={3} />
+          <Tile label="stats.goalsFor" value={numbers.goalsFor} index={4} />
+          <Tile
+            label="stats.goalsAgainst"
+            value={numbers.goalsAgainst}
+            index={5}
+          />
+          <Tile
+            label="stats.difference"
+            value={formatSigned(difference)}
+            index={6}
+          />
+          <Tile
+            label="stats.cleanSheets"
+            value={numbers.cleanSheets}
+            index={7}
+          />
         </div>
-        {numbers.halfTimeKnown > 0 && halves > 0 && (
+
+        {pace !== null && (
+          <p className="pace">
+            <span className="pace-label">
+              <T k="stats.pace" />
+            </span>
+            <span className="pace-value">{pace}</span>
+            <span className="pace-note">
+              <T k="stats.paceNote" vars={{ matches: LEAGUE_MATCHES }} />
+            </span>
+          </p>
+        )}
+
+        <div className="stats-columns">
           <div>
             <h2 className="stats-heading">
-              <T k="stats.halves" />
+              <T k="stats.venue" />
             </h2>
-            <div className="halves">
-              <div style={{ flexGrow: numbers.firstHalfGoals }} data-half="first">
-                <strong>{numbers.firstHalfGoals}</strong>
-                <T k="stats.firstHalf" />
-              </div>
-              <div style={{ flexGrow: numbers.secondHalfGoals }} data-half="second">
-                <strong>{numbers.secondHalfGoals}</strong>
-                <T k="stats.secondHalf" />
-              </div>
-            </div>
-            <p className="section-note">
-              <T k="stats.halvesNote" vars={{ count: numbers.halfTimeKnown }} />
-            </p>
+            <RecordBar label="stats.home" record={numbers.home} />
+            <RecordBar label="stats.away" record={numbers.away} />
           </div>
-        )}
-      </div>
-
-      <h2 className="stats-heading">
-        <T k="stats.runs" />
-      </h2>
-      <div className="num-grid num-grid-three">
-        <Tile label="stats.longestWinning" value={numbers.longestWinning} index={0} />
-        <Tile label="stats.longestUnbeaten" value={numbers.longestUnbeaten} index={1} />
-        <Tile label="stats.currentUnbeaten" value={numbers.currentUnbeaten} index={2} />
-      </div>
-
-      {standout.length > 0 && (
-        <>
-          <h2 className="stats-heading">
-            <T k="stats.standout" />
-          </h2>
-          <div className="standout">
-            {standout.map(({ label, match }) =>
-              match ? (
-                <div key={label}>
-                  <p className="standout-label">
-                    <T k={label} />
-                  </p>
-                  <MatchCard match={match} index={0} />
+          {numbers.halfTimeKnown > 0 && halves > 0 && (
+            <div>
+              <h2 className="stats-heading">
+                <T k="stats.halves" />
+              </h2>
+              <div className="halves">
+                <div
+                  style={{ flexGrow: numbers.firstHalfGoals }}
+                  data-half="first"
+                >
+                  <strong>{numbers.firstHalfGoals}</strong>
+                  <T k="stats.firstHalf" />
                 </div>
-              ) : null,
-            )}
-          </div>
-        </>
-      )}
+                <div
+                  style={{ flexGrow: numbers.secondHalfGoals }}
+                  data-half="second"
+                >
+                  <strong>{numbers.secondHalfGoals}</strong>
+                  <T k="stats.secondHalf" />
+                </div>
+              </div>
+              <p className="section-note">
+                <T
+                  k="stats.halvesNote"
+                  vars={{ count: numbers.halfTimeKnown }}
+                />
+              </p>
+            </div>
+          )}
+        </div>
 
-      <div className="stats-columns">
-        <Leaders
-          title="stats.scorers"
-          players={squad}
-          pick={(player) => getPlayerTotals(player).goals}
-        />
-        <Leaders
-          title="stats.assists"
-          note="stats.assistsNote"
-          players={squad}
-          pick={(player) => getPlayerTotals(player).assists ?? 0}
-        />
-      </div>
-    </section>
+        <h2 className="stats-heading">
+          <T k="stats.runs" />
+        </h2>
+        <div className="num-grid num-grid-three">
+          <Tile
+            label="stats.longestWinning"
+            value={numbers.longestWinning}
+            index={0}
+          />
+          <Tile
+            label="stats.longestUnbeaten"
+            value={numbers.longestUnbeaten}
+            index={1}
+          />
+          <Tile
+            label="stats.currentUnbeaten"
+            value={numbers.currentUnbeaten}
+            index={2}
+          />
+        </div>
+
+        {standout.length > 0 && (
+          <>
+            <h2 className="stats-heading">
+              <T k="stats.standout" />
+            </h2>
+            <div className="standout">
+              {standout.map(({ label, match }) =>
+                match ? (
+                  <div key={label}>
+                    <p className="standout-label">
+                      <T k={label} />
+                    </p>
+                    <MatchCard match={match} index={0} />
+                  </div>
+                ) : null,
+              )}
+            </div>
+          </>
+        )}
+
+        <div className="stats-columns">
+          <Leaders
+            title="stats.scorers"
+            players={squad}
+            pick={(player) => getPlayerTotals(player).goals}
+          />
+          <Leaders
+            title="stats.assists"
+            note="stats.assistsNote"
+            players={squad}
+            pick={(player) => getPlayerTotals(player).assists ?? 0}
+          />
+        </div>
+      </section>
+
+      {/* The whole season as one woven shirt: moved here from the home page, to keep home light. */}
+      <section aria-labelledby="woven" className="surface-stone weave-section">
+        <div className="page-gutter">
+          <h2 id="woven" className="section-title">
+            <T k="stats.woven" />
+          </h2>
+        </div>
+        <SeasonSelectionProvider initialIndex={Math.max(lastPlayedIndex, 0)}>
+          <WovenSeason
+            matches={matches}
+            lastPlayedIndex={lastPlayedIndex}
+            nextIndex={getNextMatchIndex(matches, new Date())}
+          />
+        </SeasonSelectionProvider>
+      </section>
+    </>
   );
 }

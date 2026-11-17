@@ -127,6 +127,43 @@ describe("reading a feed", () => {
     expect(JSON.stringify(await provider.fetchFeed(directFeed))).not.toContain("Texto completo");
   });
 
+  describe("the outlet's photo", () => {
+    const at = hoursAgo(1).toUTCString();
+    const feedWith = (extra: string) => `<?xml version="1.0"?>
+<rss xmlns:media="http://search.yahoo.com/mrss/"><channel>
+<item><title>Pedri vuelve</title><link>https://a.test/p</link><pubDate>${at}</pubDate>${extra}</item>
+</channel></rss>`;
+    const photoOf = async (extra: string) =>
+      (await createRssProvider({ fetchText: async () => feedWith(extra) }).fetchFeed(directFeed))[0]
+        ?.imageUrl;
+
+    it("takes the widest Media RSS photo", async () => {
+      expect(
+        await photoOf(
+          `<media:content url="https://img.test/small.jpg" width="140" medium="image"/>
+           <media:content url="https://img.test/big.jpg" width="460" medium="image"/>`,
+        ),
+      ).toBe("https://img.test/big.jpg");
+    });
+
+    it("takes an image enclosure, but not an audio one", async () => {
+      expect(await photoOf(`<enclosure type="image/jpeg" url="https://img.test/e.jpg"/>`)).toBe(
+        "https://img.test/e.jpg",
+      );
+      expect(await photoOf(`<enclosure type="audio/mpeg" url="https://img.test/e.mp3"/>`)).toBeNull();
+    });
+
+    it("finds a picture inside the description, skipping tracking pixels", async () => {
+      const description = `<description><![CDATA[<img src="https://secure-uk.imrworldwide.com/m?x=1"/><p>Hola</p><img src='https://img.test/d.jpg'>]]></description>`;
+      expect(await photoOf(description)).toBe("https://img.test/d.jpg");
+    });
+
+    it("refuses anything that is not a web address", async () => {
+      expect(await photoOf(`<media:content url="javascript:alert(1)" medium="image"/>`)).toBeNull();
+      expect(await photoOf(`<media:content url="https://img.test/v.mp4" medium="video"/>`)).toBeNull();
+    });
+  });
+
   it("refuses a link that is not a web link", () => {
     const item = { title: "T", link: "javascript:alert(1)", pubDate: now.toUTCString() };
     expect(mapFeedItems([item], directFeed)).toEqual([]);
@@ -269,6 +306,10 @@ const fakeAi = (changes: Partial<NewsAi> = {}): NewsAi => ({
     bullets: [{ text: "Barça won.", topic: null }],
   }),
   writeStory: async () => writtenStory,
+  headlinesToHebrew: async (headlines) =>
+    headlines.map((headline) => ({ id: headline.id, titleHe: `כותרת: ${headline.title}`, summaryHe: null })),
+  storyToHebrew: async (story) => ({ ...story, headline: `בעברית: ${story.headline}` }),
+  briefingToHebrew: async (briefing) => ({ ...briefing, headline: `בעברית: ${briefing.headline}` }),
   ...changes,
 });
 
@@ -436,6 +477,61 @@ describe("the news job", () => {
     ]);
   });
 
+  it("puts headlines, the story and the briefing into Hebrew after the English", async () => {
+    const result = await run(providerOf(three), fakeAi());
+    expect(result.status).toBe("success");
+    expect(result.hebrew).toMatchObject({ headlines: 3, stories: 1, briefing: true, errors: [] });
+
+    const [first] = await getRecentArticles(created.database, 10);
+    expect(first?.titleHe).toBe("כותרת: Barça win");
+    const { writeup } = await getStoryPage(created.database, "barca-win", 10);
+    expect(writeup?.hebrew?.headline).toBe(`בעברית: ${writtenStory.headline}`);
+    expect(writeup?.hebrew?.body).toEqual(writtenStory.body);
+    expect((await getLatestBriefing(created.database))?.hebrew?.headline).toBe("בעברית: A big day");
+
+    // Nothing left to do on the next run.
+    expect((await run(providerOf(three), fakeAi())).hebrew).toMatchObject({ headlines: 0, stories: 0 });
+  });
+
+  it("copies Israeli outlets' own Hebrew instead of translating it", async () => {
+    const israeli: NewsFeed = { ...directFeed, id: "one", language: "he", outlet: "ONE" };
+    const sent: string[] = [];
+    const ai = fakeAi({
+      headlinesToHebrew: async (headlines) => {
+        sent.push(...headlines.map((headline) => headline.title));
+        return [];
+      },
+    });
+    const hebrewItem = feedArticle({ url: "https://one.test/1", outlet: "ONE", title: "ברצלונה ניצחה", snippet: "תקציר" });
+    await runNews({ db: created.database, provider: providerOf([hebrewItem]), ai, feeds: [israeli], now });
+    const [stored] = await getRecentArticles(created.database, 10);
+    expect(stored).toMatchObject({ titleHe: "ברצלונה ניצחה", summaryHe: "תקציר" });
+    expect(sent).toEqual([]);
+  });
+
+  it("translates a rewritten story again, and keeps the English when Hebrew fails", async () => {
+    await run(providerOf(three), fakeAi());
+    const fourth = feedArticle({ url: "https://a.test/4", title: "Barça noticia 4" });
+    const broken = fakeAi({
+      writeStory: async () => ({ ...writtenStory, headline: "A newer headline" }),
+      storyToHebrew: async () => {
+        throw new Error("model busy");
+      },
+    });
+    const result = await run(providerOf([...three, fourth]), broken);
+    // Reported, but the run still succeeds: the English is fine and Hebrew is retried next run.
+    expect(result.status).toBe("success");
+    expect(result.hebrew.errors).toEqual(["barca-win: model busy"]);
+    const { writeup } = await getStoryPage(created.database, "barca-win", 10);
+    // The old Hebrew described the old story, so it is gone; the new English is there.
+    expect(writeup).toMatchObject({ headline: "A newer headline", hebrew: null });
+
+    expect((await run(providerOf([...three, fourth]), fakeAi())).hebrew.stories).toBe(1);
+    expect((await getStoryPage(created.database, "barca-win", 10)).writeup?.hebrew?.headline).toBe(
+      "בעברית: A newer headline",
+    );
+  });
+
   it("searches English and Spanish, and treats % as a normal character", async () => {
     await run(providerOf(three), fakeAi());
     const search = (query: string) =>
@@ -457,12 +553,15 @@ function article(id: string, changes: Partial<NewsArticle> = {}): NewsArticle {
     publishedAt: hoursAgo(1),
     titleEn: "Headline",
     summaryEn: null,
+    titleHe: null,
+    summaryHe: null,
     category: "transfers",
     certainty: "rumour",
     topic: "rashford",
     playerNames: [],
     language: "es",
     scoopBy: null,
+    imageUrl: null,
     ...changes,
   };
 }
@@ -523,7 +622,7 @@ describe("grouping stories", () => {
 
   it("attaches write-ups by topic, and prefers their headline", () => {
     const stories = attachWriteups(groupStories(mixed), [
-      { ...writtenStory, topic: "rashford", articleCount: 2, writtenAt: now },
+      { ...writtenStory, topic: "rashford", articleCount: 2, writtenAt: now, hebrew: null },
     ]);
     expect(stories.map((story) => story.writeup?.headline ?? null)).toEqual([
       "Barça win at the Metropolitano",

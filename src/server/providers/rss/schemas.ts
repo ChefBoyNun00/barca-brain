@@ -1,11 +1,16 @@
 import { z } from "zod";
 
 // Fields are loose on purpose: one odd item is skipped later, it must not sink the feed.
+/** With attributes kept, a tag that carries one (title type="html") arrives as an object. */
+const RssTextSchema = z
+  .union([z.string(), z.number(), z.object({ "#text": z.union([z.string(), z.number()]) })])
+  .transform((value) => String(typeof value === "object" ? value["#text"] : value));
+
 export const RssItemSchema = z.object({
-  title: z.union([z.string(), z.number()]).transform(String),
+  title: RssTextSchema,
   link: z.string().optional(),
   pubDate: z.string(),
-  description: z.string().optional(),
+  description: RssTextSchema.optional(),
   source: z.union([z.string(), z.object({ "#text": z.string() })]).optional(),
   /**
    * Podcasts: the audio file. News feeds use it for a picture, and without attributes it arrives
@@ -18,6 +23,9 @@ export const RssItemSchema = z.object({
       const parsed = z.object({ "@_url": z.string() }).safeParse(value);
       return parsed.success ? parsed.data["@_url"] : null;
     }),
+  /** Media RSS photos (AS, El País, the Guardian, the BBC). One tag or several. */
+  "media:content": z.unknown().optional(),
+  "media:thumbnail": z.unknown().optional(),
 });
 
 export const RssFeedSchema = z.object({
@@ -38,8 +46,9 @@ const AtomTextSchema = z
 
 export const AtomEntrySchema = z.object({
   title: AtomTextSchema,
-  // The summary only: the full article text in <content> is never read.
+  // The summary is the only text kept. <content> is read for one thing only: its first photo.
   summary: AtomTextSchema.optional(),
+  content: AtomTextSchema.optional(),
   link: z.union([AtomLinkSchema, z.array(AtomLinkSchema)]),
   published: z.string().optional(),
   updated: z.string().optional(),

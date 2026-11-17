@@ -1,9 +1,11 @@
 import type { PressSide, ScoopJournalist } from "@/config/news";
 import type {
   BriefingBullet,
+  BriefingText,
   NewsCategory,
   NewsCertainty,
   StoryWriteup,
+  WriteupText,
 } from "@/domain/news";
 
 export type ArticleToTranslate = {
@@ -46,7 +48,12 @@ export type StorySource = {
   scoopBy: ScoopJournalist | null;
 };
 
-export type WrittenStory = Omit<StoryWriteup, "topic" | "articleCount" | "writtenAt">;
+export type WrittenStory = Omit<StoryWriteup, "topic" | "articleCount" | "writtenAt" | "hebrew">;
+
+/** An article's English headline and summary, to be put into Hebrew. */
+export type HeadlineToTranslate = { id: string; title: string; summary: string | null };
+
+export type HebrewHeadline = { id: string; titleHe: string; summaryHe: string | null };
 
 export type GeneratedBriefing = { headline: string; bullets: BriefingBullet[] };
 
@@ -58,4 +65,8 @@ export interface NewsAi {
   ): Promise<Translation[]>;
   writeBriefing(stories: StoryForBriefing[]): Promise<GeneratedBriefing>;
   writeStory(topic: string, sources: StorySource[]): Promise<WrittenStory>;
+  /** Hebrew for readers in Israel: our own English text, put into Israeli sports-press Hebrew. */
+  headlinesToHebrew(headlines: HeadlineToTranslate[]): Promise<HebrewHeadline[]>;
+  storyToHebrew(story: WriteupText): Promise<WriteupText>;
+  briefingToHebrew(briefing: BriefingText): Promise<BriefingText>;
 }

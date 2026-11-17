@@ -1,110 +1,73 @@
 import { cookies } from "next/headers";
 import { connection } from "next/server";
 import {
+  NEWS_BRIEFING_FRESH_HOURS,
   NEWS_EDITION_COOKIE,
-  NEWS_HEAT_CHART_LIMIT,
-  NEWS_HEAT_HALF_LIFE_HOURS,
-  NEWS_NOT_IN_ISRAEL_LIMIT,
-  NEWS_SPIN_LIMIT,
+  NEWS_FIRST_STORIES,
+  NEWS_READER_LIMIT,
 } from "@/config/news";
-import type { SquadPlayer } from "@/domain/home";
-import type { NewsMedia } from "@/domain/news";
+import type { NewsBriefing } from "@/domain/news";
 import { T } from "@/i18n/language";
 import { EditionSwitch } from "./EditionSwitch";
-import { FrontPage } from "./FrontPage";
 import { getNewsData } from "./get-news-data";
-import type { HeatEntry } from "./HeatChart";
 import { chooseNewsEdition } from "./news-edition";
-import { NotInIsrael } from "./NotInIsrael";
 import { PodcastRow } from "./PodcastRow";
-import { findAbroad, heatOf, notYetIn, rankByHeat, spinsOf, type NewsStory } from "./stories";
-import { TheSpin } from "./TheSpin";
+import { InBrief, Reader } from "./Reader";
+import { orderForReader } from "./stories";
 
 type NewsPageProps = { searchParams: Promise<{ edition?: string | string[] }> };
+
+const HOUR_MS = 3_600_000;
+
+const isFresh = (
+  briefing: NewsBriefing | null,
+  now: Date,
+): briefing is NewsBriefing =>
+  briefing !== null &&
+  now.getTime() - briefing.createdAt.getTime() <
+    NEWS_BRIEFING_FRESH_HOURS * HOUR_MS;
 
 /** Runs per request, so it always shows the latest stored stories, in the chosen edition. */
 export async function NewsPage({ searchParams }: NewsPageProps) {
   await connection();
-  const [{ edition: fromUrl }, jar] = await Promise.all([searchParams, cookies()]);
-  const edition = chooseNewsEdition(fromUrl, jar.get(NEWS_EDITION_COOKIE)?.value);
+  const [{ edition: fromUrl }, jar] = await Promise.all([
+    searchParams,
+    cookies(),
+  ]);
+  const edition = chooseNewsEdition(
+    fromUrl,
+    jar.get(NEWS_EDITION_COOKIE)?.value,
+  );
   const data = await getNewsData(edition);
+  const israel = edition === "israel";
+  const stories = orderForReader(
+    israel ? data.israel : data.world,
+    data.now,
+    NEWS_READER_LIMIT,
+  );
 
   return (
     <>
       <EditionSwitch value={edition} />
       <div className="edition" data-edition={edition}>
-        {edition === "israel" ? (
-          <IsraelEdition {...data} />
-        ) : (
-          <WorldEdition stories={data.world} squad={data.squad} now={data.now} />
+        {/* The briefing is written from the world's press, so it belongs to that edition. */}
+        {!israel && isFresh(data.briefing, data.now) && (
+          <InBrief briefing={data.briefing} />
         )}
+        {stories.length > 0 ? (
+          <Reader
+            stories={stories}
+            squad={data.squad}
+            now={data.now}
+            first={NEWS_FIRST_STORIES}
+          />
+        ) : (
+          <p className="section-note">
+            <T k={israel ? "edition.israelEmpty" : "news.empty"} />
+          </p>
+        )}
+        {israel && <PodcastRow episodes={data.podcasts} now={data.now} />}
       </div>
-    </>
-  );
-}
-
-/** Heat as a share of the hottest story's, so the chart's bars read against the lead. */
-function toEntries(ranked: NewsStory[], now: Date, abroadOf?: (story: NewsStory) => number) {
-  const top = ranked[0] ? heatOf(ranked[0], now, NEWS_HEAT_HALF_LIFE_HOURS) : 0;
-  return ranked.map(
-    (story): HeatEntry => ({
-      story,
-      heat: top > 0 ? heatOf(story, now, NEWS_HEAT_HALF_LIFE_HOURS) / top : 0,
-      abroad: abroadOf?.(story),
-    }),
-  );
-}
-
-type EditionProps = { stories: NewsStory[]; squad: SquadPlayer[]; now: Date };
-
-/** The world's press: the hottest story, the heat chart, and the two cities' spin. */
-function WorldEdition({ stories, squad, now }: EditionProps) {
-  const ranked = rankByHeat(stories, now, NEWS_HEAT_HALF_LIFE_HOURS);
-  const [lead, ...chart] = toEntries(ranked.slice(0, NEWS_HEAT_CHART_LIMIT + 1), now);
-  if (!lead) {
-    return (
-      <p className="section-note">
-        <T k="news.empty" />
-      </p>
-    );
-  }
-  return (
-    <>
-      <FrontPage lead={lead} chart={chart} squad={squad} now={now} />
-      <TheSpin spins={spinsOf(ranked, NEWS_SPIN_LIMIT)} />
-    </>
-  );
-}
-
-type IsraelProps = {
-  world: NewsStory[];
-  israel: NewsStory[];
-  squad: SquadPlayer[];
-  podcasts: NewsMedia[];
-  now: Date;
-};
-
-/** Israel's own press, how far each story has travelled, what Israel has missed, and podcasts. */
-function IsraelEdition({ world, israel, squad, podcasts, now }: IsraelProps) {
-  const ranked = rankByHeat(israel, now, NEWS_HEAT_HALF_LIFE_HOURS);
-  const rankedWorld = rankByHeat(world, now, NEWS_HEAT_HALF_LIFE_HOURS);
-  const abroadOf = (story: NewsStory) => findAbroad(story, world)?.outlets.length ?? 0;
-  const [lead, ...chart] = toEntries(ranked.slice(0, NEWS_HEAT_CHART_LIMIT + 1), now, abroadOf);
-
-  return (
-    <>
-      {lead ? (
-        <FrontPage lead={lead} chart={chart} squad={squad} now={now} />
-      ) : (
-        <p className="section-note">
-          <T k="edition.israelEmpty" />
-        </p>
-      )}
-      {/* With no Israeli press read yet, every story abroad would look "missed". */}
-      {israel.length > 0 && (
-        <NotInIsrael stories={notYetIn(rankedWorld, israel, NEWS_NOT_IN_ISRAEL_LIMIT)} now={now} />
-      )}
-      <PodcastRow episodes={podcasts} now={now} />
     </>
   );
 }

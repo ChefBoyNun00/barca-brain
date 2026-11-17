@@ -4,6 +4,9 @@ import {
   BRIEFING_MAX_STORIES,
   BRIEFING_MIN_STORIES,
   BRIEFING_WINDOW_HOURS,
+  HEBREW_BATCH_SIZE,
+  HEBREW_HEADLINES_PER_RUN,
+  HEBREW_STORIES_PER_RUN,
   NEWS_KEEP_DAYS,
   NEWS_MAX_AGE_DAYS,
   NEWS_RECENT_TOPICS_LIMIT,
@@ -15,17 +18,24 @@ import {
 } from "@/config/news";
 import type { Db } from "@/server/db/client";
 import {
+  copyHebrewOriginals,
   deleteOldNews,
+  getArticlesWithoutHebrew,
+  getBriefingWithoutHebrew,
   getHoursSinceBriefing,
   getRecentTopics,
   getSquadNames,
   getStoriesForBriefing,
+  getStoriesWithoutHebrew,
   getStorySources,
   getTopicsToWrite,
   getUntranslatedArticles,
   insertArticle,
   saveBriefing,
+  saveBriefingHebrew,
+  saveHebrewHeadline,
   saveStory,
+  saveStoryHebrew,
   saveTranslation,
 } from "@/server/db/queries/news-writes";
 import type { NewsProvider } from "@/server/providers/types";
@@ -42,6 +52,8 @@ export type NewsRunResult = {
   storiesWritten: number;
   storyErrors: string[];
   briefing: "written" | "not needed" | "skipped" | "failed";
+  /** The Hebrew pass: how many headlines and stories got their Hebrew this run. */
+  hebrew: { copied: number; headlines: number; stories: number; briefing: boolean; errors: string[] };
 };
 
 type NewsDeps = {
@@ -129,6 +141,54 @@ async function refreshBriefing(db: Db, ai: NewsAi): Promise<NewsRunResult["brief
   }
 }
 
+/**
+ * Hebrew for readers in Israel, after the English is done. Israeli outlets' own Hebrew is copied
+ * as is; everything else is translated from our English. Every failure is kept for the next run:
+ * an item without Hebrew is simply shown in English until then.
+ */
+async function writeHebrew(db: Db, ai: NewsAi | null): Promise<NewsRunResult["hebrew"]> {
+  const result: NewsRunResult["hebrew"] = { copied: 0, headlines: 0, stories: 0, briefing: false, errors: [] };
+  result.copied = await copyHebrewOriginals(db);
+  if (!ai) return result;
+
+  const pending = await getArticlesWithoutHebrew(db, NEWS_MAX_AGE_DAYS, HEBREW_HEADLINES_PER_RUN);
+  for (let start = 0; start < pending.length; start += HEBREW_BATCH_SIZE) {
+    const batch = pending.slice(start, start + HEBREW_BATCH_SIZE);
+    try {
+      const wanted = new Set(batch.map((headline) => headline.id));
+      for (const headline of await ai.headlinesToHebrew(batch)) {
+        if (!wanted.has(headline.id)) continue;
+        await saveHebrewHeadline(db, headline);
+        result.headlines += 1;
+      }
+    } catch (error) {
+      result.errors.push(`headlines: ${messageOf(error)}`);
+    }
+  }
+
+  for (const { topic, ...english } of await getStoriesWithoutHebrew(db, HEBREW_STORIES_PER_RUN)) {
+    try {
+      const hebrew = await ai.storyToHebrew(english);
+      await saveStoryHebrew(db, { topic, englishHeadline: english.headline, hebrew });
+      result.stories += 1;
+    } catch (error) {
+      result.errors.push(`${topic}: ${messageOf(error)}`);
+    }
+  }
+
+  const briefing = await getBriefingWithoutHebrew(db);
+  if (briefing) {
+    try {
+      const { id, ...english } = briefing;
+      await saveBriefingHebrew(db, id, await ai.briefingToHebrew(english));
+      result.briefing = true;
+    } catch (error) {
+      result.errors.push(`briefing: ${messageOf(error)}`);
+    }
+  }
+  return result;
+}
+
 /** One feed failing never stops the others, and nothing here touches football data. */
 export async function runNews({ db, provider, ai, feeds, now = new Date() }: NewsDeps) {
   const feedResults: FeedResult[] = [];
@@ -141,11 +201,17 @@ export async function runNews({ db, provider, ai, feeds, now = new Date() }: New
     ? await writeStories(db, ai)
     : { written: 0, errors: [] as string[] };
   const briefing = ai ? await refreshBriefing(db, ai) : "skipped";
+  const hebrew = await writeHebrew(db, ai);
   await deleteOldNews(db, NEWS_KEEP_DAYS);
 
   const allFeedsFailed = feedResults.every((result) => result.error);
   const failed =
-    allFeedsFailed || errors.length > 0 || stories.errors.length > 0 || briefing === "failed";
+    allFeedsFailed ||
+    errors.length > 0 ||
+    stories.errors.length > 0 ||
+    briefing === "failed";
+  // Hebrew errors are reported but never fail the run: the item shows in English meanwhile, and
+  // the next run (three hours later) retries it. A red job for that would only cry wolf.
   return {
     status: failed ? "failed" : "success",
     feeds: feedResults,
@@ -154,5 +220,6 @@ export async function runNews({ db, provider, ai, feeds, now = new Date() }: New
     storiesWritten: stories.written,
     storyErrors: stories.errors,
     briefing,
+    hebrew,
   } satisfies NewsRunResult;
 }

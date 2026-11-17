@@ -5,7 +5,7 @@ import Link from "next/link";
 import { BARCA_CREST_URL } from "@/config/display";
 import { T, useLanguage, useT } from "@/i18n/language";
 import { formatScore } from "@/i18n/numbers";
-import { displayCompetition, formatKickoff } from "./format";
+import { displayCompetition, displayTeam, formatKickoff } from "./format";
 import { MatchClock } from "./MatchClock";
 import type { MatchdayState } from "./matchday";
 import { describeOutcome, getMatchOutcome } from "./season-story";
@@ -22,7 +22,7 @@ export function MatchdayBanner({ state, now }: { state: MatchdayState; now: Date
   const language = useLanguage();
   if (state.kind === "none") return null;
   const { match, isClasico, kind } = state;
-  const opponent = match.opponent?.name ?? t("common.tbd");
+  const opponent = match.opponent ? displayTeam(match.opponent.name, language) : t("common.tbd");
   const barca = t("common.barca");
   const names = match.isHome
     ? t("common.versus", { home: barca, away: opponent })

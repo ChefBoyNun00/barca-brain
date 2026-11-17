@@ -20,16 +20,20 @@ const ArticleRowSchema = z.object({
   published_at: z.coerce.date(),
   title_en: z.string().nullable(),
   summary_en: z.string().nullable(),
+  title_he: z.string().nullable(),
+  summary_he: z.string().nullable(),
   category: z.enum(NEWS_CATEGORIES).nullable(),
   certainty: z.enum(NEWS_CERTAINTIES).nullable(),
   topic: z.string().nullable(),
   player_names: z.array(z.string()),
   language: z.enum(["es", "en", "he"]),
   scoop_by: z.enum(SCOOP_JOURNALISTS.map((journalist) => journalist.id)).nullable(),
+  image_url: z.string().nullable(),
 });
 
 const ARTICLE_COLUMNS = `id, url, outlet, press_side, title_original, snippet_original,
-  published_at, title_en, summary_en, category, certainty, topic, player_names, language, scoop_by`;
+  published_at, title_en, summary_en, title_he, summary_he, category, certainty, topic,
+  player_names, language, scoop_by, image_url`;
 
 const toArticles = (rows: unknown): NewsArticle[] =>
   z
@@ -45,12 +49,15 @@ const toArticles = (rows: unknown): NewsArticle[] =>
       publishedAt: row.published_at,
       titleEn: row.title_en,
       summaryEn: row.summary_en,
+      titleHe: row.title_he,
+      summaryHe: row.summary_he,
       category: row.category,
       certainty: row.certainty,
       topic: row.topic,
       playerNames: row.player_names,
       language: row.language,
       scoopBy: row.scoop_by,
+      imageUrl: row.image_url,
     }));
 
 /**
@@ -136,16 +143,19 @@ export async function getRecentMedia(
     }));
 }
 
+const BulletsSchema = z.array(z.object({ text: z.string(), topic: z.string().nullable() }));
+
 const BriefingRowSchema = z.object({
   created_at: z.coerce.date(),
   headline: z.string(),
-  bullets: z.array(z.object({ text: z.string(), topic: z.string().nullable() })),
+  bullets: BulletsSchema,
   story_count: z.number(),
+  hebrew: z.object({ headline: z.string(), bullets: BulletsSchema }).nullable(),
 });
 
 export async function getLatestBriefing(db: Db): Promise<NewsBriefing | null> {
   const { rows } = await db.query(
-    `select created_at, headline, bullets, story_count from news_briefings
+    `select created_at, headline, bullets, story_count, hebrew from news_briefings
      order by created_at desc limit 1`,
   );
   const row = z.array(BriefingRowSchema).parse(rows)[0];
@@ -155,8 +165,21 @@ export async function getLatestBriefing(db: Db): Promise<NewsBriefing | null> {
     headline: row.headline,
     bullets: row.bullets,
     storyCount: row.story_count,
+    hebrew: row.hebrew,
   };
 }
+
+const QuotesSchema = z.array(z.object({ text: z.string(), speaker: z.string(), outlet: z.string() }));
+
+/** The Hebrew write-up is stored as one JSON value, so it is checked like any outside input. */
+const HebrewWriteupSchema = z.object({
+  headline: z.string(),
+  standfirst: z.string(),
+  body: z.array(z.string()),
+  keyFacts: z.array(z.string()),
+  quotes: QuotesSchema,
+  whatsNext: z.string().nullable(),
+});
 
 const StoryRowSchema = z.object({
   topic: z.string(),
@@ -164,8 +187,9 @@ const StoryRowSchema = z.object({
   standfirst: z.string(),
   body: z.array(z.string()),
   key_facts: z.array(z.string()),
-  quotes: z.array(z.object({ text: z.string(), speaker: z.string(), outlet: z.string() })),
+  quotes: QuotesSchema,
   whats_next: z.string().nullable(),
+  hebrew: HebrewWriteupSchema.nullable(),
   certainty: z.enum(NEWS_CERTAINTIES),
   article_count: z.number(),
   written_at: z.coerce.date(),
@@ -186,10 +210,11 @@ const toWriteups = (rows: unknown): StoryWriteup[] =>
       certainty: row.certainty,
       articleCount: row.article_count,
       writtenAt: row.written_at,
+      hebrew: row.hebrew,
     }));
 
 const STORY_COLUMNS = `topic, headline, standfirst, body, key_facts, quotes, whats_next,
-  certainty, article_count, written_at`;
+  certainty, article_count, written_at, hebrew`;
 
 /** The write-ups for the given stories. Stories not written yet are simply missing. */
 export async function getStoryWriteups(db: Db, topics: string[]): Promise<StoryWriteup[]> {

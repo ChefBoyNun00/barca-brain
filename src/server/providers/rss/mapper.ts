@@ -1,4 +1,9 @@
-import { NEWS_SNIPPET_MAX_CHARS, type NewsFeed } from "@/config/news";
+import {
+  NEWS_IMAGE_BLOCKED_HOSTS,
+  NEWS_IMAGE_URL_MAX_CHARS,
+  NEWS_SNIPPET_MAX_CHARS,
+  type NewsFeed,
+} from "@/config/news";
 import type { FeedArticle } from "../types";
 import { AtomEntrySchema, RssItemSchema, type AtomEntry, type RssItem } from "./schemas";
 
@@ -38,6 +43,61 @@ function toWebUrl(link: string): string | null {
   }
 }
 
+/** A feed photo: a web address that is not a tracking pixel and not absurdly long. */
+function toImageUrl(link: unknown): string | null {
+  if (typeof link !== "string" || link.length > NEWS_IMAGE_URL_MAX_CHARS) return null;
+  const url = toWebUrl(decodeEntities(link));
+  if (!url) return null;
+  const host = new URL(url).hostname;
+  return NEWS_IMAGE_BLOCKED_HOSTS.some((blocked) => host === blocked || host.endsWith(`.${blocked}`))
+    ? null
+    : url;
+}
+
+type MediaTag = { url: string; width: number };
+
+/** Media RSS tags, one or several, as { url, width } with the width when the feed gives it. */
+function mediaTags(value: unknown): MediaTag[] {
+  const tags = Array.isArray(value) ? value : value ? [value] : [];
+  return tags.flatMap((tag) => {
+    if (typeof tag !== "object" || tag === null) return [];
+    const record = tag as Record<string, unknown>;
+    const medium = record["@_medium"];
+    const type = record["@_type"];
+    // Media RSS also carries video; only photos are wanted.
+    if ((typeof medium === "string" && medium !== "image") || (typeof type === "string" && !type.startsWith("image/"))) {
+      return [];
+    }
+    const url = toImageUrl(record["@_url"]);
+    return url ? [{ url, width: Number(record["@_width"]) || 0 }] : [];
+  });
+}
+
+/** The first real photo inside a piece of feed HTML, skipping pixels and broken addresses. */
+function firstImageIn(html: string | undefined): string | null {
+  if (!html) return null;
+  for (const match of decodeEntities(html).matchAll(/<img\b[^>]*?\ssrc=["']([^"']+)["']/gi)) {
+    const url = toImageUrl(match[1]);
+    if (url) return url;
+  }
+  return null;
+}
+
+/**
+ * The best photo an item offers: the widest Media RSS photo, then an image enclosure, then the
+ * first picture inside the description's HTML (fan sites and the Israeli outlets do that).
+ */
+function pickImage(item: RssItem, enclosureType: unknown): string | null {
+  const media = [...mediaTags(item["media:content"]), ...mediaTags(item["media:thumbnail"])];
+  const widest = media.sort((a, b) => b.width - a.width)[0];
+  if (widest) return widest.url;
+  if (item.enclosure && typeof enclosureType === "string" && enclosureType.startsWith("image/")) {
+    const url = toImageUrl(item.enclosure);
+    if (url) return url;
+  }
+  return firstImageIn(item.description);
+}
+
 const sourceName = (source: RssItem["source"]) =>
   typeof source === "string" ? source : source?.["#text"];
 
@@ -53,6 +113,8 @@ function mapItem(raw: unknown, feed: NewsFeed): FeedArticle | null {
   const item = parsed.data;
 
   const audioUrl = feed.kind === "podcast" && item.enclosure ? toWebUrl(item.enclosure) : null;
+  const enclosureType = (raw as { enclosure?: { "@_type"?: unknown } } | null)?.enclosure?.["@_type"];
+  const imageUrl = feed.kind === "podcast" ? null : pickImage(item, enclosureType);
   // A podcast episode without its own page links to its audio file instead.
   const url = toWebUrl(item.link ?? "") ?? (feed.kind === "podcast" ? audioUrl : null);
   const outlet = feed.outlet ?? sourceName(item.source)?.trim();
@@ -64,7 +126,7 @@ function mapItem(raw: unknown, feed: NewsFeed): FeedArticle | null {
   const snippet = feed.outlet && item.description ? trimSnippet(toPlainText(item.description)) : null;
   if (!title) return null;
 
-  return { url, outlet, title, snippet, publishedAt, audioUrl };
+  return { url, outlet, title, snippet, publishedAt, audioUrl, imageUrl };
 }
 
 export function mapFeedItems(items: unknown[], feed: NewsFeed): FeedArticle[] {
@@ -104,6 +166,8 @@ function mapEntry(raw: unknown, feed: NewsFeed): FeedArticle | null {
     publishedAt,
     videoId,
     author: entry.author?.name.replace(/^\/u\//, "") ?? null,
+    // Only the photo's address is taken from <content>; the article text itself is never kept.
+    imageUrl: feed.kind === "article" ? firstImageIn(entry.content ?? entry.summary) : null,
   };
 }
 

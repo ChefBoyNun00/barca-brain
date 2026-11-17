@@ -2,10 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { PhotoBackdrop } from "@/components/PhotoBackdrop";
+import { BACKDROPS } from "@/config/moments";
 import type { LeagueRow, SeasonMatch } from "@/domain/home";
 import { useLanguage, useT } from "@/i18n/language";
 import { Countdown } from "./Countdown";
-import { displayCompetition, displayRound, formatKickoff } from "./format";
+import { displayCompetition, displayRound, displayTeam, formatKickoff } from "./format";
 import { TaleOfTheTape } from "./TaleOfTheTape";
 
 type NextMatchPosterProps = {
@@ -19,11 +21,12 @@ type NextMatchPosterProps = {
 export function NextMatchPoster({ match, matches, table, now }: NextMatchPosterProps) {
   const t = useT();
   const language = useLanguage();
-  const opponent = match.opponent?.name ?? t("common.tbd");
+  const opponent = match.opponent ? displayTeam(match.opponent.name, language) : t("common.tbd");
   // The CSS shrinks the name until its longest word fits on one line.
   const longestWord = Math.max(...opponent.split(/\s+/).map((word) => word.length));
   return (
     <section aria-labelledby="next-up" className="poster reveal">
+      <PhotoBackdrop moment={BACKDROPS.home.poster} />
       <div className="page-gutter poster-inner">
         <p id="next-up" className="poster-kicker">
           {t("home.nextMatch")}
@@ -50,7 +53,11 @@ export function NextMatchPoster({ match, matches, table, now }: NextMatchPosterP
             .join(" · ")}
         </p>
         <Countdown kickoffAt={match.kickoffAt} serverNow={now} />
-        <TaleOfTheTape table={table} matches={matches} opponentId={match.opponent?.id} />
+        {/* The comparison is detail, not headline: it opens on request, to keep the poster calm. */}
+        <details className="poster-more">
+          <summary>{t("home.compare")}</summary>
+          <TaleOfTheTape table={table} matches={matches} opponentId={match.opponent?.id} />
+        </details>
         <Link className="poster-ask" href={{ pathname: "/ask", query: { q: t("q.preview") } }}>
           {t("home.preview")} {t("arrow.forward")}
         </Link>

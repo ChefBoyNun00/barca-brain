@@ -6,12 +6,7 @@ import { BARCA_CREST_URL } from "@/config/display";
 import type { SeasonMatch } from "@/domain/home";
 import { useLanguage, useT } from "@/i18n/language";
 import { formatScore } from "@/i18n/numbers";
-import {
-  displayCompetition,
-  displayRound,
-  formatKickoff,
-  formatMatchDate,
-} from "../home/format";
+import { displayCompetition, displayRound, displayTeam, formatKickoff, formatMatchDate } from "../home/format";
 import {
   describeMatch,
   describeOutcome,
@@ -39,7 +34,7 @@ export function MatchCard({ match, index, showShare = true }: MatchCardProps) {
   const outcome = getMatchOutcome(match);
   const barca: Team = { name: t("common.barca"), logoUrl: BARCA_CREST_URL };
   const opponent: Team = {
-    name: match.opponent?.name ?? t("common.tbd"),
+    name: match.opponent ? displayTeam(match.opponent.name, language) : t("common.tbd"),
     logoUrl: match.opponent?.logoUrl ?? null,
   };
   const [left, right] = match.isHome ? [barca, opponent] : [opponent, barca];
