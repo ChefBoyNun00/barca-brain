@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Big_Shoulders, IBM_Plex_Mono, Inter, Noto_Sans_Hebrew } from "next/font/google";
 import localFont from "next/font/local";
 import { AskDrawer } from "@/features/ask/AskDrawer";
+import { SiteAnalytics } from "@/features/analytics/SiteAnalytics";
 import { IntroSplash } from "@/components/IntroSplash";
 import { serifFontClasses, storySerif } from "@/components/serif-fonts";
 import { PointerTilt } from "@/components/motion/PointerTilt";
@@ -114,6 +115,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <div aria-hidden="true" className="mosaic-band" />
         <SiteFooter />
         <AskDrawer />
+        <SiteAnalytics />
       </body>
     </html>
   );

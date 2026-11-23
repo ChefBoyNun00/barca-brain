@@ -538,6 +538,9 @@ const en = {
   "credits.news": "News",
   "credits.newsNote":
     "Headlines and short snippets come from the public feeds of Mundo Deportivo, Diario AS, El País, El Mundo and Google News, and in Israel from Barça Mania, ONE, Walla, ynet and Google News. Translations and labels are written by AI and can be wrong. Every story links to the outlet that published it.",
+  "credits.privacy": "Privacy",
+  "credits.privacyNote":
+    "We count which pages are visited with Vercel Web Analytics, so we know what to improve. It uses no cookies and stores nothing that identifies you. Anything you type, like a question for Ask or a name on a shirt, is removed from the address before a visit is counted.",
   "credits.photos": "Photos",
   "credits.photosNote":
     "Player photos and the stadium come from Wikimedia Commons under free licences, and are cropped to fit. Each link opens the original with its full licence. News photos belong to the outlet credited on each one: they load from that outlet's own feed and are not copied or stored here.",
@@ -1085,6 +1088,9 @@ const he: Record<TextKey, string> = {
   "credits.news": "חדשות",
   "credits.newsNote":
     "הכותרות והקטעים הקצרים מגיעים מהפידים הציבוריים של מונדו דפורטיבו, דיאריו AS, אל פאיס, אל מונדו ו־Google News, ובישראל מבארסה מאניה, ONE, וואלה, ynet ו־Google News. התרגומים והתיוגים נכתבים בידי בינה מלאכותית ועלולים לטעות. כל כתבה מקשרת לכלי התקשורת שפרסם אותה.",
+  "credits.privacy": "פרטיות",
+  "credits.privacyNote":
+    "אנחנו סופרים אילו דפים נצפים בעזרת Vercel Web Analytics, כדי לדעת מה לשפר. אין בזה עוגיות, ושום דבר שמזהה אתכם לא נשמר. כל מה שאתם מקלידים, כמו שאלה ל־Ask או שם על חולצה, נמחק מהכתובת לפני שהביקור נספר.",
   "credits.photos": "תמונות",
   "credits.photosNote":
     "תמונות השחקנים והאצטדיון מגיעות מוויקישיתוף ברישיונות חופשיים, וחתוכות כדי להתאים. כל קישור פותח את המקור עם הרישיון המלא שלו. תמונות החדשות שייכות לכלי התקשורת שמוזכר על כל אחת מהן: הן נטענות מהפיד של אותו כלי ואינן מועתקות או נשמרות כאן.",

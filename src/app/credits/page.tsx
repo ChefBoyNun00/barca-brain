@@ -38,6 +38,12 @@ export default function CreditsPage() {
           <T k="credits.newsNote" />
         </p>
         <h2 className="credits-heading">
+          <T k="credits.privacy" />
+        </h2>
+        <p className="max-w-2xl">
+          <T k="credits.privacyNote" />
+        </p>
+        <h2 className="credits-heading">
           <T k="credits.photos" />
         </h2>
         <p className="max-w-2xl">
