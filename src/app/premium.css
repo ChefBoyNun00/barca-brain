@@ -103,9 +103,10 @@ body {
   align-items: center;
   gap: 1.5rem;
   height: 64px;
-  max-width: 1440px;
+  /* Same edges as .page-gutter, so the logo lines up with every page's title below it. */
+  max-width: 1200px;
   margin-inline: auto;
-  padding-inline: clamp(1rem, 3vw, 2.5rem);
+  padding-inline: 1rem;
 }
 
 /* The main pages, right in the bar. */
@@ -1564,5 +1565,109 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .backdrop img {
     animation: none;
+  }
+}
+
+/* ---------- Alignment pass (2026-11-22) ----------
+   One left edge for everything: header, page titles, sections and footer all sit on the
+   .page-gutter box (1200px wide, 1rem padding). */
+
+.site-foot {
+  padding-inline: 0;
+}
+
+.site-foot-inner {
+  padding-inline: 1rem;
+}
+
+/* The fine print's hairline should start and end on the same edge as the text, so the row is
+   narrowed instead of padded. */
+.site-foot-fine {
+  width: calc(100% - 2rem);
+  max-width: calc(1200px - 2rem);
+}
+
+/* Tall sections (the great nights, the pinned matchday) would stretch a photo to thousands of
+   pixels and blow it up into a blur. The photo covers at most the first screen and a half,
+   then fades into the section's own night colour. */
+.backdrop[data-tone="night"] {
+  inset: 0 0 auto;
+  height: min(100%, 150vh);
+}
+
+/* The next-match poster: the section already has its padding; the inner box adds none. */
+.poster .poster-inner {
+  padding-block: 0;
+}
+
+.poster-ask {
+  justify-self: start;
+  margin-top: 1.5rem;
+}
+
+/* The comparison toggle: a plus that turns into a minus, so it reads as something to open. */
+.poster-more > summary {
+  gap: 0.75rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.poster-more > summary::-webkit-details-marker {
+  display: none;
+}
+
+.poster-more > summary::after {
+  content: "+";
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--gold-soft);
+}
+
+.poster-more[open] > summary::after {
+  content: "–";
+}
+
+/* Home's three stories: on wide screens the heading sits on the page's left edge, like every
+   other section, and the stories keep their reading width beside it. */
+@media (min-width: 1024px) {
+  .home-news {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, var(--read-width));
+    column-gap: 4rem;
+    align-items: start;
+  }
+
+  .home-news > * {
+    max-width: none;
+    margin-inline: 0;
+  }
+
+  .home-news-head {
+    position: sticky;
+    top: 6rem;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 1.5rem;
+  }
+
+  .home-news .rd-list {
+    margin-top: 0;
+  }
+}
+
+/* The table: the form pips sit under the centred "Form" heading. */
+.league-wrap .form-pips {
+  display: flex;
+  justify-content: center;
+}
+
+/* Match cards side by side: a two-line competition name ("Champions League · Matchday 1")
+   would push its crests lower than its neighbours'. Every header keeps room for two lines. */
+@media (min-width: 640px) {
+  .match-card-top {
+    align-items: flex-start;
+    min-height: 2lh;
+    line-height: 1.3;
   }
 }

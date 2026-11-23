@@ -86,17 +86,26 @@ export const MOMENTS = {
 /** Which photo sits behind which part of the app. */
 export const BACKDROPS = {
   club: {
-    founding: MOMENTS.trebleParade,
-    catalonia: MOMENTS.mesQueUnClub,
-    culers: MOMENTS.canaletes,
+    // Rule of thumb: no big lettering in a photo that sits behind body text (the parade's
+    // "CAMPIONS" banner used to sit behind the 1899 story).
+    // TODO(debt): a real archive photo (the 1899 or 1903 team, public domain on Wikimedia
+    // Commons) would suit chapter one better than the crest — Daniel to supply.
+    founding: MOMENTS.mesQueUnClub, // the crest, aged to sepia: where it all started
+    catalonia: MOMENTS.canaletes, // Senyeres waving in the street
+    culers: MOMENTS.remontada, // Messi climbing the barrier into the crowd
     masia: MOMENTS.ronaldinhoMessi,
-    idea: MOMENTS.messiRecord,
-    matchday: MOMENTS.lamineTen,
+    // Calm and dark around one figure, so it sits quietly behind the passing pitch.
+    idea: MOMENTS.messiArmsUp,
+    // Stack layout, one heading over it: the parade through the city suits "a day in the city".
+    matchday: MOMENTS.trebleParade,
+    nights: MOMENTS.messiRecord,
     tonight: MOMENTS.flick,
   },
   home: {
     poster: MOMENTS.lamineTen,
-    motto: MOMENTS.messiArmsUp,
+    // A short wide band: only a strip of the photo shows. Fans, flags and fireworks read as
+    // "more than a club" in any strip; Messi's photo showed only two disembodied hands.
+    motto: MOMENTS.canaletes,
   },
   page: {
     news: MOMENTS.remontada,
