@@ -1,4 +1,5 @@
 import { connection } from "next/server";
+import { SquadLeaders } from "../stats/SquadLeaders";
 import { getSquadData } from "./get-squad-data";
 import { SquadExplorer } from "./SquadExplorer";
 
@@ -6,5 +7,10 @@ import { SquadExplorer } from "./SquadExplorer";
 export async function SquadPage() {
   await connection();
   const { now, squad, stories, teamGoals } = await getSquadData();
-  return <SquadExplorer squad={squad} now={now} teamGoals={teamGoals} stories={stories} />;
+  return (
+    <>
+      <SquadExplorer squad={squad} now={now} teamGoals={teamGoals} stories={stories} />
+      <SquadLeaders squad={squad} />
+    </>
+  );
 }

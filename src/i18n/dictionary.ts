@@ -19,8 +19,6 @@ const en = {
   "nav.matches": "Matches",
   "nav.squad": "Squad",
   "nav.ask": "Ask",
-  "nav.stats": "Stats",
-  "nav.history": "History",
   "nav.shirt": "Your shirt",
   "nav.more": "More",
   "nav.club": "The club",
@@ -149,8 +147,6 @@ const en = {
     "Every stripe is a match. Every dot is a goal. A defeat tears the shirt, a diamond marks Europe, and the empty threads are still to be played.",
   "season.list": "See every match as a list",
 
-  "history.title": "Best moments",
-  "history.note": "The nights that made the club. Tap a moment for one more detail.",
   "history.sources":
     "Compiled from FCBarcelona.com and Wikipedia. If you spot a mistake, tell Daniel.",
   "history.fact": "One more thing",
@@ -195,7 +191,6 @@ const en = {
   "stats.scorers": "Top scorers",
   "stats.assists": "Most assists",
   "stats.assistsNote": "Assists are only recorded for players who have also scored.",
-  "stats.empty": "Numbers will appear once matches are played.",
 
   "ask.launch": "Ask Blaugrana",
   "ask.title": "Ask Blaugrana",
@@ -245,7 +240,6 @@ const en = {
   "loading.matches": "Loading matches",
   "loading.news": "Loading the news",
   "loading.story": "Loading the story",
-  "loading.numbers": "Loading the numbers",
   "loading.season": "Loading Barça's season",
   "loading.credits": "Loading credits",
   "a11y.main": "Main",
@@ -574,8 +568,6 @@ const he: Record<TextKey, string> = {
   "nav.matches": "משחקים",
   "nav.squad": "סגל",
   "nav.ask": "שאלו",
-  "nav.stats": "נתונים",
-  "nav.history": "היסטוריה",
   "nav.shirt": "החולצה שלך",
   "nav.more": "עוד",
   "nav.club": "המועדון",
@@ -704,8 +696,6 @@ const he: Record<TextKey, string> = {
     "כל פס הוא משחק. כל נקודה היא שער. הפסד קורע את החולצה, יהלום מסמן את אירופה, והחוטים הריקים הם משחקים שעוד לא שוחקו.",
   "season.list": "כל המשחקים ברשימה",
 
-  "history.title": "הרגעים הגדולים",
-  "history.note": "הלילות שעשו את המועדון. הקישו על רגע כדי לגלות עוד פרט.",
   "history.sources": "נאסף מ־FCBarcelona.com ומוויקיפדיה. מצאתם טעות? ספרו לדניאל.",
   "history.fact": "עוד דבר אחד",
   "history.ask": "שאלו את בלאוגרנה על זה",
@@ -748,7 +738,6 @@ const he: Record<TextKey, string> = {
   "stats.scorers": "מלכי השערים",
   "stats.assists": "מלכי הבישולים",
   "stats.assistsNote": "בישולים נרשמים רק לשחקנים שגם כבשו.",
-  "stats.empty": "המספרים יופיעו אחרי שישוחקו משחקים.",
 
   "ask.launch": "שאלו את בלאוגרנה",
   "ask.title": "שאלו את בלאוגרנה",
@@ -798,7 +787,6 @@ const he: Record<TextKey, string> = {
   "loading.matches": "טוען את המשחקים",
   "loading.news": "טוען את החדשות",
   "loading.story": "טוען את הכתבה",
-  "loading.numbers": "טוען את המספרים",
   "loading.season": "טוען את העונה של בארסה",
   "loading.credits": "טוען את הקרדיטים",
   "a11y.main": "ראשי",

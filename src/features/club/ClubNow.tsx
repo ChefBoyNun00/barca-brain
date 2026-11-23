@@ -8,7 +8,7 @@ import {
 import { TonightView, type TonightMatch } from "./TonightView";
 
 /**
- * Chapter seven reads this season from our own database, so the story ends on what is true
+ * Chapter eight reads this season from our own database, so the story ends on what is true
  * tonight. Runs per request, like the home page.
  */
 export async function ClubNow() {
@@ -18,7 +18,7 @@ export async function ClubNow() {
     data = await getHomeData();
   } catch (error) {
     // The story is the point of this page; a database hiccup should not take it down with it.
-    console.error("club: could not load the season for chapter seven", error);
+    console.error("club: could not load the season for chapter eight", error);
     return <TonightView headline={[]} next={null} />;
   }
   const { now, matches, standing } = data;

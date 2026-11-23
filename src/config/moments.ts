@@ -103,8 +103,6 @@ export const BACKDROPS = {
     matches: MOMENTS.supercopa,
     table: MOMENTS.ligaTrophy,
     squad: MOMENTS.flick,
-    stats: MOMENTS.messiRecord,
-    history: MOMENTS.trebleParade,
   },
 } as const satisfies Record<string, Record<string, Moment>>;
 

@@ -45,3 +45,9 @@ export const INGEST_TARGETS: Partial<Record<FootballProviderName, IngestTarget>>
 
 /** La Liga has 20 clubs, so each plays 38 league matches. Used to project a points total. */
 export const LEAGUE_MATCHES = 38;
+
+/**
+ * Months (1 = January) when the table offers the "play out the season" simulator: the run-in,
+ * when the title race is close enough to be worth playing with. The page itself always works.
+ */
+export const SEASON_SIM_MONTHS: readonly number[] = [4, 5];

@@ -1110,7 +1110,7 @@
   }
 }
 
-/* ---------- VII. Tonight ---------- */
+/* ---------- VIII. Tonight ---------- */
 
 .tonight-loading {
   min-height: 70vh;
@@ -1309,4 +1309,105 @@
 /* A chapter's background photo (PhotoBackdrop) sits under everything else in the chapter. */
 .chapter > :not(.backdrop, .chapter-numeral) {
   position: relative;
+}
+
+/* ---------- VII. The great nights (the timeline that was /history) ----------
+   The timeline's app styles are paper cards on stone; here they go quiet on night: hairline
+   cards, serif titles, gold only on the seam and the knots. */
+
+.nights {
+  max-width: 76rem;
+  margin: 4rem auto 0;
+  padding-inline: 1.5rem;
+}
+
+/* The chapter rail (fixed at the side from 1200px) would sit on the cards: keep 12rem clear. */
+@media (min-width: 1200px) {
+  .nights {
+    max-width: min(64rem, calc(100vw - 24rem));
+  }
+}
+
+.story .nights .chip {
+  color: var(--st-muted);
+  background: transparent;
+  border-color: var(--st-faint);
+}
+
+.story .nights .chip:hover:not(:disabled) {
+  color: var(--st-ink);
+  border-color: var(--st-muted);
+}
+
+.story .nights .chip[aria-pressed="true"] {
+  color: var(--st-night);
+  background: var(--st-ink);
+  border-color: var(--st-ink);
+}
+
+.story .timeline::before {
+  width: 1px;
+  background: linear-gradient(180deg, transparent, var(--st-gold) 6%, var(--st-gold) 94%, transparent);
+}
+
+.story .moment::before {
+  width: 0.6rem;
+  height: 0.6rem;
+  margin-inline-start: 0.25rem;
+  background: var(--st-gold);
+  border: 0;
+  box-shadow: 0 0 0 6px var(--st-night);
+}
+
+@media (min-width: 900px) {
+  .story .moment::before {
+    margin-block-start: -0.3rem;
+    margin-inline-start: -0.3rem;
+  }
+}
+
+.story .moment-year {
+  font-family: var(--st-serif);
+  font-weight: 400;
+  -webkit-text-stroke: 1px rgba(244, 239, 230, 0.3);
+}
+
+.story .moment-card {
+  color: var(--st-muted);
+  background: rgba(7, 12, 38, 0.72);
+  border: 1px solid var(--st-faint);
+  box-shadow: none;
+  backdrop-filter: blur(6px);
+}
+
+.story .moment-when {
+  color: var(--st-gold);
+}
+
+.story .moment-title {
+  font-family: var(--st-serif);
+  font-weight: 400;
+  text-transform: none;
+  color: var(--st-ink);
+}
+
+.story .moment-fact summary,
+.story .moment-ask {
+  color: var(--st-ink);
+}
+
+.story .moment-fact p {
+  color: var(--st-ink);
+  background: rgba(244, 239, 230, 0.06);
+}
+
+.story .moment-tags > span {
+  color: var(--st-muted);
+  border-color: var(--st-faint);
+}
+
+.nights-sources {
+  margin-top: 3rem;
+  font-size: 0.8rem;
+  color: var(--st-muted);
 }

@@ -21,7 +21,7 @@ export type Chapter = {
 };
 
 export const STORY_COVER = {
-  kicker: { en: "A story in seven chapters", he: "סיפור בשבעה פרקים" },
+  kicker: { en: "A story in eight chapters", he: "סיפור בשמונה פרקים" },
   title: { en: "More than a club.", he: "יותר ממועדון." },
   lead: {
     en: "To understand Barça, start with a newspaper advert, a language, a farmhouse and an idea.",
@@ -128,6 +128,20 @@ export const CHAPTERS = [
     title: { en: "The whole city keeps the same clock.", he: "כל העיר חיה לפי אותו שעון." },
     body: [],
   },
+  {
+    // The old /history page lives here now (/history redirects to /club#nights).
+    id: "nights",
+    numeral: "VII",
+    label: { en: "Great nights", he: "לילות גדולים" },
+    kicker: { en: "Chapter seven · The great nights", he: "פרק שביעי · הלילות הגדולים" },
+    title: { en: "The nights that made the club.", he: "הלילות שעשו את המועדון." },
+    body: [
+      {
+        en: "Tap a moment for one more detail, or ask Blaugrana about it.",
+        he: "הקישו על רגע כדי לגלות עוד פרט, או שאלו עליו את בלאוגרנה.",
+      },
+    ],
+  },
 ] as const satisfies readonly Chapter[];
 
 /** Chapter two's centrepiece: the words, then who said them. */
@@ -220,13 +234,14 @@ export const MATCHDAY_HOURS: readonly MatchdayHour[] = [
   },
 ];
 
-/** Chapter seven's anchor (/club#tonight). It is rendered separately, because it reads live data. */
+/** Chapter eight's anchor (/club#tonight). It is rendered separately, because it reads live data. */
 export const TONIGHT_ID = "tonight";
+export const TONIGHT_NUMERAL = "VIII";
 
-/** Chapter seven is live: it reads this season from our database. */
+/** Chapter eight is live: it reads this season from our database. */
 export const STORY_NOW = {
   label: { en: "Tonight", he: "הערב" },
-  kicker: { en: "Chapter seven · Tonight", he: "פרק שביעי · הערב" },
+  kicker: { en: "Chapter eight · Tonight", he: "פרק שמיני · הערב" },
   title: { en: "The story is still being written.", he: "הסיפור עוד נכתב." },
   lead: {
     en: "Every match adds a line. This is where it stands right now.",
@@ -245,7 +260,7 @@ export const STORY_NOW = {
 export const STORY_EXITS = [
   { href: "/", label: { en: "Follow the season", he: "לעקוב אחרי העונה" } },
   { href: "/squad", label: { en: "Meet the squad", he: "להכיר את הסגל" } },
-  { href: "/history", label: { en: "The great nights", he: "הלילות הגדולים" } },
+  { href: "/news", label: { en: "Read the news", he: "לקרוא את החדשות" } },
   { href: "/ask", label: { en: "Ask Blaugrana anything", he: "לשאול את בלאוגרנה הכול" } },
 ] as const satisfies readonly { href: string; label: Words }[];
 

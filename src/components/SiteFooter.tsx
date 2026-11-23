@@ -14,9 +14,7 @@ const PAGES: { href: string; label: TextKey }[] = [
   { href: "/matches", label: "nav.matches" },
   { href: "/table", label: "nav.table" },
   { href: "/squad", label: "nav.squad" },
-  { href: "/stats", label: "nav.stats" },
-  { href: "/history", label: "nav.history" },
-  { href: "/shirt", label: "nav.shirt" },
+  { href: "/club", label: "nav.club" },
   { href: "/ask", label: "nav.ask" },
 ];
 

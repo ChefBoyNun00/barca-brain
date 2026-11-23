@@ -20,9 +20,6 @@ const SECTIONS: Section[] = [
   { href: "/table", label: "nav.table", also: ["/season"], inBar: true },
   { href: "/squad", label: "nav.squad", inBar: true },
   { href: "/club", label: "nav.club", inBar: true },
-  { href: "/stats", label: "nav.stats" },
-  { href: "/history", label: "nav.history" },
-  { href: "/shirt", label: "nav.shirt" },
   { href: "/ask", label: "nav.ask" },
 ];
 

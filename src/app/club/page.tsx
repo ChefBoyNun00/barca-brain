@@ -8,7 +8,7 @@ import "@/features/club/club-story.css";
 export const metadata: Metadata = {
   title: "More than a club · Barça Brain",
   description:
-    "FC Barcelona's story in seven chapters: a newspaper advert, a language, a farmhouse, an idea and a city that keeps the same clock.",
+    "FC Barcelona's story in eight chapters: a newspaper advert, a language, a farmhouse, an idea, a city that keeps the same clock and the nights that made the club.",
 };
 
 export default function ClubPage() {

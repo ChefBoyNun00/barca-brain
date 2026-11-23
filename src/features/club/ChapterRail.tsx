@@ -35,7 +35,7 @@ export function ChapterRail({ stops, label }: { stops: readonly RailStop[]; labe
     );
     storyBand.observe(story);
 
-    // Chapter seven streams in after the rest (it waits for live data), so keep looking for
+    // Chapter eight streams in after the rest (it waits for live data), so keep looking for
     // chapters that were not on the page yet.
     const watchNew = () => {
       for (const { id } of stops) {

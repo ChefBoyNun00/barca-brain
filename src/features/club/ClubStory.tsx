@@ -14,6 +14,7 @@ import {
   STORY_COVER,
   STORY_NOW,
   TONIGHT_ID,
+  TONIGHT_NUMERAL,
   type Chapter,
 } from "@/config/club-story";
 import { BARCA_CREST_URL } from "@/config/display";
@@ -28,6 +29,8 @@ import { NameDrift } from "./NameDrift";
 import { Odometer } from "./Odometer";
 import { PassingPitch } from "./PassingPitch";
 import { Senyera } from "./Senyera";
+import { HistoryTimeline } from "../history/HistoryTimeline";
+import { useT } from "@/i18n/language";
 import { useWords } from "./use-words";
 
 /** Today's academy graduates, by the names fans know (the provider says "Pablo Gavira" for Gavi). */
@@ -35,14 +38,15 @@ const MASIA_NOW = [...LA_MASIA_GRADUATES].map((name) => PLAYER_SEARCH_NAMES[name
 
 /**
  * "The club": FC Barcelona's story told in chapters as you scroll, from a newspaper advert in
- * 1899 to a matchday in the city. Chapter seven, the live one, follows it on the page.
+ * 1899 to a matchday in the city. Chapter eight, the live one, follows it on the page.
  */
 export function ClubStory() {
   const w = useWords();
-  const [founding, catalonia, culers, masia, idea, matchday] = CHAPTERS;
+  const t = useT();
+  const [founding, catalonia, culers, masia, idea, matchday, nights] = CHAPTERS;
   const stops = [
     ...CHAPTERS.map(({ id, numeral, label }) => ({ id, numeral, label: w(label) })),
-    { id: TONIGHT_ID, numeral: "VII", label: w(STORY_NOW.label) },
+    { id: TONIGHT_ID, numeral: TONIGHT_NUMERAL, label: w(STORY_NOW.label) },
   ];
 
   return (
@@ -137,6 +141,14 @@ export function ClubStory() {
         backdrop={BACKDROPS.club.matchday}
       >
         <MatchdayClock />
+      </StoryChapter>
+
+      {/* The club's best moments (this was the /history page). */}
+      <StoryChapter chapter={nights} tone="blue" layout="stack" backdrop={BACKDROPS.club.nights}>
+        <div className="nights">
+          <HistoryTimeline />
+          <p className="nights-sources">{t("history.sources")}</p>
+        </div>
       </StoryChapter>
     </>
   );

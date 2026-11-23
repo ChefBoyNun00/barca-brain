@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Icon } from "@/components/Icon";
 import { PhotoBackdrop } from "@/components/PhotoBackdrop";
 import { Reveal } from "@/components/motion/Reveal";
-import { STORY_EXITS, STORY_NOW, TONIGHT_ID } from "@/config/club-story";
+import { STORY_EXITS, STORY_NOW, TONIGHT_ID, TONIGHT_NUMERAL } from "@/config/club-story";
 import { BACKDROPS } from "@/config/moments";
 import { displayCompetition, displayTeam, formatKickoff } from "@/features/home/format";
 import { HeadlineLine } from "@/features/home/HeadlineLine";
@@ -21,7 +21,7 @@ export type TonightMatch = {
   competition: string;
 };
 
-/** Chapter seven: this season in one line, the next match, and the doors into the rest of the app. */
+/** Chapter eight: this season in one line, the next match, and the doors into the rest of the app. */
 export function TonightView({ headline, next }: { headline: HeadlinePart[]; next: TonightMatch | null }) {
   const w = useWords();
   const language = useLanguage();
@@ -30,7 +30,7 @@ export function TonightView({ headline, next }: { headline: HeadlinePart[]; next
     <section id={TONIGHT_ID} className="chapter tonight" data-tone="garnet" data-layout="stack">
       <PhotoBackdrop moment={BACKDROPS.club.tonight} />
       <span aria-hidden="true" className="chapter-numeral">
-        VII
+        {TONIGHT_NUMERAL}
       </span>
       <div className="chapter-inner">
         <div className="chapter-words">
