@@ -5441,8 +5441,11 @@ body {
    form guide, results ticker, bars) stay left to right, because their animations and the
    wall's drag-to-scrub are measured from the left edge. */
 html[lang="he"] {
-  --font-inter: var(--font-hebrew);
-  --font-display: var(--font-hebrew);
+  /* Latin face first, Hebrew second: the browser takes each letter from the first font that has
+     it, so digits and Latin names stay in the English fonts and only Hebrew letters change.
+     --latin-* are set on <html> in layout.tsx. */
+  --font-inter: var(--latin-body), var(--font-hebrew);
+  --font-display: var(--latin-display), var(--font-hebrew-display), var(--font-hebrew);
 }
 
 html[data-lang-pending] body {
@@ -5471,9 +5474,17 @@ html[lang="he"] [class] {
   letter-spacing: normal;
 }
 
-html[lang="he"] .poster-opponent {
-  /* Heebo's capitals are wider than Big Shoulders' (measured: about 0.68 against 0.54). */
-  --cap-width: 0.7;
+/* The "עב" on the language switch, on English pages too, where nothing else is Hebrew. */
+.lang-toggle [lang="he"] {
+  font-family: var(--font-hebrew);
+}
+
+/* Hebrew sentences run a little longer than the English ones, so the home headline is set about
+   8% smaller to keep each line whole (measured at 1280px: 1187px of text in a 1168px box).
+   The poster needs no such rule: the narrow Hebrew letters (about 0.47-0.54 of the font size,
+   measured) fit inside the 0.56 --cap-width that English uses. */
+html[lang="he"] .hero-title {
+  font-size: clamp(2.5rem, 10.5vw, 8.25rem);
 }
 
 [dir="rtl"] .wall,
@@ -5541,13 +5552,6 @@ html[lang="he"] .poster-opponent {
   to {
     transform: none;
   }
-}
-
-/* The headline sits on the right, so the dark wash behind it does too. */
-[dir="rtl"] .hero::after {
-  background:
-    linear-gradient(270deg, rgba(6, 11, 31, 0.92) 0%, rgba(6, 11, 31, 0.7) 40%, rgba(6, 11, 31, 0.3) 100%),
-    linear-gradient(180deg, rgba(6, 11, 31, 0.1) 0%, rgba(6, 11, 31, 0.8) 100%);
 }
 
 [dir="rtl"] .story-art[data-size="hero"] .story-art-photo {

@@ -1,8 +1,10 @@
+import type { CSSProperties } from "react";
 import type { Metadata } from "next";
-import { Big_Shoulders, Heebo, IBM_Plex_Mono, Inter } from "next/font/google";
+import { Big_Shoulders, IBM_Plex_Mono, Inter, Noto_Sans_Hebrew } from "next/font/google";
+import localFont from "next/font/local";
 import { AskDrawer } from "@/features/ask/AskDrawer";
 import { IntroSplash } from "@/components/IntroSplash";
-import { serifFontClasses } from "@/components/serif-fonts";
+import { serifFontClasses, storySerif } from "@/components/serif-fonts";
 import { PointerTilt } from "@/components/motion/PointerTilt";
 import { LanguageReady } from "@/components/LanguageReady";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -29,11 +31,43 @@ const mono = IBM_Plex_Mono({
   weight: ["400", "500"],
 });
 
-// The fonts above have no Hebrew letters, so Hebrew pages switch to Heebo.
-const hebrew = Heebo({
+// The fonts above have no Hebrew letters. Hebrew pages keep them for Latin letters and digits, so
+// names, scores and numbers look exactly as in English, and only the Hebrew letters come from
+// Noto Sans Hebrew, which is built on the same proportions as Inter.
+const hebrew = Noto_Sans_Hebrew({
   variable: "--font-hebrew",
-  subsets: ["hebrew", "latin"],
+  subsets: ["hebrew"],
 });
+
+// Hebrew headlines: the narrow cut of the same font, to stand next to Big Shoulders. Self-hosted
+// because Google's loader only gives the normal width; the file holds Hebrew letters only.
+const hebrewDisplay = localFont({
+  src: [{ path: "../assets/fonts/NotoSansHebrew-Condensed.woff2", weight: "500 900", style: "normal" }],
+  variable: "--font-hebrew-display",
+  declarations: [
+    { prop: "font-stretch", value: "62.5%" },
+    { prop: "unicode-range", value: "U+0590-05FF, U+FB1D-FB4F" },
+    // Its Hebrew letters are shorter than Big Shoulders' tall capitals; this evens them out.
+    { prop: "size-adjust", value: "110%" },
+  ],
+  adjustFontFallback: false,
+});
+
+/**
+ * "'Inter', 'Inter Fallback'" becomes "'Inter'": the web font alone. The fallback is a resized
+ * Arial that also has Hebrew letters, so left in a Hebrew stack it would draw them before our
+ * Hebrew font got a turn. Read from next/font, so the real family names are never hand-copied.
+ */
+function webFontOnly(font: { style: { fontFamily: string } }): string {
+  return (font.style.fontFamily.split(",")[0] ?? font.style.fontFamily).trim();
+}
+
+/** The Latin faces on their own, for the Hebrew font stacks in globals.css. */
+const latinFaces = {
+  "--latin-body": webFontOnly(inter),
+  "--latin-display": webFontOnly(display),
+  "--latin-serif": webFontOnly(storySerif),
+} as CSSProperties;
 
 /** Runs before the first paint. Our own constant, nothing from a visitor goes into it. */
 const INTRO_SKIP_SCRIPT = `try{if(sessionStorage.getItem(${JSON.stringify(INTRO_STORAGE_KEY)})||matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.dataset.intro="seen"}}catch(e){}`;
@@ -63,7 +97,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${display.variable} ${hebrew.variable} ${mono.variable} ${serifFontClasses} h-full antialiased`}
+      className={`${inter.variable} ${display.variable} ${hebrew.variable} ${hebrewDisplay.variable} ${mono.variable} ${serifFontClasses} h-full antialiased`}
+      style={latinFaces}
       suppressHydrationWarning
     >
       <head>
