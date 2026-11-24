@@ -6,10 +6,11 @@
      2. The header, the full-screen menu, and the curtain that lifts on every page change.
      3. Movement for every page: things rise in as they scroll into view (CSS only).
      4. Quieter building blocks: type, pills, cards (with a slight tilt under the mouse).
-     5. The home page's sections: hero, motto band, season cards, explore list.
+     5. The home page's sections: hero, motto band, news.
    Rule of thumb: fewer colours, more space, slow easing. If something shouts, quiet it.
-   TODO(debt): globals.css still holds the old nav/tab-bar and ticker rules (.nav, .tabbar, .ticker), which nothing
-   renders now — delete them in a cleanup change, not mixed into this one.
+   TODO(debt): many globals.css rules still set values this file then overrides (the two-layer
+   look) — fold each pair into one rule when touching that component, checking computed styles.
+   Rules for classes nothing renders were removed on 2026-11-24.
    ========================================================================== */
 
 /* ---------- 1. Tokens ---------- */
@@ -481,8 +482,6 @@ body {
         .poster-inner > *,
         .room > *,
         .credits > *,
-        .front-hottest,
-        .briefing,
         .podcast,
         table,
         figure
@@ -584,15 +583,6 @@ body {
   box-shadow: none;
 }
 
-.pill-light {
-  color: var(--night);
-  background: var(--ivory);
-}
-
-.pill-light:hover {
-  color: var(--ivory);
-}
-
 /* Filter chips and switches: paper, with night for the chosen one. No gradients. */
 .chip,
 .segmented {
@@ -643,7 +633,7 @@ body {
 }
 
 /* Cards: paper on stone, a hairline instead of a heavy shadow. */
-:is(.match-card, .nw-card, .explore-tile, .moment-card, .player-card, .league, .tally) {
+:is(.match-card, .nw-card, .moment-card, .player-card, .league, .tally) {
   border-color: var(--line-warm);
   border-radius: var(--radius-lg);
   background-color: var(--paper);
@@ -652,14 +642,14 @@ body {
 
 /* The tilt (src/components/motion/PointerTilt.tsx writes --rx/--ry while the mouse is over it).
    Not on match cards: 46 results leaning under the mouse is noise, not meaning. */
-:is([data-tilt], .explore-tile, .nw-card, .moment-card) {
+:is([data-tilt], .nw-card, .moment-card) {
   transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
   transition:
     transform 0.6s var(--ease-premium),
     box-shadow 0.4s ease;
 }
 
-:is([data-tilt], .explore-tile, .nw-card, .moment-card)[data-tilting] {
+:is([data-tilt], .nw-card, .moment-card)[data-tilting] {
   /* Repeated here so the tilt beats the older hover lift in globals.css. */
   transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
   box-shadow: var(--shadow-lg);
@@ -784,12 +774,8 @@ body {
   letter-spacing: -0.005em;
 }
 
-/* Solid gold. The old shimmer (globals.css) was hidden under this colour but still repainting
-   forever, so it is switched off here, not just covered. */
 .hero-hot {
   color: var(--gold-soft);
-  background: none;
-  animation: none;
 }
 
 /* Stats: big numbers on a hairline, no boxes. */
@@ -809,10 +795,6 @@ body {
   box-shadow: none;
   outline: 0;
   backdrop-filter: none;
-  transform: none;
-}
-
-.hero-stat:hover {
   transform: none;
 }
 
@@ -1046,11 +1028,6 @@ body {
   box-shadow: none;
 }
 
-.num-tile:hover {
-  transform: none;
-  box-shadow: none;
-}
-
 .num-tile-value {
   color: var(--text-heading);
   font-weight: 800;
@@ -1107,10 +1084,6 @@ body {
   font-family: var(--font-caption);
   font-weight: 500;
   letter-spacing: 0.14em;
-}
-
-.heat-bar::after {
-  background: var(--barca-garnet);
 }
 
 /* The floating Ask button steps aside while the menu is open (it would cover the language switch). */

@@ -9,7 +9,7 @@ import { MOTION } from "@/config/motion";
  * list in premium.css, joins in. Only for a real mouse, and never for anyone who asked for less
  * motion. The look (perspective, the sheen) is in CSS; this only writes --rx, --ry and --mx.
  */
-const TILT_SELECTOR = "[data-tilt], .explore-tile, .nw-card, .moment-card, .hcard";
+const TILT_SELECTOR = "[data-tilt], .nw-card, .moment-card";
 
 export function PointerTilt() {
   useEffect(() => {
