@@ -48,6 +48,7 @@ export function MatchCard({ match, index, showShare = true }: MatchCardProps) {
       id={`match-${match.id}`}
       className="match-card"
       data-outcome={outcome ?? "none"}
+      data-linked={showShare ? "" : undefined}
       style={{ "--i": index } as React.CSSProperties}
       aria-label={describeMatch(match, language)}
     >
@@ -81,9 +82,13 @@ export function MatchCard({ match, index, showShare = true }: MatchCardProps) {
           </>
         )}
       </p>
+      {/* The whole card is the door to the Matchday Room (the link stretches over it in CSS),
+          so one visible "Matchday Room" line isn't repeated on every one of 46 cards. */}
       {showShare && (
-        <Link className="match-card-share" href={`/matches/${match.id}`}>
-          {t("match.room")}
+        <Link className="match-card-link" href={`/matches/${match.id}`}>
+          <span className="sr-only">
+            {t("match.room")} {describeMatch(match, language)}
+          </span>
         </Link>
       )}
     </article>

@@ -83,7 +83,7 @@
   }
 
   /* On navy, blue disappears; gold reads at 9:1. */
-  :where(.nav, .tabbar, .poster, .hero, .home-hero, .site-foot, .matchday, .intro, [data-surface="dark"]) {
+  :where(.poster, .hero, .site-foot, .matchday, .intro, [data-surface="dark"]) {
     --focus-ring: var(--barca-gold);
   }
 
@@ -122,54 +122,6 @@ body {
 }
 
 @layer components {
-  .nav {
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    padding: 0.875rem 1rem;
-    background: rgba(10, 18, 48, 0.94);
-    backdrop-filter: blur(20px);
-  }
-
-  /* The edge of the nav is a strip of the shirt. */
-  .nav::after {
-    content: "";
-    position: absolute;
-    inset: auto 0 0;
-    height: 3px;
-    background: repeating-linear-gradient(
-      90deg,
-      var(--barca-garnet) 0 32px,
-      var(--barca-blue) 32px 64px
-    );
-  }
-
-  .nav-inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    max-width: 1200px;
-    margin-inline: auto;
-  }
-
-  .nav-links {
-    display: flex;
-    gap: clamp(0.5rem, 2.5vw, 1.75rem);
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.88);
-  }
-
-  .nav-links a {
-    display: inline-block;
-    padding-block: 0.25rem;
-    transition: color 150ms var(--ease-smooth);
-  }
-
-  .nav-links a:hover {
-    color: var(--barca-gold);
-  }
 
   .brand {
     display: inline-flex;
@@ -358,7 +310,7 @@ body {
     font-size: 1.25rem;
     color: var(--primary);
     cursor: pointer;
-    background: #ffffff;
+    background: var(--paper);
     border: 2px solid var(--border);
     border-radius: var(--radius-md);
     transition:
@@ -524,31 +476,12 @@ body {
     color: var(--text-heading);
   }
 
+  /* A page title and its one-line note are one thought: they sit close. */
   .section-note {
-    margin-top: 0.5rem;
-    font-size: 0.875rem;
-  }
-
-  .tally-rows {
-    display: grid;
-    gap: 1rem;
-    margin-top: 1.5rem;
-  }
-
-  .tally-rows li {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 0.25rem 0.75rem;
-    align-items: center;
-  }
-
-  .tally-name {
-    font-weight: 500;
-  }
-
-  .tally-name[data-strong="true"] {
-    font-weight: 700;
-    color: var(--text-heading);
+    margin-top: 0.75rem;
+    max-width: 60ch;
+    font-size: 0.9375rem;
+    line-height: 1.5;
   }
 
   .tally {
@@ -597,13 +530,6 @@ body {
     font-size: 1.5rem;
     font-weight: 800;
     color: var(--text-heading);
-  }
-
-  .tally-extra {
-    font-family: var(--font-inter);
-    font-size: 0.8rem;
-    font-weight: 500;
-    color: var(--text-secondary);
   }
 
   footer {
@@ -692,10 +618,6 @@ body {
 
     .countdown-wrap .countdown {
       margin-top: 0;
-    }
-
-    .tally-rows li {
-      grid-template-columns: 11rem minmax(0, 1fr) 6.5rem;
     }
 
     .tally {
@@ -805,11 +727,6 @@ body {
 
   html:has(dialog[open]) {
     overflow: hidden;
-  }
-
-  .footer-link {
-    font-weight: 600;
-    color: var(--primary);
   }
 
   /* Choices */
@@ -1055,7 +972,7 @@ body {
 
   .picks {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(4.75rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(4.75rem, 100%), 1fr));
     gap: 0.5rem;
     margin-top: 1rem;
   }
@@ -1246,9 +1163,11 @@ body {
   }
 
   /* League table */
+  /* A table may scroll sideways inside its own box (large text, small phone); the page never does. */
   .league-wrap {
     margin-top: 1.25rem;
-    background: #ffffff;
+    overflow-x: auto;
+    background: var(--paper);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
@@ -1363,7 +1282,7 @@ body {
   .meeting[data-outcome="none"] {
     font-weight: 600;
     color: var(--text-secondary);
-    background: #ffffff;
+    background: var(--paper);
     outline: 1px dashed #9db8dd;
     outline-offset: -1px;
   }
@@ -1596,46 +1515,7 @@ body {
     transform: translateY(-2px);
   }
 
-  .press-more {
-    display: inline-block;
-    margin-top: 1rem;
-  }
-
   /* The press */
-  .briefing {
-    margin-top: 1.25rem;
-    padding: 1.5rem;
-    color: #ffffff;
-    background: linear-gradient(115deg, var(--barca-garnet), var(--primary) 55%, var(--barca-blue));
-    border-radius: var(--radius-lg);
-  }
-
-  .briefing-kicker {
-    font-size: 0.8rem;
-    font-weight: 600;
-  }
-
-  .briefing-title {
-    margin-top: 0.25rem;
-    font-family: var(--font-display);
-    font-size: clamp(2rem, 6vw, 3.25rem);
-    font-weight: 900;
-    line-height: 1.02;
-    text-transform: uppercase;
-  }
-
-  .briefing-bullets {
-    display: grid;
-    gap: 0.5rem;
-    margin-top: 0.875rem;
-    padding-inline-start: 1.125rem;
-    list-style: disc;
-  }
-
-  .briefing-note {
-    margin-top: 0.875rem;
-    font-size: 0.75rem;
-  }
 
   .story-tags {
     display: flex;
@@ -1688,10 +1568,6 @@ body {
     font-weight: 600;
   }
 
-  .story-source-outlet {
-    display: block;
-  }
-
   .player-press {
     margin-top: 1rem;
     font-size: 0.875rem;
@@ -1721,18 +1597,63 @@ body {
     margin-top: 1.5rem;
   }
 
+  /* What it can do: plain text, read once. The box below is the thing to use. */
   .chat-tip {
-    padding: 1rem 1.25rem;
+    max-width: 60ch;
+    line-height: 1.55;
+  }
+
+  .chat-tip strong {
     color: var(--text-heading);
-    background: var(--primary-wash);
-    border-radius: var(--radius-md);
+  }
+
+  .chat-tip ~ .chat-input {
+    margin-top: 1.5rem;
+  }
+
+  /* Ideas sit under the box and stay quiet: help for anyone stuck, not six calls to action. */
+  .chat-ideas {
+    margin-top: 2rem;
+  }
+
+  .chat-ideas-title {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-secondary);
   }
 
   .chat-suggestions {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    margin-top: 1rem;
+    margin-top: 0.75rem;
+  }
+
+  .chat-suggestion {
+    min-height: var(--tap);
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    line-height: 1.35;
+    text-align: start;
+    color: var(--text-heading);
+    background: transparent;
+    border: 1px solid var(--border);
+    /* Not a full pill: on phones some ideas wrap to two lines, and a two-line capsule looks swollen. */
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition:
+      border-color 0.2s ease,
+      background-color 0.2s ease;
+  }
+
+  .chat-suggestion:hover {
+    background: var(--surface);
+    border-color: color-mix(in srgb, var(--text-heading) 40%, transparent);
+  }
+
+  .chat-suggestion:focus-visible {
+    outline: 2px solid var(--focus-ring, var(--barca-blue));
+    outline-offset: 2px;
   }
 
   .chat-turns {
@@ -1753,12 +1674,12 @@ body {
     border-end-end-radius: 4px;
   }
 
+  /* The answer reads as plain text under the question bubble: the bubble already marks who said what. */
   .chat-answer {
     margin-top: 0.75rem;
-    padding-inline-start: 0.875rem;
+    max-width: 65ch;
+    line-height: 1.6;
     color: var(--text-heading);
-    border-inline-start: 4px solid;
-    border-image: linear-gradient(180deg, var(--barca-garnet), var(--barca-blue)) 1;
   }
 
   .answer-text {
@@ -1860,6 +1781,8 @@ body {
     border-color: var(--primary);
   }
 
+  /* The panel IS the field: one box, not a white box inside a white box. It stays pinned to the
+     bottom while answers scroll, so it is solid (a blur would have to redraw on every frame). */
   .chat-input {
     position: sticky;
     bottom: 0.5rem;
@@ -1867,16 +1790,33 @@ body {
     align-items: flex-end;
     gap: 0.5rem;
     margin-top: 1.25rem;
-    padding: 0.5rem;
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(20px);
+    padding: 0.375rem;
+    background: var(--paper);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
+    transition: border-color 150ms var(--ease-smooth);
   }
 
-  .chat-input textarea {
+  .chat-input:focus-within {
+    border-color: var(--text-heading);
+    box-shadow:
+      0 0 0 1px var(--text-heading),
+      var(--shadow-md);
+  }
+
+  /* Hint text in every field: the secondary ink (about 7:1 on white), not the browser's
+     half-transparent default (3.5:1). */
+  :where(input, textarea)::placeholder {
+    color: var(--text-secondary);
+    opacity: 1;
+  }
+
+  .chat-input textarea,
+  .chat-input textarea:focus {
     resize: none;
+    background: transparent;
+    border-color: transparent;
   }
 
   .btn-primary:disabled {
@@ -1886,56 +1826,10 @@ body {
 }
 
 @layer components {
-  /* The home page's doors to the other pages */
-  .explore {
-    display: grid;
-    gap: 0.75rem;
-    margin-top: 1.5rem;
-    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
-  }
-
-  .explore-tile {
-    display: block;
-    padding: 1.25rem;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    background: #ffffff;
-    transition:
-      transform 150ms var(--ease-smooth),
-      box-shadow 150ms var(--ease-smooth);
-  }
-
-  .explore-tile:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-  }
-
-  .explore-tile:focus-visible {
-    outline: 3px solid var(--primary);
-    outline-offset: 2px;
-  }
-
-  .explore-title {
-    display: block;
-    font-family: var(--font-display);
-    font-size: 1.5rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    color: var(--text-heading);
-  }
-
-  .explore-note {
-    display: block;
-    margin-top: 0.25rem;
-    font-size: 0.875rem;
-  }
-}
-
-@layer components {
   /* The wardrobe: shirts hanging on a rail */
   .wardrobe {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(8.5rem, 100%), 1fr));
     gap: 1.5rem 0.5rem;
     margin-top: 1.5rem;
   }
@@ -2170,38 +2064,17 @@ body {
 
   .hero-hot {
     width: fit-content;
-    color: transparent;
-    background: linear-gradient(100deg, var(--barca-gold) 35%, #fff6c9 50%, var(--barca-gold) 65%);
-    background-size: 220% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    animation: shimmer 5s linear infinite;
   }
 
   .hero-stats {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(7.5rem, 100%), 1fr));
     gap: 0.75rem;
     margin-top: clamp(1.5rem, 4vw, 2.5rem);
   }
 
   .hero-stat {
-    padding: 0.875rem 1rem;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    border-top: 3px solid var(--barca-gold);
-    border-radius: var(--radius-lg);
-    backdrop-filter: blur(8px);
     animation: fadeInUp 0.55s var(--ease-out) both;
-    transition: transform 200ms var(--ease-smooth);
-  }
-
-  .hero-stat:hover {
-    transform: translateY(-4px);
-  }
-
-  .hero-stat:nth-child(even) {
-    border-top-color: #ff4d8d;
   }
 
   .hero-stat-number {
@@ -2219,66 +2092,6 @@ body {
     letter-spacing: 0.05em;
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.72);
-  }
-
-  /* The ticker: latest results, endlessly */
-  .ticker {
-    overflow: hidden;
-    color: #ffffff;
-    background: var(--barca-garnet);
-  }
-
-  .ticker-track {
-    display: flex;
-    width: max-content;
-    animation: marquee 48s linear infinite;
-  }
-
-  .ticker:hover .ticker-track {
-    animation-play-state: paused;
-  }
-
-  .ticker-copy,
-  .ticker-copy ul {
-    display: contents;
-  }
-
-  .ticker-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1.75rem;
-    font-size: 0.8rem;
-    font-weight: 600;
-    white-space: nowrap;
-    border-right: 1px solid rgba(255, 255, 255, 0.25);
-  }
-
-  .ticker-item img {
-    width: 20px;
-    height: 20px;
-    object-fit: contain;
-  }
-
-  .ticker-outcome {
-    display: inline-grid;
-    place-items: center;
-    width: 1.25rem;
-    height: 1.25rem;
-    font-size: 0.75rem;
-    font-weight: 800;
-    color: var(--barca-navy);
-    background: #ffffff;
-    border-radius: 50%;
-  }
-
-  .ticker-outcome[data-outcome="W"] {
-    background: var(--barca-gold);
-  }
-
-  .ticker-outcome[data-outcome="L"] {
-    color: #ffffff;
-    background: var(--barca-navy);
   }
 }
 
@@ -2311,22 +2124,11 @@ body {
   }
 }
 
-@keyframes marquee {
-  to {
-    transform: translateX(-50%);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .hero-stripes,
   .hero-stripes::after,
-  .hero-hot,
-  .ticker-track {
+  .hero-hot {
     animation: none;
-  }
-
-  .ticker {
-    overflow-x: auto;
   }
 }
 
@@ -2338,46 +2140,6 @@ body {
     /* Opacity only: a transform here would trap the fixed tab bar inside the page. */
     animation: pageFade 0.4s var(--ease-out) both;
   }
-
-  /* Explore tiles: a strip of the shirt on top, and they light up in club colours on hover. */
-  .explore-tile {
-    position: relative;
-    overflow: hidden;
-    padding-top: 1.75rem;
-  }
-
-  .explore-tile::before {
-    content: "";
-    position: absolute;
-    inset: 0 0 auto;
-    height: 6px;
-    background: repeating-linear-gradient(
-      90deg,
-      var(--barca-garnet) 0 14px,
-      var(--barca-blue) 14px 28px
-    );
-  }
-
-  .explore-tile:hover {
-    color: #ffffff;
-    background: linear-gradient(135deg, var(--barca-blue), var(--barca-garnet));
-    border-color: transparent;
-  }
-
-  .explore-tile:hover .explore-title,
-  .explore-tile:hover .explore-note {
-    color: #ffffff;
-  }
-
-  .explore-tile:hover .explore-title {
-    color: var(--barca-gold);
-  }
-
-  @media (max-width: 520px) {
-    .brand-name {
-      display: none;
-    }
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2388,80 +2150,12 @@ body {
 
 @layer components {
   /* Nav: the page you are on is lit up */
-  .nav-links a[aria-current="page"] {
-    color: var(--barca-gold);
-    box-shadow: 0 2px 0 var(--barca-gold);
-  }
-
-  .tabbar {
-    display: none;
-  }
 
   /* Phones: the main features move to the bottom, within a thumb's reach. */
   @media (max-width: 639px) {
-    .nav-links {
-      display: none;
-    }
 
     body {
       padding-bottom: 4.5rem;
-    }
-
-    .tabbar {
-      position: fixed;
-      inset: auto 0 0;
-      z-index: 70;
-      display: block;
-      padding-bottom: env(safe-area-inset-bottom);
-      background: rgba(10, 18, 48, 0.97);
-      backdrop-filter: blur(16px);
-      border-top: 3px solid transparent;
-      border-image: repeating-linear-gradient(
-          90deg,
-          var(--barca-garnet) 0 32px,
-          var(--barca-blue) 32px 64px
-        )
-        1;
-    }
-
-    .tabbar ul {
-      display: grid;
-      grid-template-columns: repeat(6, minmax(0, 1fr));
-    }
-
-    .tabbar a {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.125rem;
-      padding: 0.5rem 0 0.4rem;
-      font-size: 0.6875rem;
-      font-weight: 600;
-      color: rgba(255, 255, 255, 0.65);
-      transition: color 150ms var(--ease-smooth);
-    }
-
-    .tabbar a[aria-current="page"] {
-      color: var(--barca-gold);
-    }
-
-    .tabbar a:focus-visible {
-      outline: 2px solid var(--barca-gold);
-      outline-offset: -2px;
-    }
-
-    .tab-icon {
-      width: 1.4rem;
-      height: 1.4rem;
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 1.8;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .tabbar a[aria-current="page"] .tab-icon {
-      animation: tabPop 0.35s var(--ease-out);
     }
   }
 
@@ -2493,7 +2187,7 @@ body {
     background: linear-gradient(135deg, var(--barca-blue), var(--barca-garnet));
     border-radius: var(--radius-pill);
     transform: translateX(calc(var(--index) * 100%));
-    transition: transform 350ms cubic-bezier(0.34, 1.4, 0.64, 1);
+    transition: transform 350ms var(--ease-premium);
   }
 
   .segmented button {
@@ -2521,7 +2215,8 @@ body {
     flex-wrap: wrap;
     align-items: center;
     gap: 0.75rem 1rem;
-    margin-top: 1.25rem;
+    /* The controls are a different job from the title, so a clear gap separates them. */
+    margin-top: 2rem;
   }
 
   .board-record {
@@ -2529,14 +2224,12 @@ body {
     color: var(--text-heading);
   }
 
+  /* More room above a month than inside it, so each month reads as its own group. */
   .board-month {
-    margin-top: 2rem;
+    margin-top: 3rem;
   }
 
   .board-month-title {
-    position: sticky;
-    top: 3.6rem;
-    z-index: 5;
     padding-block: 0.5rem;
     font-family: var(--font-display);
     font-size: 1.5rem;
@@ -2544,12 +2237,24 @@ body {
     letter-spacing: 0.04em;
     text-transform: uppercase;
     color: var(--barca-garnet);
-    background: linear-gradient(180deg, var(--off-white) 70%, transparent);
+  }
+
+  /* Phones: one match per row makes a month long, so its name stays pinned under the header
+     while you scroll it. The band runs edge to edge so it reads as a shelf, not a stray box. */
+  @media (max-width: 639px) {
+    .board-month-title {
+      position: sticky;
+      top: var(--hdr-h);
+      z-index: 5;
+      background: var(--off-white);
+      box-shadow: 0 0 0 100vmax var(--off-white);
+      clip-path: inset(0 -100vmax);
+    }
   }
 
   .board-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(17rem, 100%), 1fr));
     gap: 0.875rem;
     margin-top: 0.5rem;
   }
@@ -2575,13 +2280,27 @@ body {
       box-shadow 200ms var(--ease-smooth);
   }
 
-  .match-card::before {
+  /* The result lives in the W/D/L badge only: one signal, not a stripe repeating it. */
+
+  /* The link covers the whole card, so anywhere on it opens the Matchday Room. */
+  .match-card-link::after {
     content: "";
     position: absolute;
-    inset-block: 0;
-    inset-inline-start: 0;
-    width: 6px;
-    background: var(--tone);
+    inset: 0;
+    border-radius: inherit;
+  }
+
+  .match-card-link:focus-visible {
+    outline: none;
+  }
+
+  .match-card[data-linked]:has(.match-card-link:focus-visible) {
+    outline: 2px solid var(--focus-ring, var(--barca-blue));
+    outline-offset: 2px;
+  }
+
+  .match-card[data-linked]:hover {
+    border-color: color-mix(in srgb, var(--text-heading) 35%, transparent);
   }
 
   .match-card[data-outcome="W"] {
@@ -2596,10 +2315,6 @@ body {
     --tone: var(--barca-garnet);
   }
 
-  .match-card:hover {
-    transform: translateY(-4px) rotate(-0.4deg);
-    box-shadow: 0 18px 36px -14px rgba(0, 77, 152, 0.4);
-  }
 
   /* Arriving from the table: the card you asked for glows */
   .match-card:target {
@@ -2679,11 +2394,57 @@ body {
     text-align: center;
   }
 
+  /* Phones: a scoreboard row (crest, name, score, name, crest) instead of a tall card, so the
+     whole season reads in a few thumb-scrolls rather than fourteen screens. */
+  @media (max-width: 639px) {
+    .board-grid {
+      gap: 0.5rem;
+    }
+
+    .match-card {
+      gap: 0.5rem;
+      padding: 0.75rem 0.875rem;
+    }
+
+    .match-card-teams {
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      gap: 0.5rem;
+    }
+
+    .match-card-team {
+      flex-direction: row;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+    }
+
+    /* Both names sit next to the score and both crests on the outside edges, like a scoreboard.
+       (Flex follows the reading direction, so Hebrew mirrors this by itself.) */
+    .match-card-team:first-child {
+      justify-content: flex-end;
+      text-align: end;
+    }
+
+    .match-card-team:last-child {
+      flex-direction: row-reverse;
+      justify-content: flex-end;
+      text-align: start;
+    }
+
+    .match-card-team img {
+      width: 1.75rem;
+      height: 1.75rem;
+      flex: none;
+    }
+
+    .match-card-score {
+      font-size: 1.75rem;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .match-card,
     .match-card:target,
-    .segmented-thumb,
-    .tabbar a[aria-current="page"] .tab-icon {
+    .segmented-thumb {
       animation: none;
       transition: none;
     }
@@ -2710,18 +2471,6 @@ body {
     box-shadow:
       0 0 0 3px var(--barca-gold),
       0 0 32px 6px rgba(237, 187, 0, 0.55);
-  }
-}
-
-@keyframes tabPop {
-  0% {
-    transform: scale(0.7);
-  }
-  60% {
-    transform: scale(1.2);
-  }
-  100% {
-    transform: scale(1);
   }
 }
 
@@ -2839,7 +2588,9 @@ body {
     text-align: center;
   }
 
+  /* Padding, not a display change, so the row keeps its marker: about 44px to tap. */
   .wall-table summary {
+    padding-block: 0.75rem;
     font-weight: 600;
     color: var(--primary);
     cursor: pointer;
@@ -2921,87 +2672,6 @@ body {
 }
 
 @layer components {
-  .season-more {
-    margin-top: 1rem;
-    text-align: center;
-  }
-}
-
-@layer components {
-  /* The briefing: numbered, with gold counters */
-  .briefing {
-    position: relative;
-    overflow: hidden;
-    background: linear-gradient(115deg, var(--barca-garnet), var(--barca-blue));
-  }
-
-  .briefing::after {
-    content: "";
-    position: absolute;
-    inset-block: 0;
-    inset-inline-end: 0;
-    width: 40%;
-    pointer-events: none;
-    background: repeating-linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.07) 0 28px,
-      transparent 28px 56px
-    );
-  }
-
-  .briefing-bullets {
-    padding-inline-start: 0;
-    list-style: none;
-    counter-reset: bullet;
-  }
-
-  .briefing-bullets li {
-    position: relative;
-    padding-inline-start: 2.25rem;
-    counter-increment: bullet;
-  }
-
-  .briefing-bullets li::before {
-    content: counter(bullet);
-    position: absolute;
-    inset-block-start: 0.0625rem;
-    inset-inline-start: 0;
-    display: grid;
-    place-items: center;
-    width: 1.5rem;
-    height: 1.5rem;
-    font-size: 0.75rem;
-    font-weight: 800;
-    color: var(--barca-navy);
-    background: var(--barca-gold);
-    border-radius: 50%;
-  }
-
-  .briefing-bullets[start] {
-    counter-reset: bullet 3;
-  }
-
-  .briefing-more summary {
-    margin-top: 0.75rem;
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--barca-gold);
-    cursor: pointer;
-  }
-
-  .news-bar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.75rem 1rem;
-    margin-top: 1.5rem;
-  }
-
-  .news-jump {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.375rem;
-  }
 
   /* Story pictures: made from the player's shirt or the crest, over a colour for the topic */
   .story-art {
@@ -3214,7 +2884,7 @@ body {
 
   .matchday-score {
     font-size: clamp(2.75rem, 9vw, 4.5rem);
-    animation: scoreSlam 0.7s cubic-bezier(0.34, 1.6, 0.64, 1) both;
+    animation: scoreSlam 0.7s var(--ease-premium) both;
   }
 
   .matchday-names {
@@ -3372,7 +3042,6 @@ body {
 }
 
 @layer components {
-  .match-card-share,
   .player-share {
     align-self: center;
     font-size: 0.75rem;
@@ -3380,7 +3049,6 @@ body {
     color: var(--primary);
   }
 
-  .match-card-share:hover,
   .player-share:hover {
     text-decoration: underline;
   }
@@ -3531,7 +3199,7 @@ body {
     outline-offset: -7px;
     transform: rotate(var(--tilt, -1.2deg));
     transform-origin: top center;
-    transition: transform 300ms cubic-bezier(0.34, 1.5, 0.64, 1);
+    transition: transform 300ms var(--ease-premium);
   }
 
   .hero-stat:nth-child(even) {
@@ -3796,7 +3464,7 @@ body {
     box-shadow:
       0 10px 24px -8px rgba(10, 18, 48, 0.55),
       4px 4px 0 var(--barca-garnet);
-    transition: transform 200ms cubic-bezier(0.34, 1.5, 0.64, 1);
+    transition: transform 200ms var(--ease-premium);
   }
 
   .ask-launch:hover {
@@ -3896,7 +3564,7 @@ body {
   /* Season in numbers */
   .num-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(9rem, 100%), 1fr));
     gap: 0.75rem;
     margin-top: 1.5rem;
   }
@@ -3912,43 +3580,18 @@ body {
   }
 
   .num-grid-three {
-    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(11rem, 100%), 1fr));
   }
 
-  /* Each tile is a scrap of the shirt: navy cloth with faint stripes, a coloured hem,
-     arriving one after another and lifting when you point at it. */
+  /* Stat tiles: structure and the staggered arrival. The look (figures on hairlines) is in premium.css. */
   .num-tile {
     position: relative;
     display: flex;
     flex-direction: column;
     gap: 0.375rem;
-    padding: 1.25rem 1.125rem 1rem;
     overflow: hidden;
-    color: #ffffff;
-    background:
-      repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.035) 0 18px, transparent 18px 36px),
-      linear-gradient(160deg, #13235a 0%, var(--barca-navy) 70%);
-    border-bottom: 5px solid var(--barca-gold);
-    border-radius: var(--radius-md);
-    box-shadow: 0 10px 24px -14px rgba(10, 18, 48, 0.7);
-    transition:
-      transform 200ms var(--ease-smooth),
-      box-shadow 200ms var(--ease-smooth);
     animation: fadeInUp 0.5s var(--ease-out) backwards;
     animation-delay: calc(var(--i, 0) * 60ms);
-  }
-
-  .num-tile:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 16px 30px -14px rgba(10, 18, 48, 0.8);
-  }
-
-  .num-tile:nth-child(3n + 2) {
-    border-bottom-color: var(--barca-garnet);
-  }
-
-  .num-tile:nth-child(3n) {
-    border-bottom-color: var(--barca-blue);
   }
 
   .num-tile-value {
@@ -4011,8 +3654,6 @@ body {
     font-weight: 900;
     text-transform: uppercase;
     color: var(--text-heading);
-    border-inline-start: 6px solid var(--barca-gold);
-    padding-inline-start: 0.75rem;
   }
 
   .stats-columns {
@@ -4113,7 +3754,7 @@ body {
 
   .standout {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr));
     gap: 1rem;
     margin-top: 1rem;
   }
@@ -4134,8 +3775,6 @@ body {
     font-weight: 900;
     text-transform: uppercase;
     color: var(--text-heading);
-    border-inline-start: 6px solid var(--barca-garnet);
-    padding-inline-start: 0.75rem;
   }
 
   .leaders ol {
@@ -4163,6 +3802,17 @@ body {
 
   .leaders a:hover {
     transform: translateX(3px);
+  }
+
+  /* Large text on a phone: the bar is a picture of the number next to it, so it goes first. */
+  @media (max-width: 22em) {
+    .leaders a {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+    }
+
+    .leaders-bar {
+      display: none;
+    }
   }
 
   /* The leader of each list gets the navy shirt and a gold number. */
@@ -4246,6 +3896,7 @@ body {
   .timeline {
     position: relative;
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: 2.5rem;
     margin-top: 2.5rem;
     padding-inline-start: 1.5rem;
@@ -4300,7 +3951,6 @@ body {
     margin-top: 0.25rem;
     background: #ffffff;
     border: 1px solid var(--border);
-    border-inline-start: 6px solid var(--barca-gold);
     border-radius: var(--radius-lg);
     border-start-start-radius: 6px;
     border-end-start-radius: 6px;
@@ -4330,7 +3980,8 @@ body {
   }
 
   .moment-fact summary {
-    margin-top: 0.75rem;
+    margin-top: 0.25rem;
+    padding-block: 0.75rem;
     font-size: 0.85rem;
     font-weight: 800;
     color: var(--primary);
@@ -4366,6 +4017,9 @@ body {
   }
 
   .moment-ask {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
     margin-inline-start: auto;
     font-size: 0.8rem;
     font-weight: 700;
@@ -4440,66 +4094,6 @@ body {
       animation: knotPop linear both;
       animation-timeline: view();
       animation-range: entry 10% entry 50%;
-    }
-  }
-}
-
-@layer components {
-  @media (max-width: 639px) {
-    .tabbar ul {
-      grid-template-columns: repeat(6, minmax(0, 1fr));
-    }
-
-    .tabbar button {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.125rem;
-      width: 100%;
-      padding: 0.5rem 0 0.4rem;
-      font-size: 0.6875rem;
-      font-weight: 600;
-      color: rgba(255, 255, 255, 0.65);
-      cursor: pointer;
-    }
-
-    .tabbar button[aria-current="page"],
-    .tabbar button[aria-expanded="true"] {
-      color: var(--barca-gold);
-    }
-
-    .tabbar button:focus-visible {
-      outline: 2px solid var(--barca-gold);
-      outline-offset: -2px;
-    }
-
-    .tabbar-more {
-      position: absolute;
-      inset-block-end: 100%;
-      inset-inline-end: 0.5rem;
-      display: grid;
-      gap: 0.125rem;
-      min-width: 11rem;
-      padding: 0.375rem;
-      margin-bottom: 0.5rem;
-      background: var(--barca-navy);
-      border: 2px solid var(--barca-gold);
-      border-radius: var(--radius-md);
-      box-shadow: 0 16px 32px -10px rgba(0, 0, 0, 0.6);
-      animation: cardPop 0.25s var(--ease-out) both;
-    }
-
-    .tabbar .tabbar-more {
-      grid-template-columns: none;
-    }
-
-    .tabbar-more a {
-      flex-direction: row;
-      justify-content: flex-start;
-      gap: 0.75rem;
-      padding: 0.625rem 0.75rem;
-      font-size: 0.9rem;
-      border-radius: var(--radius-sm);
     }
   }
 }
@@ -4714,7 +4308,6 @@ body {
     line-height: 1;
     text-transform: uppercase;
     color: var(--text-heading);
-    border-inline-start: 6px solid var(--barca-garnet);
   }
 
   .sp-related {
@@ -4722,21 +4315,6 @@ body {
   }
 
   /* Breaking: a stadium ticker of the newest headlines */
-  
-
-  /* The front page: the lead story, and the next biggest beside it */
-  .front {
-    display: grid;
-    gap: 1.25rem;
-    margin-top: 1.25rem;
-  }
-
-  @media (min-width: 900px) {
-    .front {
-      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-      align-items: start;
-    }
-  }
 
   /* Story cards: four shapes, so the page has rhythm */
   .nw-card-link {
@@ -4852,14 +4430,6 @@ body {
 
   .nw-card[data-size="text"] .scoop-avatar {
     box-shadow: none;
-  }
-
-  .nw-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(16.5rem, 1fr));
-    grid-auto-flow: dense;
-    gap: 1rem;
-    margin-top: 1.25rem;
   }
 
   @media (min-width: 720px) {
@@ -5490,8 +5060,7 @@ html[lang="he"] .hero-title {
 [dir="rtl"] .wall,
 [dir="rtl"] .wall-crests,
 [dir="rtl"] .wall-readout,
-[dir="rtl"] .form-pips,
-[dir="rtl"] .ticker {
+[dir="rtl"] .form-pips {
   direction: ltr;
 }
 
@@ -5644,318 +5213,12 @@ html[lang="he"] .hero-title {
     border-color: var(--israel-blue);
   }
 
-  .front-lead {
-    display: flex;
-    flex-direction: column;
-    gap: 0.625rem;
-  }
-
-  .front-hottest {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    align-items: center;
-    font-size: 0.8rem;
-    font-weight: 900;
-    color: var(--barca-garnet);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-
-  .abroad-tag {
-    display: inline-flex;
-    gap: 0.25rem;
-    align-items: center;
-    padding: 0.125rem 0.5rem;
-    font-size: 0.75rem;
-    font-weight: 800;
-    color: var(--primary);
-    text-transform: none;
-    letter-spacing: 0;
-    background: var(--primary-soft);
-    border-radius: var(--radius-pill);
-  }
-
-  .abroad-tag[data-only="true"] {
-    color: #ffffff;
-    background: var(--israel-blue);
-  }
-
-  /* The heat chart: numbered like the charts, with a bar for how hot each story is */
-  .heat {
-    padding: 1.25rem 1.25rem 0.5rem;
-    background: #ffffff;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
-    animation: cardPop 0.5s var(--ease-out) 0.1s both;
-  }
-
-  .heat-head {
-    padding-bottom: 0.625rem;
-    border-bottom: 4px solid var(--barca-gold);
-  }
-
-  .heat-title {
-    font-family: var(--font-display);
-    font-size: 1.6rem;
-    font-weight: 900;
-    line-height: 1;
-    text-transform: uppercase;
-    color: var(--text-heading);
-  }
-
-  .heat-note {
-    margin-top: 0.25rem;
-    font-size: 0.75rem;
-    line-height: 1.4;
-  }
-
-  .heat-list li + li {
-    border-top: 1px solid var(--border);
-  }
-
-  .heat-item {
-    display: grid;
-    grid-template-columns: 2.25rem minmax(0, 1fr);
-    column-gap: 0.625rem;
-    padding-block: 0.875rem;
-  }
-
-  .heat-item:focus-visible {
-    outline: 3px solid var(--barca-gold);
-    outline-offset: 2px;
-    border-radius: var(--radius-sm);
-  }
-
-  .heat-rank {
-    font-family: var(--font-display);
-    font-size: 2.25rem;
-    font-weight: 900;
-    line-height: 0.9;
-    color: transparent;
-    -webkit-text-stroke: 1.5px var(--barca-garnet);
-  }
-
-  .heat-body {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    min-width: 0;
-  }
-
-  .heat-headline {
-    font-weight: 700;
-    line-height: 1.3;
-    color: var(--text-heading);
-  }
-
-  .heat-item:hover .heat-headline {
-    text-decoration: underline;
-    text-decoration-color: var(--barca-gold);
-    text-decoration-thickness: 2px;
-    text-underline-offset: 3px;
-  }
-
-  .heat-bar {
-    position: relative;
-    height: 6px;
-    overflow: hidden;
-    background: var(--primary-wash);
-    border-radius: var(--radius-pill);
-  }
-
-  .heat-bar::after {
-    content: "";
-    position: absolute;
-    inset-block: 0;
-    inset-inline-start: 0;
-    width: calc(max(var(--heat), 0.06) * 100%);
-    background: linear-gradient(90deg, var(--barca-gold), var(--barca-garnet));
-    border-radius: inherit;
-    transform-origin: left;
-    animation: heatFill 0.8s var(--ease-out) 0.2s both;
-  }
-
-  [dir="rtl"] .heat-bar::after {
-    background: linear-gradient(270deg, var(--barca-gold), var(--barca-garnet));
-    transform-origin: right;
-  }
-
-  .heat-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem 0.625rem;
-    align-items: center;
-    font-size: 0.75rem;
-    font-weight: 600;
-  }
-
   /* The spin: one story, as each city's press tells it */
-  .spin,
   .gap {
     margin-top: 3rem;
   }
 
-  .spin-list {
-    display: grid;
-    gap: 1rem;
-    margin-top: 1.25rem;
-  }
-
-  .spin-card {
-    padding: 1.25rem;
-    background: #ffffff;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
-  }
-
-  .spin-story {
-    font-size: 1.05rem;
-    font-weight: 800;
-    line-height: 1.3;
-    color: var(--text-heading);
-  }
-
-  .spin-story:hover {
-    text-decoration: underline;
-    text-decoration-color: var(--barca-gold);
-    text-underline-offset: 3px;
-  }
-
-  .spin-sides {
-    display: grid;
-    gap: 0.75rem;
-    align-items: center;
-    margin-top: 1rem;
-  }
-
-  .spin-take {
-    height: 100%;
-    padding: 0.875rem 1rem;
-    border-radius: var(--radius-lg);
-  }
-
-  .spin-take[data-side="barcelona"] {
-    background: linear-gradient(135deg, rgba(165, 0, 68, 0.08), rgba(0, 77, 152, 0.08));
-    border-inline-start: 5px solid var(--barca-garnet);
-  }
-
-  .spin-take[data-side="madrid"] {
-    background: #f4f2f8;
-    border-inline-start: 5px solid #8a7fa8;
-  }
-
-  .spin-city {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem 0.5rem;
-    align-items: baseline;
-    font-size: 0.75rem;
-    font-weight: 900;
-    color: var(--text-heading);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-
-  .spin-outlet {
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-transform: none;
-    letter-spacing: 0;
-  }
-
-  .spin-headline {
-    margin-top: 0.4rem;
-    font-size: 1rem;
-    font-weight: 700;
-    line-height: 1.35;
-    color: var(--text-heading);
-  }
-
-  .spin-headline::before {
-    content: "“";
-  }
-
-  .spin-headline::after {
-    content: "”";
-  }
-
-  .spin-vs {
-    justify-self: center;
-    display: grid;
-    place-items: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    font-family: var(--font-display);
-    font-size: 0.9rem;
-    font-weight: 900;
-    color: var(--barca-navy);
-    text-transform: uppercase;
-    background: var(--barca-gold);
-    border-radius: 50%;
-  }
-
-  @media (min-width: 720px) {
-    .spin-sides {
-      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    }
-  }
-
   /* What the world is running that Israel has not */
-  .gap-list {
-    display: grid;
-    gap: 0.625rem;
-    margin-top: 1.25rem;
-  }
-
-  .gap-item {
-    display: grid;
-    grid-template-columns: 4.5rem minmax(0, 1fr);
-    column-gap: 1rem;
-    align-items: center;
-    padding: 0.875rem 1rem;
-    background: #ffffff;
-    border: 1px dashed var(--israel-blue);
-    border-radius: var(--radius-lg);
-  }
-
-  .gap-item:hover {
-    background: var(--primary-wash);
-  }
-
-  .gap-count {
-    grid-row: span 2;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-size: 0.6875rem;
-    font-weight: 800;
-    line-height: 1.2;
-    color: var(--text-secondary);
-    text-align: center;
-    text-transform: uppercase;
-  }
-
-  .gap-number {
-    font-family: var(--font-display);
-    font-size: 1.9rem;
-    font-weight: 900;
-    line-height: 1;
-    color: var(--israel-blue);
-  }
-
-  .gap-headline {
-    font-weight: 700;
-    line-height: 1.3;
-    color: var(--text-heading);
-  }
-
-  .gap-age {
-    font-size: 0.75rem;
-    font-weight: 600;
-  }
 
 
   .podcasts {
@@ -5964,7 +5227,7 @@ html[lang="he"] .hero-title {
 
   .podcast-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(17rem, 100%), 1fr));
     gap: 0.875rem;
     margin-top: 1.25rem;
   }
@@ -5976,7 +5239,6 @@ html[lang="he"] .hero-title {
     padding: 1rem;
     background: #ffffff;
     border: 1px solid var(--border);
-    border-inline-start: 6px solid var(--barca-garnet);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
   }
@@ -6014,17 +5276,7 @@ html[lang="he"] .hero-title {
   }
 }
 
-@keyframes heatFill {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .heat-bar::after,
   .edition {
     animation: none;
   }
@@ -6056,7 +5308,6 @@ html[lang="he"] .hero-title {
   }
 
   /* An arrow points the way you read: right in English, left in Hebrew. */
-  [dir="rtl"] .explore-go,
   [dir="rtl"] .icon-flip {
     transform: scaleX(-1);
   }
@@ -6074,19 +5325,6 @@ html[lang="he"] .hero-title {
 
   .edition-flag .flag {
     width: 1.1em;
-  }
-
-  .front-hottest .icon {
-    width: 1.15rem;
-    height: 1.15rem;
-    color: var(--barca-garnet);
-    fill: rgba(237, 187, 0, 0.35);
-  }
-
-  .abroad-tag .icon,
-  .abroad-tag .flag {
-    width: 1rem;
-    height: auto;
   }
 
   .ask-drawer-close {
@@ -6109,99 +5347,6 @@ html[lang="he"] .hero-title {
   /* ---------- The Explore doors ----------
      Four across on a wide screen and two on a phone, so eight doors never leave an orphan row.
      Each has its icon on a navy tile with a gold mark, the colours of the away crest. */
-  .explore {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  @media (min-width: 900px) {
-    .explore {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 1rem;
-    }
-  }
-
-  .explore-tile {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-rows: auto auto 1fr;
-    align-content: start;
-    column-gap: 0.5rem;
-    min-height: 9.5rem;
-    padding: 1.5rem 1rem 1rem;
-    box-shadow: var(--shadow-sm);
-    transition:
-      transform var(--dur-base) var(--ease-smooth),
-      box-shadow var(--dur-base) var(--ease-smooth),
-      background var(--dur-base) var(--ease-smooth);
-  }
-
-  .explore-tile:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-lg);
-  }
-
-  .explore-icon {
-    grid-column: 1 / -1;
-    display: grid;
-    place-items: center;
-    width: 2.75rem;
-    height: 2.75rem;
-    margin-bottom: 0.875rem;
-    color: var(--barca-gold);
-    background: var(--barca-navy);
-    border-radius: var(--radius-md);
-    box-shadow: inset 0 -3px 0 var(--barca-garnet);
-    transition: transform var(--dur-base) var(--ease-smooth);
-  }
-
-  .explore-icon .icon {
-    width: 1.375rem;
-    height: 1.375rem;
-  }
-
-  .explore-tile:hover .explore-icon {
-    transform: rotate(-6deg) scale(1.06);
-  }
-
-  .explore-title {
-    grid-column: 1 / -1;
-    font-size: clamp(1.15rem, 4.2vw, 1.5rem);
-    line-height: 1.05;
-    overflow-wrap: anywhere;
-  }
-
-  .explore-note {
-    grid-column: 1;
-    align-self: end;
-    margin-top: 0.375rem;
-    font-size: 0.8125rem;
-    line-height: 1.4;
-    color: var(--ink-muted);
-  }
-
-  .explore-go {
-    grid-column: 2;
-    align-self: end;
-    width: 1.125rem;
-    height: 1.125rem;
-    color: var(--barca-garnet);
-    transition: translate var(--dur-base) var(--ease-smooth);
-  }
-
-  .explore-tile:hover .explore-go {
-    color: var(--barca-gold);
-    translate: 3px 0;
-  }
-
-  [dir="rtl"] .explore-tile:hover .explore-go {
-    translate: -3px 0;
-  }
-
-  .explore-tile:hover .explore-icon {
-    color: var(--barca-navy);
-    background: var(--barca-gold);
-    box-shadow: none;
-  }
 
   .home-fresh {
     margin-top: 3rem;
@@ -6392,7 +5537,7 @@ html[lang="he"] .hero-title {
 
   .room-facts {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(11rem, 100%), 1fr));
     gap: 0.75rem;
   }
 

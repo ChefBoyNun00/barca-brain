@@ -6,10 +6,11 @@
      2. The header, the full-screen menu, and the curtain that lifts on every page change.
      3. Movement for every page: things rise in as they scroll into view (CSS only).
      4. Quieter building blocks: type, pills, cards (with a slight tilt under the mouse).
-     5. The home page's sections: hero, motto band, season cards, explore list.
+     5. The home page's sections: hero, motto band, news.
    Rule of thumb: fewer colours, more space, slow easing. If something shouts, quiet it.
-   TODO(debt): globals.css still holds the old nav/tab-bar and ticker rules (.nav, .tabbar, .ticker), which nothing
-   renders now — delete them in a cleanup change, not mixed into this one.
+   TODO(debt): many globals.css rules still set values this file then overrides (the two-layer
+   look) — fold each pair into one rule when touching that component, checking computed styles.
+   Rules for classes nothing renders were removed on 2026-11-24.
    ========================================================================== */
 
 /* ---------- 1. Tokens ---------- */
@@ -82,6 +83,34 @@ body {
   --focus-ring: var(--barca-gold);
 }
 
+/* ---------- 2. Skip link (src/components/SkipLink.tsx) ----------
+   Off screen until a keyboard user tabs to it, then a gold tag over the header's top corner. */
+.skip-link {
+  position: fixed;
+  inset-block-start: 0.5rem;
+  inset-inline-start: 0.5rem;
+  z-index: 100;
+  padding: 0.625rem 1rem;
+  color: var(--night);
+  background: var(--barca-gold);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus-visible {
+  transform: none;
+  outline: 2px solid var(--ivory);
+  outline-offset: 2px;
+}
+
+/* The skip link's landing spot: an empty marker, never a visible stop. */
+#content:focus {
+  outline: none;
+}
+
 /* ---------- 2a. Header ---------- */
 
 /* Always there, never hiding: the main pages are one tap away from anywhere. Solid, not
@@ -92,6 +121,20 @@ body {
   z-index: 70;
   color: var(--ivory);
   background: var(--night);
+}
+
+/* Large text on a phone: the two-row header grows to a third of the screen, so it stops following
+   you and gives the room back. "em" here follows the visitor's text-size setting, so 360px+
+   phones at normal size keep the pinned header. It stays pinned while the menu is open,
+   because the menu's close button lives in it. */
+@media (max-width: 22em) {
+  .hdr:not([data-open]) {
+    position: relative;
+  }
+
+  .board-month-title {
+    top: 0;
+  }
 }
 
 .hdr[data-open] {
@@ -155,7 +198,8 @@ body {
 /* Phones: the links move to a row of their own under the logo, swiped sideways. */
 @media (max-width: 899px) {
   :root {
-    --hdr-h: 108px;
+    /* The two-row header (logo, then links) measures 96px in the browser. */
+    --hdr-h: 96px;
   }
 
   .hdr-inner {
@@ -438,8 +482,6 @@ body {
         .poster-inner > *,
         .room > *,
         .credits > *,
-        .front-hottest,
-        .briefing,
         .podcast,
         table,
         figure
@@ -541,15 +583,6 @@ body {
   box-shadow: none;
 }
 
-.pill-light {
-  color: var(--night);
-  background: var(--ivory);
-}
-
-.pill-light:hover {
-  color: var(--ivory);
-}
-
 /* Filter chips and switches: paper, with night for the chosen one. No gradients. */
 .chip,
 .segmented {
@@ -576,23 +609,47 @@ body {
   transition: transform 0.6s var(--ease-premium);
 }
 
+/* Large text on a phone: five equal slots no longer fit, so the switch scrolls sideways inside
+   itself and the chosen option is filled directly (the sliding highlight assumes equal slots). */
+@media (max-width: 22em) {
+  .segmented {
+    grid-template-columns: repeat(var(--count), max-content);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .segmented-thumb {
+    display: none;
+  }
+
+  .segmented button {
+    padding-inline: 0.75rem;
+  }
+
+  .segmented button[aria-pressed="true"] {
+    color: var(--ivory);
+    background: var(--night);
+  }
+}
+
 /* Cards: paper on stone, a hairline instead of a heavy shadow. */
-:is(.match-card, .nw-card, .explore-tile, .moment-card, .player-card, .league, .tally) {
+:is(.match-card, .nw-card, .moment-card, .player-card, .league, .tally) {
   border-color: var(--line-warm);
   border-radius: var(--radius-lg);
   background-color: var(--paper);
   box-shadow: var(--shadow-sm);
 }
 
-/* The tilt (src/components/motion/PointerTilt.tsx writes --rx/--ry while the mouse is over it). */
-:is([data-tilt], .match-card, .explore-tile, .nw-card, .moment-card) {
+/* The tilt (src/components/motion/PointerTilt.tsx writes --rx/--ry while the mouse is over it).
+   Not on match cards: 46 results leaning under the mouse is noise, not meaning. */
+:is([data-tilt], .nw-card, .moment-card) {
   transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
   transition:
     transform 0.6s var(--ease-premium),
     box-shadow 0.4s ease;
 }
 
-:is([data-tilt], .match-card, .explore-tile, .nw-card, .moment-card)[data-tilting] {
+:is([data-tilt], .nw-card, .moment-card)[data-tilting] {
   /* Repeated here so the tilt beats the older hover lift in globals.css. */
   transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
   box-shadow: var(--shadow-lg);
@@ -702,10 +759,14 @@ body {
   padding-block: 4rem clamp(3rem, 7vw, 5rem);
 }
 
+/* Ivory, not gold: it sits over the brightest seats in the photo, where gold fell to 3.1:1.
+   Gold stays for the headline's second line, the one thing on the hero meant to glow. */
 .hero-kicker {
   font-family: var(--font-caption);
   font-size: 0.75rem;
   letter-spacing: 0.22em;
+  color: var(--ivory);
+  text-shadow: 0 1px 4px rgba(2, 4, 13, 0.55);
 }
 
 .hero-title {
@@ -734,10 +795,6 @@ body {
   box-shadow: none;
   outline: 0;
   backdrop-filter: none;
-  transform: none;
-}
-
-.hero-stat:hover {
   transform: none;
 }
 
@@ -863,6 +920,30 @@ body {
     0 18px 40px -16px rgba(0, 0, 0, 0.6);
 }
 
+.ask-launch:hover {
+  transform: translateY(-2px);
+}
+
+/* Phones: just the crest in a round button. It floats over tables and match lists, so the
+   smaller it is the less it hides; the label stays for screen readers. */
+@media (max-width: 639px) {
+  .ask-launch {
+    justify-content: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    padding: 0;
+  }
+
+  .ask-launch > span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
 /* ---------- Keyframes ---------- */
 
 @keyframes curtainLift {
@@ -929,14 +1010,22 @@ body {
   border-color: var(--barca-garnet);
 }
 
-/* Stats tiles: paper cards with ink numbers and a hairline, not striped navy slabs. */
+/* Stats: a ledger, not a wall of boxes. Figures sit on hairlines, like the home hero's numbers,
+   so eleven numbers read as one table instead of eleven separate things asking to be looked at.
+   No hover lift: they aren't buttons, and lifting would suggest they are. */
+.num-grid {
+  gap: 0 1.5rem;
+}
+
 .num-tile,
 .num-tile:nth-child(n) {
+  padding: 1.25rem 0 1rem;
   color: var(--text-heading);
-  background: var(--paper);
-  border: 1px solid var(--line-warm);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  background: none;
+  border: 0;
+  border-top: 1px solid var(--line-warm);
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .num-tile-value {
@@ -971,9 +1060,9 @@ body {
   letter-spacing: 0.18em;
 }
 
+/* More room above a sub-heading than below it, so it clearly belongs to what follows. */
 .stats-heading {
-  border-inline-start: 0;
-  padding-inline-start: 0;
+  margin-top: 3.5rem;
 }
 
 /* News: the chosen edition is night (World) or a thin flag-blue frame (Israel), never a gradient. */
@@ -995,10 +1084,6 @@ body {
   font-family: var(--font-caption);
   font-weight: 500;
   letter-spacing: 0.14em;
-}
-
-.heat-bar::after {
-  background: var(--barca-garnet);
 }
 
 /* The floating Ask button steps aside while the menu is open (it would cover the language switch). */
@@ -1023,8 +1108,16 @@ body {
   --read-width: 46rem;
 }
 
+/* Hebrew news reads in Frank Ruhl Libre, the newspaper letter (see serif-fonts.ts), at 500:
+   Hebrew serifs at 400 have hairline strokes that fade on screen. Instrument Serif only comes in
+   400, so font-synthesis stops the browser drawing a fake bold on Latin names. */
 [dir="rtl"] {
-  --font-read: var(--latin-serif), var(--font-serif-he), var(--font-hebrew), serif;
+  --font-read: var(--latin-serif), var(--font-news-he), var(--font-hebrew), serif;
+}
+
+[dir="rtl"] :is(.rd-masthead-title, .rd-brief-headline, .rd-lead-title, .rd-item-title, .home-news-head .section-title, .sp-title, .sp-quote blockquote) {
+  font-weight: 500;
+  font-synthesis: none;
 }
 
 .rd-page > *,
@@ -1035,6 +1128,11 @@ body {
 
 .rd-masthead {
   padding-block: clamp(2.5rem, 7vw, 4.5rem) 1.5rem;
+}
+
+/* The date sits over the faded photo, where plain garnet dipped to 4.4:1: one step deeper here. */
+.rd-masthead .eyebrow {
+  color: color-mix(in srgb, var(--barca-garnet) 80%, #000);
 }
 
 .rd-masthead-title {
@@ -1060,7 +1158,8 @@ body {
 /* The two editions as quiet text tabs with an underline, not big coloured boxes. */
 .edition-switch {
   display: flex;
-  gap: 1.75rem;
+  flex-wrap: wrap;
+  gap: 0 1.75rem;
   margin-bottom: 0.5rem;
   border-bottom: 1px solid var(--line-warm);
 }
@@ -1108,13 +1207,9 @@ body {
 .rd-brief {
   margin-block: 2rem 1rem;
   padding: 1.5rem 1.75rem;
-  border-inline-start: 2px solid var(--gold-soft);
   background: var(--paper);
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
-}
-
-[dir="rtl"] .rd-brief {
-  border-radius: var(--radius-md) 0 0 var(--radius-md);
+  border: 1px solid var(--line-warm);
+  border-radius: var(--radius-md);
 }
 
 .rd-brief-headline {
@@ -1409,9 +1504,8 @@ body {
 
 /* Story page sidebar and quotes: hairlines and serif, not dashed boxes and gradients. */
 .sp-facts {
-  border: 0;
-  border-inline-start: 2px solid var(--gold-soft);
-  border-radius: 0;
+  border: 1px solid var(--line-warm);
+  border-radius: var(--radius-md);
   background: var(--paper);
   outline: 0;
   box-shadow: none;

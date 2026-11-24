@@ -9,6 +9,7 @@ import { serifFontClasses, storySerif } from "@/components/serif-fonts";
 import { PointerTilt } from "@/components/motion/PointerTilt";
 import { LanguageReady } from "@/components/LanguageReady";
 import { SiteFooter } from "@/components/SiteFooter";
+import { SkipLink } from "@/components/SkipLink";
 import { INTRO_STORAGE_KEY, LANGUAGE_STORAGE_KEY } from "@/config/display";
 import { LANGUAGES, RTL_LANGUAGES } from "@/i18n/dictionary";
 import "./globals.css";
@@ -108,6 +109,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: LANGUAGE_SCRIPT }} />
       </head>
       <body className="min-h-full flex flex-col">
+        <SkipLink />
         <IntroSplash />
         <PointerTilt />
         <LanguageReady />

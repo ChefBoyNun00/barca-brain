@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
+import { useEffect, useId, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { ASK_MAX_MESSAGES } from "@/config/ai";
 import type { TextKey } from "@/i18n/dictionary";
 import { useLanguage, useT } from "@/i18n/language";
@@ -56,6 +56,8 @@ type AskChatProps = {
 export function AskChat({ suggestions = SUGGESTIONS, readQuestionFromUrl = true }: AskChatProps) {
   const t = useT();
   const language = useLanguage();
+  // The page and the drawer can both hold a chat, so the ideas heading needs a unique id.
+  const ideasTitleId = useId();
   const urlQuestion = useSearchParams().get("q") ?? "";
   const firstQuestion = readQuestionFromUrl ? urlQuestion : "";
   const [turns, setTurns] = useState<Turn[]>([]);
@@ -156,26 +158,14 @@ export function AskChat({ suggestions = SUGGESTIONS, readQuestionFromUrl = true 
 
   return (
     <div className="chat">
+      {/* Before the first question: what it can do, then the box (the main task), then ideas.
+          The ideas come after the box on purpose: they help a visitor who is stuck, but they
+          shouldn't push the box off a phone screen. */}
       {turns.length === 0 && (
-        <div className="chat-start">
-          <p className="chat-tip">
-            <strong>{t("chat.tipStrong")}</strong>
-            {t("chat.tipRest")}
-          </p>
-          <ul className="chat-suggestions">
-            {suggestions.map((suggestion) => (
-              <li key={suggestion}>
-                <button
-                  type="button"
-                  className="chip chip-action"
-                  onClick={() => void ask(t(suggestion), turns)}
-                >
-                  {t(suggestion)}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <p className="chat-tip">
+          <strong>{t("chat.tipStrong")}</strong>
+          {t("chat.tipRest")}
+        </p>
       )}
 
       <ol className="chat-turns">
@@ -250,6 +240,23 @@ export function AskChat({ suggestions = SUGGESTIONS, readQuestionFromUrl = true 
           </button>
         )}
       </form>
+
+      {turns.length === 0 && (
+        <section className="chat-ideas" aria-labelledby={ideasTitleId}>
+          <h2 id={ideasTitleId} className="chat-ideas-title">
+            {t("chat.tryAsking")}
+          </h2>
+          <ul className="chat-suggestions">
+            {suggestions.map((suggestion) => (
+              <li key={suggestion}>
+                <button type="button" className="chat-suggestion" onClick={() => void ask(t(suggestion), turns)}>
+                  {t(suggestion)}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </div>
   );
 }

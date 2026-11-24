@@ -25,7 +25,7 @@ const en = {
   "nav.menu": "Menu",
   "nav.close": "Close",
 
-  "hero.kicker": "Més que un club · Season {season} · {played} of {total} played",
+  "hero.kicker": "Season {season} · {played} of {total} played",
   "hero.position": "League position",
   "hero.points": "Points",
   "hero.wins": "Wins",
@@ -246,6 +246,7 @@ const en = {
   "a11y.allPages": "All pages",
   "a11y.tabs": "Tabs",
   "a11y.language": "Language",
+  "a11y.skip": "Skip to content",
 
   "age.minutes": "{n}m ago",
   "age.hours": "{n}h ago",
@@ -496,6 +497,7 @@ const en = {
   "chat.continue": "Continue",
   "chat.inputLabel": "Your question",
   "chat.placeholder": "Ask anything, or paste Spanish to translate",
+  "chat.tryAsking": "Try asking",
   "chat.stop": "Stop",
   "chat.ask": "Ask",
   "chat.limit": "That's a lot of questions for one hour. Try again a little later.",
@@ -577,7 +579,7 @@ const he: Record<TextKey, string> = {
   "nav.menu": "תפריט",
   "nav.close": "סגירה",
 
-  "hero.kicker": "Més que un club · עונת {season} · {played} מתוך {total} משחקים",
+  "hero.kicker": "עונת {season} · {played} מתוך {total} משחקים",
   "hero.position": "מקום בליגה",
   "hero.points": "נקודות",
   "hero.wins": "ניצחונות",
@@ -796,6 +798,7 @@ const he: Record<TextKey, string> = {
   "a11y.allPages": "כל העמודים",
   "a11y.tabs": "לשוניות",
   "a11y.language": "שפה",
+  "a11y.skip": "דלגו לתוכן",
 
   "age.minutes": "לפני {n} דק׳",
   "age.hours": "לפני {n} שע׳",
@@ -1046,6 +1049,7 @@ const he: Record<TextKey, string> = {
   "chat.continue": "המשך",
   "chat.inputLabel": "השאלה שלך",
   "chat.placeholder": "שאלו כל דבר, או הדביקו ספרדית לתרגום",
+  "chat.tryAsking": "אפשר לשאול למשל",
   "chat.stop": "עצירה",
   "chat.ask": "שאלו",
   "chat.limit": "זה הרבה שאלות לשעה אחת. נסו שוב עוד מעט.",

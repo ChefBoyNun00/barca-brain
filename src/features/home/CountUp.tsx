@@ -37,8 +37,11 @@ export function CountUp({
     return () => cancelAnimationFrame(frame);
   }, [value, durationMs]);
 
+  // Screen readers get the final number as plain text; the ticking digits are hidden from them.
+  // (aria-label on a bare span is ignored by some screen readers, which then read the count mid-way.)
   return (
-    <span aria-label={`${value}${written}`}>
+    <span>
+      <span className="sr-only">{`${value}${written}`}</span>
       <span aria-hidden="true">
         {shown}
         {written}

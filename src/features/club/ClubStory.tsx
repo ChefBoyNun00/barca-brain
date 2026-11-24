@@ -83,7 +83,8 @@ export function ClubStory() {
         archival
         visual={<Odometer value="1899" />}
       >
-        <Reveal as="aside" className="story-aside">
+        {/* A one-line side note, so a paragraph: an <aside> here made a stray landmark inside <main>. */}
+        <Reveal as="p" className="story-aside">
           {w(COLOURS_NOTE)}
         </Reveal>
       </StoryChapter>
