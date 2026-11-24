@@ -2,8 +2,8 @@ name: News
 
 on:
   schedule:
-    # Every three hours, off the hour because GitHub delays jobs most at the top of each hour.
-    - cron: "23 */3 * * *"
+    # Every hour, off the hour because GitHub delays jobs most at the top of each hour.
+    - cron: "23 * * * *"
   workflow_dispatch: # adds a "Run workflow" button for manual runs
 
 # Never let two runs overlap: they could translate the same articles twice.

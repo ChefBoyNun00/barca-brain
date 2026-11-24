@@ -211,7 +211,7 @@ export async function runNews({ db, provider, ai, feeds, now = new Date() }: New
     stories.errors.length > 0 ||
     briefing === "failed";
   // Hebrew errors are reported but never fail the run: the item shows in English meanwhile, and
-  // the next run (three hours later) retries it. A red job for that would only cry wolf.
+  // the next run (an hour later) retries it. A red job for that would only cry wolf.
   return {
     status: failed ? "failed" : "success",
     feeds: feedResults,
