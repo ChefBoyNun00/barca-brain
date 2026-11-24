@@ -18,7 +18,7 @@ describe("translations", () => {
 
   it("fills in placeholders", () => {
     expect(translate("en", "hero.kicker", { season: "2026–27", played: 15, total: 46 })).toBe(
-      "Més que un club · Season 2026–27 · 15 of 46 played",
+      "Season 2026–27 · 15 of 46 played",
     );
     expect(translate("he", "headline.wins", { wins: 13, played: 15 })).toBe("13 ניצחונות מתוך 15.");
   });

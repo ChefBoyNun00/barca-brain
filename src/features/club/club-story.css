@@ -155,35 +155,43 @@
     opacity: 1;
   }
 
+
+  /* A slim night capsule behind the numerals: the rail floats over every chapter, including
+     the bright midday sky, where light marks alone fell to 2:1. A small solid backing is the
+     only way to keep it readable there without dimming the page around it. */
   .rail ol {
     display: grid;
-    gap: 0.25rem;
+    gap: 0.125rem;
+    padding: 0.5rem 0.25rem;
+    background: rgba(4, 7, 26, 0.74);
+    border-radius: 999px;
   }
 
   .rail a {
+    position: relative;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
     min-height: 2rem;
-    color: rgba(244, 239, 230, 0.4);
+    color: rgba(244, 239, 230, 0.72);
     text-decoration: none;
     transition: color 0.4s var(--st-ease);
   }
 
   .rail-numeral {
     position: relative;
-    width: 2rem;
+    width: 2.25rem;
     font-family: var(--st-serif);
     font-size: 0.9375rem;
+    text-align: center;
   }
 
-  /* A short gold line grows out of the chapter you are in. */
+  /* A short gold line runs from the capsule to the chapter's name. */
   .rail-numeral::after {
     content: "";
     position: absolute;
     inset-block-start: 50%;
-    inset-inline-start: 1.5rem;
-    width: 1rem;
+    inset-inline-start: calc(100% + 0.25rem);
+    width: 0.5rem;
     height: 1px;
     background: var(--st-gold);
     transform: scaleX(0);
@@ -195,12 +203,20 @@
     transform-origin: right;
   }
 
+  /* The name sits outside the capsule on its own small tag, so the capsule stays slim. */
   .rail-label {
+    position: absolute;
+    inset-inline-start: calc(100% + 0.875rem);
+    padding: 0.25rem 0.5rem;
     font-size: 0.75rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
+    white-space: nowrap;
+    background: rgba(4, 7, 26, 0.74);
+    border-radius: 4px;
     opacity: 0;
     transform: translateX(-6px);
+    pointer-events: none;
     transition:
       opacity 0.4s var(--st-ease),
       transform 0.4s var(--st-ease);
@@ -230,6 +246,7 @@
 
 .story-kicker {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.875rem;
   color: var(--st-gold);
@@ -300,11 +317,19 @@
   }
 }
 
+/* Bound to the screen's width (it used to size to its longest line), so with large text the
+   lines wrap instead of running off the edge. */
 .cover-inner {
   position: relative;
   display: grid;
   justify-items: center;
-  max-width: 64rem;
+  width: min(100%, 64rem);
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.cover-inner .story-kicker {
+  justify-content: center;
 }
 
 .cover-crest {
@@ -431,6 +456,8 @@
 .chapter-inner {
   position: relative;
   display: grid;
+  /* One column no wider than the screen: with large text it wraps instead of overflowing. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 3.5rem;
   max-width: 76rem;
   margin-inline: auto;
@@ -911,6 +938,13 @@
   inset: 0;
 }
 
+/* A size container, so the sun and moon can be placed in cqw/cqh (shares of the sky) with a
+   transform. Moving them with left/top made the browser re-lay out the page on every scroll
+   frame and showed up as layout shift (0.28, "poor", in the 2026-11-24 audit). */
+.clock-sky {
+  container-type: size;
+}
+
 .sky-day {
   background: linear-gradient(180deg, #2f6db5 0%, #7fb0de 60%, #efd6ad 100%);
   opacity: clamp(0, calc(1 - (var(--p) - 0.1) * 4), 1);
@@ -946,20 +980,28 @@
   --a: calc(60deg + 120deg * min(var(--p) / 0.55, 1));
 
   position: absolute;
-  left: calc(50% - 42% * cos(var(--a)) - 3rem);
-  top: calc(78% - 58% * sin(var(--a)) - 3rem);
+  top: 0;
+  left: 0;
   width: 6rem;
   height: 6rem;
   border-radius: 50%;
   background: radial-gradient(circle at 40% 40%, #fff8de, #f8cf6a 55%, #ef9d3c);
   box-shadow: 0 0 80px 30px rgba(248, 190, 90, 0.35);
   opacity: clamp(0, calc((0.6 - var(--p)) * 6), 1);
+  /* Same arc as before, as a transform: it moves on the compositor and the glow is not repainted. */
+  transform: translate(
+    calc(50cqw - 42cqw * cos(var(--a)) - 3rem),
+    calc(78cqh - 58cqh * sin(var(--a)) - 3rem)
+  );
+  will-change: transform;
 }
 
 .clock-moon {
   position: absolute;
-  top: 14%;
-  left: calc(64% + 10% * var(--p));
+  top: 0;
+  left: 0;
+  transform: translate(calc(64cqw + 10cqw * var(--p)), 14cqh);
+  will-change: transform;
   width: 3.5rem;
   height: 3.5rem;
   border-radius: 50%;
@@ -1075,7 +1117,10 @@
   margin-inline: auto;
   padding-top: 0.875rem;
   border-top: 1px solid rgba(244, 239, 230, 0.2);
-  color: rgba(244, 239, 230, 0.38);
+  /* Hours still to come: readable (it was 0.38, under 2:1 on the day sky), but quieter than the
+     hours already past, which are quieter than the gold one you're in. */
+  color: rgba(244, 239, 230, 0.66);
+  text-shadow: 0 1px 3px rgba(2, 4, 13, 0.6);
   font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.12em;
@@ -1087,7 +1132,7 @@
 }
 
 .clock-dial li[data-past] {
-  color: rgba(244, 239, 230, 0.7);
+  color: rgba(244, 239, 230, 0.88);
 }
 
 .clock-dial li[data-on] {

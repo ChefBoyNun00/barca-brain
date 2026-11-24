@@ -8,6 +8,7 @@ import { BARCA_CREST_URL } from "@/config/display";
 import type { TextKey } from "@/i18n/dictionary";
 import { useT } from "@/i18n/language";
 import { LanguageToggle } from "./LanguageToggle";
+import { SKIP_TARGET_ID } from "./SkipLink";
 
 /** inBar: shown right in the header (and the phone's link row), not only in the full menu. */
 type Section = { href: string; label: TextKey; also?: string[]; inBar?: boolean };
@@ -155,8 +156,13 @@ function ActiveNav() {
  */
 export function SiteNav() {
   return (
-    <Suspense fallback={<NavShell pathname="" />}>
-      <ActiveNav />
-    </Suspense>
+    <>
+      <Suspense fallback={<NavShell pathname="" />}>
+        <ActiveNav />
+      </Suspense>
+      {/* Where "Skip to content" lands: right after the header, just before the page's <main>.
+          Static, so the link works before any script runs. */}
+      <span id={SKIP_TARGET_ID} tabIndex={-1} />
+    </>
   );
 }

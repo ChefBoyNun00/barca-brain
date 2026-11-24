@@ -14,16 +14,19 @@ export default function Ask() {
   return (
     <>
       <SiteNav />
-      <main className="page-gutter flex-1 pt-10 pb-8">
-        <p className="kicker">
-          <T k="ask.kicker" />
-        </p>
-        <h1 className="display-title mt-3">
-          <T k="ask.title" />
-        </h1>
-        <Suspense fallback={<PageLoader />}>
-          <AskChat />
-        </Suspense>
+      {/* Same title, note and spacing as Matches, Table and Squad: every page opens the same way. */}
+      <main className="page-gutter flex-1 pb-16">
+        <section className="section">
+          <h1 className="section-title">
+            <T k="ask.title" />
+          </h1>
+          <p className="section-note">
+            <T k="ask.kicker" />
+          </p>
+          <Suspense fallback={<PageLoader />}>
+            <AskChat />
+          </Suspense>
+        </section>
       </main>
     </>
   );

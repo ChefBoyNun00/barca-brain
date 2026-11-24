@@ -28,9 +28,10 @@ function Leaders({
   const top = ranked[0]?.value ?? 1;
   return (
     <section className="leaders">
-      <h3 className="leaders-title">
+      {/* h2: it sits straight under the Squad page's h1. */}
+      <h2 className="leaders-title">
         <T k={title} />
-      </h3>
+      </h2>
       <ol>
         {ranked.map(({ player, value }, index) => (
           <li key={player.id} data-first={index === 0} style={{ "--i": index } as CSSProperties}>
