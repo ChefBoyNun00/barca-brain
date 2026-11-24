@@ -1108,8 +1108,16 @@ body {
   --read-width: 46rem;
 }
 
+/* Hebrew news reads in Frank Ruhl Libre, the newspaper letter (see serif-fonts.ts), at 500:
+   Hebrew serifs at 400 have hairline strokes that fade on screen. Instrument Serif only comes in
+   400, so font-synthesis stops the browser drawing a fake bold on Latin names. */
 [dir="rtl"] {
-  --font-read: var(--latin-serif), var(--font-serif-he), var(--font-hebrew), serif;
+  --font-read: var(--latin-serif), var(--font-news-he), var(--font-hebrew), serif;
+}
+
+[dir="rtl"] :is(.rd-masthead-title, .rd-brief-headline, .rd-lead-title, .rd-item-title, .home-news-head .section-title, .sp-title, .sp-quote blockquote) {
+  font-weight: 500;
+  font-synthesis: none;
 }
 
 .rd-page > *,

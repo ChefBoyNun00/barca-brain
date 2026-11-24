@@ -1,4 +1,4 @@
-import { Instrument_Serif } from "next/font/google";
+import { Frank_Ruhl_Libre, Instrument_Serif } from "next/font/google";
 import localFont from "next/font/local";
 
 // The editorial serif: headlines in the news reader and the /club story. Loaded once, in the
@@ -25,4 +25,14 @@ export const storySerifHebrew = localFont({
   adjustFontFallback: false,
 });
 
-export const serifFontClasses = `${storySerif.variable} ${storySerifHebrew.variable}`;
+// Hebrew headlines in the news section. Frank Ruhl Libre is the modern cut of Frank-Rühl, the
+// letter Israeli newspapers and books have been set in for a century, so it is the shape Hebrew
+// readers read fastest. It has normal width, where the narrow Noto cut above was hard to read
+// at headline sizes. Hebrew letters only: Latin names keep Instrument Serif.
+export const newsSerifHebrew = Frank_Ruhl_Libre({
+  weight: ["500"],
+  subsets: ["hebrew"],
+  variable: "--font-news-he",
+});
+
+export const serifFontClasses = `${storySerif.variable} ${storySerifHebrew.variable} ${newsSerifHebrew.variable}`;
