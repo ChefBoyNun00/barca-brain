@@ -545,11 +545,11 @@ const en = {
     "We count which pages are visited with Vercel Web Analytics, so we know what to improve. It uses no cookies and stores nothing that identifies you. Anything you type, like a question for Ask or a name on a shirt, is removed from the address before a visit is counted.",
   "credits.photos": "Photos",
   "credits.photosNote":
-    "Player photos and the stadium come from Wikimedia Commons under free licences, and are cropped to fit. Each link opens the original with its full licence. News photos belong to the outlet credited on each one: they load from that outlet's own feed and are not copied or stored here.",
+    "Player photos, the stadium and the background photos come from Wikimedia Commons under free licences, and are cropped to fit. Each link opens the original with its full licence. News photos belong to the outlet credited on each one: they load from that outlet's own feed and are not copied or stored here.",
   "credits.stadium": "Camp Nou (home page)",
-  "credits.moments": "Match and celebration photos (home and The club)",
+  "credits.moments": "Background photos (home, The club and the top of each page)",
   "credits.tinted":
-    "Player photos are colour-tinted in blue and garnet, and the stadium photo is darkened, so text stays readable on top. The originals are at the links.",
+    "Player photos are colour-tinted in blue and garnet, and the stadium and background photos are darkened or faded (the 1903 team is also toned sepia), so text stays readable on top. The originals are at the links.",
   "credits.noPhotos": "No player photos are in use yet.",
 
   "error.title": "We couldn't load Barça's data",
@@ -1097,11 +1097,11 @@ const he: Record<TextKey, string> = {
     "אנחנו סופרים אילו דפים נצפים בעזרת Vercel Web Analytics, כדי לדעת מה לשפר. אין בזה עוגיות, ושום דבר שמזהה אתכם לא נשמר. כל מה שאתם מקלידים, כמו שאלה ל־Ask או שם על חולצה, נמחק מהכתובת לפני שהביקור נספר.",
   "credits.photos": "תמונות",
   "credits.photosNote":
-    "תמונות השחקנים והאצטדיון מגיעות מוויקישיתוף ברישיונות חופשיים, וחתוכות כדי להתאים. כל קישור פותח את המקור עם הרישיון המלא שלו. תמונות החדשות שייכות לכלי התקשורת שמוזכר על כל אחת מהן: הן נטענות מהפיד של אותו כלי ואינן מועתקות או נשמרות כאן.",
+    "תמונות השחקנים, האצטדיון ותמונות הרקע מגיעות מוויקישיתוף ברישיונות חופשיים, וחתוכות כדי להתאים. כל קישור פותח את המקור עם הרישיון המלא שלו. תמונות החדשות שייכות לכלי התקשורת שמוזכר על כל אחת מהן: הן נטענות מהפיד של אותו כלי ואינן מועתקות או נשמרות כאן.",
   "credits.stadium": "קאמפ נואו (דף הבית)",
-  "credits.moments": "תמונות משחקים וחגיגות (דף הבית והמועדון)",
+  "credits.moments": "תמונות רקע (דף הבית, המועדון וראש כל דף)",
   "credits.tinted":
-    "תמונות השחקנים צבועות בכחול ובבורדו, ותמונת האצטדיון מוחשכת, כדי שהטקסט מעליהן יישאר קריא. המקורות נמצאים בקישורים.",
+    "תמונות השחקנים צבועות בכחול ובבורדו, ותמונות האצטדיון והרקע מוחשכות או מעומעמות (קבוצת 1903 גם בגוון ספיה), כדי שהטקסט מעליהן יישאר קריא. המקורות נמצאים בקישורים.",
   "credits.noPhotos": "עדיין אין תמונות שחקנים בשימוש.",
 
   "error.title": "לא הצלחנו לטעון את הנתונים של בארסה",

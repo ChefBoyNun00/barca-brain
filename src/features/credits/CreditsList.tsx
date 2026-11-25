@@ -6,6 +6,7 @@ import { getAppDatabase } from "@/server/db/app-database";
 import { getSquad } from "@/server/db/queries/squad";
 import { getCurrentTeamScope } from "@/server/db/team-scope";
 import { T } from "@/i18n/language";
+import { MomentCredits } from "./MomentCredits";
 
 /** Free licences require this credit, so it lists whatever the page actually shows. */
 export async function CreditsList() {
@@ -24,13 +25,11 @@ export async function CreditsList() {
             {STADIUM_PHOTO.credit}, {STADIUM_PHOTO.license}
           </a>
         </li>
-        <li>
-          <span className="credits-player">
-            <T k="credits.moments" />
-          </span>
-          <span>{[...new Set(ALL_MOMENTS.map((moment) => moment.credit))].join(", ")}</span>
-        </li>
       </ul>
+      <h3 className="mt-8 font-semibold">
+        <T k="credits.moments" />
+      </h3>
+      <MomentCredits moments={ALL_MOMENTS} />
       {/* CC BY-SA asks us to say when a photo has been changed. */}
       <p className="section-note">
         <T k="credits.tinted" />
